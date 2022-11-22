@@ -1,10 +1,10 @@
-name: Actions 😎
+name: Windows Build and Deploy
 
 on: workflow_dispatch
 
 jobs:
   build:
-    name: Build my project ✨
+    name: Build Windows
     runs-on: ubuntu-latest
     steps:
       # Checkout (without LFS)

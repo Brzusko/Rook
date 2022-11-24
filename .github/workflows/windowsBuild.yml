@@ -5,6 +5,10 @@ on:
     tags:
     - '*'
 
+env:
+  ITCH_USERNAME: Brzusko
+  ITCH_GAME_ID: rook-multiplayer
+
 jobs:
   build:
     name: Build Windows ${{ matrix.targetPlatform }}
@@ -59,3 +63,26 @@ jobs:
         with:
           name: Build-${{ matrix.targetPlatform }}
           path: build/${{ matrix.targetPlatform }}
+  deploy:
+    name: Upload to Itch io
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        channel:
+          - windows
+    runs-on: ubuntu-latest
+    name: Deploy - Itch.io ${{ matrix.template }}
+    steps:
+      - uses: actions/download-artifact@v2.0.8
+        with:
+          name: ${{ matrix.channel }}
+          path: build/${{ matrix.channel }} v${{github.ref_name}}
+      - uses: KikimoraGames/itch-publish@v0.0.3
+        with:
+          butlerApiKey: ${{secrets.BUTLER_API_KEY}}
+          gameData: ./build/${{ matrix.template }}
+          itchUsername: ${{env.ITCH_USERNAME}}
+          itchGameId: ${{ env.ITCH_GAME_ID }}
+          buildChannel: ${{ matrix.channel }}
+          buildNumber: ${{github.ref_name}}

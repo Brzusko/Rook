@@ -1,9 +1,9 @@
 name: Linux Server Build
 
-on: workflow_dispatch
-  # push:
-  #   tags:
-  #   - '*'
+on:
+  push:
+    tags:
+    - '*'
 
 jobs:
   build:

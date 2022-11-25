@@ -18,8 +18,6 @@ jobs:
       matrix:
         targetPlatform:
           - StandaloneWindows64 # Build a Windows 64-bit standalone.
-        channel:
-          - windows
     steps:
       # Checkout (without LFS)
       - name: Checkout repository
@@ -65,15 +63,31 @@ jobs:
         with:
           name: Build-${{ matrix.targetPlatform }}
           path: build/${{ matrix.targetPlatform }}
-      # Deploy    
-      # - uses: actions/download-artifact@v2.0.8
-      #   with:
-      #     name: Build-${{ matrix.targetPlatform }}
-      #     path: build/${{ matrix.targetPlatform }}
+
+  deploy:
+    name: Upload to Itch
+    needs: [build]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        channel:
+          - windows
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Download StandaloneWindows64 Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: Build-StandaloneWindows64
+          path: build/StandaloneWindows64
       - uses: KikimoraGames/itch-publish@v0.0.3
         with:
           butlerApiKey: ${{secrets.BUTLER_API_KEY}}
-          gameData: ./build/${{ matrix.targetPlatform }}-${{github.ref_name}}
+          gameData: ./build/StandaloneWindows64
           itchUsername: ${{env.ITCH_USERNAME}}
           itchGameId: ${{ env.ITCH_GAME_ID }}
           buildChannel: ${{ matrix.channel }}

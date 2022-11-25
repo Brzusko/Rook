@@ -18,6 +18,8 @@ jobs:
       matrix:
         targetPlatform:
           - StandaloneWindows64 # Build a Windows 64-bit standalone.
+        channel:
+          - windows
     steps:
       # Checkout (without LFS)
       - name: Checkout repository
@@ -63,16 +65,7 @@ jobs:
         with:
           name: Build-${{ matrix.targetPlatform }}
           path: build/${{ matrix.targetPlatform }}
-  deploy:
-    name: Upload to Itch io
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: true
-      matrix:
-        channel:
-          - windows
-    runs-on: ubuntu-latest
-    steps:
+      # Deploy    
       - uses: actions/download-artifact@v2.0.8
         with:
           name: ${{ matrix.channel }}

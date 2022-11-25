@@ -1,9 +1,9 @@
 name: Windows Build and Deploy
 
-on:
-  push:
-    tags:
-    - '*'
+on: workflow_dispatch
+  # push:
+  #   tags:
+  #   - '*'
 
 env:
   ITCH_USERNAME: Brzusko
@@ -73,7 +73,6 @@ jobs:
       matrix:
         channel:
           - windows
-    runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2

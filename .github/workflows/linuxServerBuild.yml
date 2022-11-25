@@ -13,7 +13,7 @@ jobs:
       fail-fast: false
       matrix:
         targetPlatform:
-          - LinuxHeadlessSimulation # Build a Windows 64-bit standalone.
+          - StandaloneLinux64 # Build a Windows 64-bit standalone.
     steps:
       # Checkout (without LFS)
       - name: Checkout repository
@@ -53,6 +53,7 @@ jobs:
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           targetPlatform: ${{ matrix.targetPlatform }}
+          customParameters: -EnableHeadlessMode
 
       # Output
       - uses: actions/upload-artifact@v2

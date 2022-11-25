@@ -88,8 +88,8 @@ jobs:
       - name: Download StandaloneWindows64 Artifact
         uses: actions/download-artifact@v2
         with:
-          name: Build-LinuxHeadlessSimulation
-          path: build/LinuxHeadlessSimulation
+          name: Build-StandaloneLinux64
+          path: build/StandaloneLinux64
       - name: Upload ftp
         uses: sebastianpopp/ftp-action@releases/v2
         with:

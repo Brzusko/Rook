@@ -1,9 +1,9 @@
 name: Windows Build and Deploy
 
-on: workflow_dispatch
-  # push:
-  #   tags:
-  #   - '*'
+on:
+  push:
+    tags:
+    - '*'
 
 env:
   ITCH_USERNAME: Brzusko

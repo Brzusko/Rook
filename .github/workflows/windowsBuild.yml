@@ -64,9 +64,22 @@ jobs:
           name: Build-${{ matrix.targetPlatform }}
           path: build/${{ matrix.targetPlatform }}
 
+  # Sets Version
+  version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set env
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+      - name: Echo Version
+        run: |
+          echo $RELEASE_VERSION
+          echo ${{ env.RELEASE_VERSION }}
+
+  # Deployment
   deploy:
     name: Upload to Itch
-    needs: [build]
+    needs: [build, version]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
@@ -90,4 +103,4 @@ jobs:
           itchUsername: ${{env.ITCH_USERNAME}}
           itchGameId: ${{ env.ITCH_GAME_ID }}
           buildChannel: ${{ matrix.channel }}
-          buildNumber: ${{github.ref_name}}
+          buildNumber: ${{ env.RELEASE_VERSION }}

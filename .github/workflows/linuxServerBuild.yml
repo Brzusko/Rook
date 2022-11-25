@@ -85,6 +85,17 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
+      - name: SSH - delete old server app
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: 22
+          script: |
+            cd /home/server/rook-server
+            screen -S rook-server -X quit
+            rm -rf StandaloneLinux64
       - name: Download StandaloneWindows64 Artifact
         uses: actions/download-artifact@v2
         with:
@@ -98,3 +109,14 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           localDir: "./build"
           remoteDir: "/home/server/rook-server"
+      - name: SSH - Run Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: 22
+          script: |
+            cd /home/server/rook-server/StandaloneLinux64
+            chmod +rwx StandaloneLinux64
+            screen -S rook-server ./StandaloneLinux64

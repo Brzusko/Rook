@@ -69,7 +69,7 @@ jobs:
       - uses: actions/download-artifact@v2.0.8
         with:
           name: ${{ matrix.channel }}
-          path: build/${{ matrix.channel }} v${{github.ref_name}}
+          path: build/${{ matrix.channel }}-${{github.ref_name}}
       - uses: KikimoraGames/itch-publish@v0.0.3
         with:
           butlerApiKey: ${{secrets.BUTLER_API_KEY}}

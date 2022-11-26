@@ -12,21 +12,40 @@ namespace IT.Commands
         public static string RemoteAddress
         {
             get => ServiceContainer.Get<INetworkBridge>().Address;
-            set => ServiceContainer.Get<INetworkBridge>().Address = value;
+            set
+            {
+                ServiceContainer.Get<INetworkSettingsService>().Address = value;
+                ServiceContainer.Get<INetworkBridge>().Address = value;
+            }
         }
         
         [Command("remote-port")]
         public static ushort RemotePort
         {
             get => ServiceContainer.Get<INetworkBridge>().Port;
-            set => ServiceContainer.Get<INetworkBridge>().Port = value;
+            set
+            {
+                ServiceContainer.Get<INetworkSettingsService>().Port = value;
+                ServiceContainer.Get<INetworkBridge>().Port = value;
+            }
         }
         
         [Command("max-clients")]
         public static int MaxClients
         {
             get => ServiceContainer.Get<INetworkBridge>().MaxClients;
-            set => ServiceContainer.Get<INetworkBridge>().MaxClients = value;
+            set
+            {
+                ServiceContainer.Get<INetworkSettingsService>().MaxClients = value;
+                ServiceContainer.Get<INetworkBridge>().MaxClients = value;
+            }
+        }
+
+        [Command("is-dedicated-server")]
+        public static bool AsDedicatedServer
+        {
+            get => ServiceContainer.Get<INetworkSettingsService>().AsServer;
+            set => ServiceContainer.Get<INetworkSettingsService>().AsServer = value;
         }
         
         [Command("start-server")]

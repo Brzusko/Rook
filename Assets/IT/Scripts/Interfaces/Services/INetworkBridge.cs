@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace IT.Interfaces
 {
-    public interface INetworkBridge : IService
+    public interface INetworkBridge : IServiceWithDependency
     {
         public string Address { get; set; }
         public ushort Port { get; set; }

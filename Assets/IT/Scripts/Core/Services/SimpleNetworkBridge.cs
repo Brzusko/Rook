@@ -15,12 +15,17 @@ namespace IT
         [SerializeField] private ServerManager _serverManager;
         [SerializeField] private ClientManager _clientManager;
         [SerializeField] private TransportManager _transportManager;
+        
         private Transport _transport;
         private bool _isRegistered;
         
         public override Type Type => typeof(INetworkBridge);
-        
-        
+        public void FetchDependency()
+        {
+            ReloadNetworkSettings();
+        }
+
+
         public string Address
         {
             get => _transport.GetClientAddress();
@@ -108,6 +113,8 @@ namespace IT
                 return;
             
             ServiceContainer.RegisterService<INetworkBridge>(this);
+            _serverManager.OnServerConnectionState += ServerInternalState;
+            _clientManager.OnClientConnectionState += ClientInternalState;
             _isRegistered = true;
         }
 
@@ -117,6 +124,33 @@ namespace IT
                 return;
             
             ServiceContainer.UnregisterService<INetworkBridge>();
+        }
+
+        private void ReloadNetworkSettings()
+        {
+            if(IsServerCreated || IsClientCreated)
+                return;
+            
+            var networkSettings = ServiceContainer.Get<INetworkSettingsService>();
+            Port = networkSettings.Port;
+            Address = networkSettings.Address;
+            MaxClients = networkSettings.MaxClients;
+        }
+
+        private void ServerInternalState(ServerConnectionStateArgs args)
+        {
+            if(args.ConnectionState != LocalConnectionState.Stopped)
+                return;
+            
+            ReloadNetworkSettings();
+        }
+
+        private void ClientInternalState(ClientConnectionStateArgs args)
+        {
+            if(args.ConnectionState != LocalConnectionState.Stopped)
+                return;
+            
+            ReloadNetworkSettings();
         }
     }
 }

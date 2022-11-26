@@ -19,5 +19,10 @@ namespace IT.Data
             AsDedicatedServer = false;
             Version = 1;
         }
+
+        public NetworkSettingsWriteData ToWriteData()
+        {
+            return new NetworkSettingsWriteData(Port, Address, MaxClients, AsDedicatedServer);
+        }
     }
 }

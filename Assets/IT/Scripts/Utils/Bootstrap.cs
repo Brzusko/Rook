@@ -1,6 +1,8 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using IT.Data;
+using IT.Interfaces;
 using IT.ScriptableObjects;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -20,6 +22,7 @@ namespace IT.Utils
         private async void Start()
         {
             await LoadScenes();
+            ServiceContainer.FetchDependency();
         }
 
         private async Task LoadScenes()

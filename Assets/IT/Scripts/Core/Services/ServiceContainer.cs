@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using IT.Interfaces;
+using IT.ScriptableObjects;
 using UnityEngine;
 
 namespace IT
@@ -10,36 +11,29 @@ namespace IT
     public class ServiceContainer : MonoBehaviour
     {
         private static readonly  Dictionary<Type, IService> _services = new Dictionary<Type, IService>();
-        [SerializeField] private Service[] _servicePrefabs;
-        private void Awake()
-        {
-            LoadServices();
-            FetchDependency();
-        }
-
+  
         private void OnDestroy()
         {
             UnloadServices();
         }
 
-        private void LoadServices()
+        public static void RegisterService<T>(T service) where T : class, IService
         {
-            foreach (var servicePrefab in _servicePrefabs)
-            {
-                if(servicePrefab is not IService)
-                    continue;
-
-                var serviceInstance = Instantiate(servicePrefab);
-                var serviceInterface = (IService)serviceInstance;
-                
-                if(_services.ContainsKey(serviceInterface.Type))
-                    Destroy(serviceInstance.gameObject);
-
-                _services.Add(serviceInstance.Type, serviceInstance);
-            }
+            if(_services.ContainsKey(typeof(T)))
+                return;
+            
+            _services.Add(typeof(T), service);
         }
 
-        private void FetchDependency()
+        public static void UnregisterService<T>() where T : class, IService
+        {
+            if(!_services.ContainsKey(typeof(T)))
+                return;
+
+            _services.Remove(typeof(T));
+        }
+        
+        public static void FetchDependency()
         {
             if(_services.Count == 0)
                 return;
@@ -49,23 +43,23 @@ namespace IT
                 ((IServiceWithDependency)service.Value).FetchDependency();
             }
         }
-
+        
+        public static T Get<T>() where T : IService
+        {
+            return (T)_services[typeof(T)];
+        }
+        
+        public static bool Contains<T>()
+        {
+            return _services.ContainsKey((typeof(T)));
+        }
+        
         private void UnloadServices()
         {
             foreach (var service in _services)
                 Destroy(service.Value.GameObject);
 
             _services.Clear();
-        }
-
-        private static T Get<T>() where T : IService
-        {
-            return (T)_services[typeof(T)];
-        }
-
-        private static bool Contains<T>()
-        {
-            return _services.ContainsKey((typeof(T)));
         }
     }
 }

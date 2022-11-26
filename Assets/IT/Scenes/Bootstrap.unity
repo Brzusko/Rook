@@ -168,5 +168,3 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _scenesToLoad: {fileID: 11400000, guid: 99cdc6e3ef769584e9e2d243135c4558, type: 2}
-  _bootstrapSceneRef:
-    m_Handle: 0

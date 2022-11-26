@@ -11,7 +11,7 @@ namespace IT.Interfaces
         public ushort Port { get; set; }
         public bool IsClientCreated { get; }
         public bool IsServerCreated { get; }
-        public int MaxClients { get; }
+        public int MaxClients { get; set; }
 
         public void StartServer();
         public void StartClient();

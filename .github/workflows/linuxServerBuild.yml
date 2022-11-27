@@ -53,7 +53,7 @@ jobs:
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           targetPlatform: ${{ matrix.targetPlatform }}
-          customParameters: -EnableHeadlessMode
+          customParameters: -EnableHeadlessMode -Development
 
       # Output
       - uses: actions/upload-artifact@v2

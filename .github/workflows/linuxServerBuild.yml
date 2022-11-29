@@ -4,11 +4,12 @@ on:
   push:
     tags:
     - '*'
+  - workflow_dispatch
 
 jobs:
   build:
     name: Build Linux ${{ matrix.targetPlatform }}
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     strategy:
       fail-fast: false
       matrix:
@@ -63,7 +64,7 @@ jobs:
 
   # Sets Version
   version:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v2
       - name: Set env
@@ -77,7 +78,7 @@ jobs:
   ftpdeploy:
     name: Upload to Server via ftp
     needs: [build, version]
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     strategy:
       fail-fast: true
     steps:

@@ -4,6 +4,7 @@ on:
   push:
     tags:
     - '*'
+  - workflow_dispatch
 
 env:
   ITCH_USERNAME: Brzusko
@@ -12,7 +13,7 @@ env:
 jobs:
   build:
     name: Build Windows ${{ matrix.targetPlatform }}
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     strategy:
       fail-fast: false
       matrix:
@@ -67,7 +68,7 @@ jobs:
 
   # Sets Version
   version:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v2
       - name: Set env
@@ -81,7 +82,7 @@ jobs:
   deploy:
     name: Upload to Itch
     needs: [build, version]
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     strategy:
       fail-fast: true
       matrix:

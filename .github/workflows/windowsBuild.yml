@@ -106,3 +106,7 @@ jobs:
           itchGameId: ${{ env.ITCH_GAME_ID }}
           buildChannel: ${{ matrix.channel }}
           buildNumber: ${{ env.RELEASE_VERSION }}
+      - name: Artifact removal
+        uses: geekyeggo/delete-artifact@v2
+        with:
+            name: Build-StandaloneWindows64

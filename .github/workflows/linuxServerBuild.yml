@@ -120,4 +120,8 @@ jobs:
           port: 22
           script: |
             cd /home/server/rook-server
-            ./start-rook.sh
+            ./start-rook.sh 
+      - name: Artifact removal
+        uses: geekyeggo/delete-artifact@v2
+        with:
+            name: Build-StandaloneLinux64

@@ -16,6 +16,29 @@ namespace IT.Tests
             stat.ConfigureStat(StatID.HEALTH, 100, new List<ModifiersID> { ModifiersID.HEALTH });
             Assert.IsNotNull(stat);
         }
+        
+        [Test]
+        public void AddModifierTest()
+        {
+            var stat = new SingleStat();
+            stat.ConfigureStat(StatID.HEALTH, 100, new List<ModifiersID> { ModifiersID.HEALTH });
+            Assert.IsNotNull(stat);
+            
+            var healthModifier = new StatModifier
+            {
+                ID = ModifiersID.HEALTH,
+                Value = 100
+            };
+
+            var staminaModifier = new StatModifier
+            {
+                ID = ModifiersID.MOVEMENT_SPEED,
+                Value = 100,
+            };
+
+            Assert.IsTrue(stat.AddModifier(healthModifier));
+            Assert.IsFalse(stat.AddModifier(staminaModifier));
+        }
 
         // A UnityTest behaves like a coroutine in Play Mode. In Edit Mode you can use
         // `yield return null;` to skip a frame.

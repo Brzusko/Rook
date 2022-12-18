@@ -7,6 +7,7 @@ namespace IT
     public enum ModifiersID : byte
     {
         NONE,
-        HEALTH
+        HEALTH,
+        MOVEMENT_SPEED,
     }
 }

@@ -35,17 +35,18 @@ namespace IT.Stats
             _acceptedModifiers = new List<ModifiersID>(acceptedModifiers);
         }
 
-        public void AddModifier(StatModifier modifier, bool addToCurrentValue = false)
+        public bool AddModifier(StatModifier modifier, bool addToCurrentValue = false)
         {
             if(!CanAddModifier(modifier))
-                return;
+                return false;
             
             _modifiers.Add(modifier);
             
             if(!addToCurrentValue)
-                return;
+                return true;
             
             AddToValue(modifier.Value);
+            return true;
         }
 
         public void RemoveModifier(StatModifier modifier)

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace EasyCharacterMovement.Examples
+namespace EasyCharacterMovement.CharacterMovementDemo
 {
     public sealed class SimpleCameraController : MonoBehaviour
     {
@@ -48,11 +48,17 @@ namespace EasyCharacterMovement.Examples
 
         public void Start()
         {
+            if (_target == null)
+                return;
+
             transform.position = target.position - transform.forward * distanceToTarget;
         }
 
         public void LateUpdate()
         {
+            if (_target == null)
+                return;
+
             Vector3 targetPosition = target.position - transform.forward * distanceToTarget;
 
             transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref _followVelocity, _smoothTime);

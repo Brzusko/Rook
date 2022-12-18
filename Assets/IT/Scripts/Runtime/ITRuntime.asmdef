@@ -1,0 +1,23 @@
+{
+    "name": "ITRuntime",
+    "rootNamespace": "",
+    "references": [
+        "GUID:e66dbdfabf9e6a14ead1b347276e9bb7",
+        "GUID:7c88a4a7926ee5145ad2dfa06f454c67",
+        "GUID:32955a4cb30234c47b43545a7ec84d17",
+        "GUID:9341dc36b33c3984e97b22dac619ca50",
+        "GUID:b3f49edfedc855a48aa1a9e5d3cba438",
+        "GUID:50b2bdd4833ec8043a7227258a04ccb7",
+        "GUID:a02547252a8685b458cb58325927f320",
+        "GUID:fb24642277b1db2449da7ac148ce939d"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

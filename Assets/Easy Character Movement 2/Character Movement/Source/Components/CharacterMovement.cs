@@ -450,13 +450,13 @@ namespace EasyCharacterMovement
                 minMoveDistance = 0.0f;
 
                 maxMovementIterations = 5;
-                maxDepenetrationIterations = 2;
+                maxDepenetrationIterations = 1;
 
                 enablePhysicsInteraction = false;
                 allowPushCharacters = false;
-                impartPlatformMovement = true;
-                impartPlatformRotation = true;
-                impartPlatformVelocity = true;
+                impartPlatformMovement = false;
+                impartPlatformRotation = false;
+                impartPlatformVelocity = false;
             }
 
             public void OnValidate()
@@ -515,6 +515,40 @@ namespace EasyCharacterMovement
             /// </summary>
 
             public Vector3 platformVelocity;
+        }
+
+        /// <summary>
+        /// Movement simulation state.
+        /// i.e. the data needed to ensure proper continuity from tick to tick.
+        /// </summary>
+
+        readonly public struct State
+        {
+            public State(Vector3 position, Quaternion rotation, Vector3 velocity, bool isConstrainedToGround,
+                float unconstrainedTimer, bool hitGround, bool isWalkable, Vector3 groundNormal)
+            {
+                this.position = position;
+                this.rotation = rotation;
+                this.velocity = velocity;
+                this.isConstrainedToGround = isConstrainedToGround;
+                this.unconstrainedTimer = unconstrainedTimer;
+                this.hitGround = hitGround;
+                this.isWalkable = isWalkable;
+                this.groundNormal = groundNormal;
+            }
+
+            public Vector3 position { get; }
+            public Quaternion rotation { get; }
+
+            public Vector3 velocity { get; }
+
+            public bool isConstrainedToGround { get; }
+            public float unconstrainedTimer { get; }
+
+            public bool hitGround { get; }
+            public bool isWalkable { get; }
+
+            public Vector3 groundNormal { get; }
         }
 
         #endregion
@@ -4301,20 +4335,20 @@ namespace EasyCharacterMovement
         {
             updatedPosition = newPosition;
 
+            if (updateGround)
+            {
+                FindGround(updatedPosition, out FindGroundResult groundResult);
+                {
+                    UpdateCurrentGround(ref groundResult);
+
+                    AdjustGroundHeight();
+
+                    UpdateCurrentPlatform();
+                }
+            }
+
             rigidbody.position = updatedPosition;
             transform.position = updatedPosition;
-
-            if (!updateGround)
-                return;
-            
-            FindGround(updatedPosition, out FindGroundResult groundResult);
-            {
-                UpdateCurrentGround(ref groundResult);
-                
-                AdjustGroundHeight();
-
-                UpdateCurrentPlatform();
-            }
         }
 
         /// <summary>
@@ -4366,22 +4400,22 @@ namespace EasyCharacterMovement
             updatedPosition = newPosition;
             updatedRotation = newRotation;
 
+            if (updateGround)
+            {
+                FindGround(updatedPosition, out FindGroundResult groundResult);
+                {
+                    UpdateCurrentGround(ref groundResult);
+
+                    AdjustGroundHeight();
+
+                    UpdateCurrentPlatform();
+                }
+            }
+
             rigidbody.position = updatedPosition;
             rigidbody.rotation = updatedRotation;
 
-            transform.SetPositionAndRotation(newPosition, newRotation);
-
-            if (!updateGround)
-                return;
-            
-            FindGround(updatedPosition, out FindGroundResult groundResult);
-            {
-                UpdateCurrentGround(ref groundResult);
-                
-                AdjustGroundHeight();
-
-                UpdateCurrentPlatform();
-            }
+            transform.SetPositionAndRotation(updatedPosition, updatedRotation);
         }
 
         /// <summary>
@@ -4690,6 +4724,43 @@ namespace EasyCharacterMovement
             // Perform the movement
 
             return Move(deltaTime);
+        }
+
+        /// <summary>
+        /// Returns movement simulation state.
+        /// i.e. the data needed to ensure proper continuity from tick to tick.
+        /// </summary>        
+
+        public State GetState()
+        {
+            return new State(
+                updatedPosition,
+                updatedRotation,
+                _velocity,
+                _isConstrainedToGround,
+                _unconstrainedTimer,
+                _currentGround.hitGround,
+                _currentGround.isWalkable,
+                _currentGround.normal);
+        }
+
+        /// <summary>
+        /// Restore a previous simulation state ensuring proper simulation continuity.
+        /// </summary>
+
+        public void SetState(in State inState)
+        {
+            SetPositionAndRotation(inState.position, inState.rotation);
+
+            _velocity = inState.velocity;
+
+            _isConstrainedToGround = inState.isConstrainedToGround;
+            _unconstrainedTimer = inState.unconstrainedTimer;
+
+            _currentGround.hitGround = inState.hitGround;
+            _currentGround.isWalkable = inState.isWalkable;
+
+            _currentGround.hitResult.normal = inState.groundNormal;
         }
 
         /// <summary>

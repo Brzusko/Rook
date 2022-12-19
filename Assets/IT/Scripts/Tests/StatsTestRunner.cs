@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using IT.Stats;
@@ -10,34 +11,46 @@ namespace IT.Tests
     public class StatsTestRunner
     {
         [Test]
-        public void CreationTest()
+        public void CreateSingleStat()
         {
-            var stat = new SingleStat();
-            stat.ConfigureStat(StatID.HEALTH, 100, new List<ModifiersID> { ModifiersID.HEALTH });
-            Assert.IsNotNull(stat);
+            var singleStat = new SingleStat(StatID.HEALTH, 100f, 1f);
+            Assert.IsTrue(singleStat.Modifier == 1f);
+            Assert.IsTrue(singleStat.CurrentValue == 100f);
+            Assert.IsTrue(singleStat.MaxValue == 100f);
         }
-        
+
         [Test]
-        public void AddModifierTest()
+        public void UpdateCurrentValue()
         {
-            var stat = new SingleStat();
-            stat.ConfigureStat(StatID.HEALTH, 100, new List<ModifiersID> { ModifiersID.HEALTH });
-            Assert.IsNotNull(stat);
-            
-            var healthModifier = new StatModifier
-            {
-                ID = ModifiersID.HEALTH,
-                Value = 100
-            };
+            var singleStat = new SingleStat(StatID.HEALTH, 100f, 1f);
+            singleStat.CurrentValue = -10f;
+            Assert.IsTrue(singleStat.CurrentValue == -10f);
+            singleStat.CurrentValue = 300f;
+            Assert.IsTrue(singleStat.CurrentValue == 100f);
+        }
 
-            var staminaModifier = new StatModifier
-            {
-                ID = ModifiersID.MOVEMENT_SPEED,
-                Value = 100,
-            };
+        [Test]
+        public void UpdateMaxValue()
+        {
+            var singleStat = new SingleStat(StatID.HEALTH, 100f, 1f);
+            singleStat.UpdateMaxValue(200);
+            Assert.IsTrue(singleStat.MaxValue == 200f);
+            singleStat.UpdateMaxValue(300f, true);
+            Assert.IsTrue(singleStat.CurrentValue == 200f);
+            singleStat.UpdateMaxValue(200f, true);
+            Assert.IsTrue(singleStat.CurrentValue == 100f);
+        }
 
-            Assert.IsTrue(stat.AddModifier(healthModifier));
-            Assert.IsFalse(stat.AddModifier(staminaModifier));
+        [Test]
+        public void UpdateModifierValue()
+        {
+            var singleStat = new SingleStat(StatID.HEALTH, 10f, 1f);
+            singleStat.UpdateModifier(1.1f, true);
+            Assert.IsTrue(singleStat.CurrentValue == 11.0f);
+            singleStat.UpdateModifier(1.0f, true);
+            Assert.IsTrue(singleStat.CurrentValue == 10.0f);
+            singleStat.UpdateModifier(1.2f);
+            Assert.IsTrue(singleStat.MaxValue == 12.0f);
         }
 
         // A UnityTest behaves like a coroutine in Play Mode. In Edit Mode you can use

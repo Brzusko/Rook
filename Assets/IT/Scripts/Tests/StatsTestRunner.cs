@@ -10,47 +10,34 @@ namespace IT.Tests
 {
     public class StatsTestRunner
     {
+        private static float _maxFloatTolerance = 0.01f;
+        private static float _maxValueStartingPoint = 10f;
+        
         [Test]
         public void CreateSingleStat()
         {
-            var singleStat = new SingleStat(StatID.HEALTH, 100f, 1f);
-            Assert.IsTrue(singleStat.Modifier == 1f);
-            Assert.IsTrue(singleStat.CurrentValue == 100f);
-            Assert.IsTrue(singleStat.MaxValue == 100f);
+            var stat = new SingleStat(StatID.HEALTH, _maxValueStartingPoint, null);
+            Assert.IsTrue((Math.Abs(stat.CurrentValue - _maxValueStartingPoint) < _maxFloatTolerance) && Math.Abs(stat.MaxValue - _maxValueStartingPoint) < _maxFloatTolerance);
+            stat.CurrentValue = 300f;
+            Assert.IsTrue(Math.Abs(stat.CurrentValue - _maxValueStartingPoint) < _maxValueStartingPoint);
         }
 
         [Test]
-        public void UpdateCurrentValue()
+        public void ModifierChanging()
         {
-            var singleStat = new SingleStat(StatID.HEALTH, 100f, 1f);
-            singleStat.CurrentValue = -10f;
-            Assert.IsTrue(singleStat.CurrentValue == -10f);
-            singleStat.CurrentValue = 300f;
-            Assert.IsTrue(singleStat.CurrentValue == 100f);
-        }
-
-        [Test]
-        public void UpdateMaxValue()
-        {
-            var singleStat = new SingleStat(StatID.HEALTH, 100f, 1f);
-            singleStat.UpdateMaxValue(200);
-            Assert.IsTrue(singleStat.MaxValue == 200f);
-            singleStat.UpdateMaxValue(300f, true);
-            Assert.IsTrue(singleStat.CurrentValue == 200f);
-            singleStat.UpdateMaxValue(200f, true);
-            Assert.IsTrue(singleStat.CurrentValue == 100f);
-        }
-
-        [Test]
-        public void UpdateModifierValue()
-        {
-            var singleStat = new SingleStat(StatID.HEALTH, 10f, 1f);
-            singleStat.UpdateModifier(1.1f, true);
-            Assert.IsTrue(singleStat.CurrentValue == 11.0f);
-            singleStat.UpdateModifier(1.0f, true);
-            Assert.IsTrue(singleStat.CurrentValue == 10.0f);
-            singleStat.UpdateModifier(1.2f);
-            Assert.IsTrue(singleStat.MaxValue == 12.0f);
+            var stat = new SingleStat(StatID.HEALTH, _maxValueStartingPoint,
+                new List<StatModifier> { new StatModifier { ID = StatID.HEALTH, Value = 2.0f } });
+            
+            Assert.IsTrue(stat.CurrentValue - (_maxValueStartingPoint * 2f) < _maxFloatTolerance);
+            Assert.IsTrue(stat.RemoveModifier(new StatModifier{ ID = StatID.HEALTH, Value = 2.0f }));
+            Assert.IsTrue(Math.Abs(stat.CurrentValue - _maxValueStartingPoint) < _maxFloatTolerance);
+            Assert.IsTrue(stat.AddModifier(new StatModifier { ID = StatID.HEALTH, Value = 1.1f}));
+            Assert.IsFalse(stat.AddModifier(new StatModifier {ID = StatID.STAMINA, Value = 10f}));
+            Assert.IsTrue(stat.AddModifier(new StatModifier{ID = StatID.HEALTH, Value = 0.1f}, true));
+            Assert.IsTrue(Math.Abs(stat.CurrentValue - (_maxValueStartingPoint + 1)) < _maxFloatTolerance);
+            Assert.IsTrue(stat.RemoveModifier(new StatModifier { ID = StatID.HEALTH, Value = 1.1f}, true));
+            Assert.IsTrue(stat.RemoveModifier(new StatModifier{ID = StatID.HEALTH, Value = 0.1f}, true));
+            Assert.IsTrue(Math.Abs(stat.CurrentValue - _maxValueStartingPoint) < _maxFloatTolerance);
         }
 
         // A UnityTest behaves like a coroutine in Play Mode. In Edit Mode you can use

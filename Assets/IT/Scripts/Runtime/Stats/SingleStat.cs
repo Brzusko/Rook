@@ -8,12 +8,13 @@ using IT.Utils.PrimitiveExtensions;
 namespace IT.Stats
 {
     [System.Serializable]
-    public struct SingleStat
+    public class SingleStat
     {
+        private StatID _id;
         private float _currentValue;
         private float _maxValue;
-        private float _modifier;
-        private StatID _id;
+        private float _modifiersValue = 1f;
+        private List<StatModifier> _modifierList = new List<StatModifier>();
 
         public float CurrentValue
         {
@@ -25,40 +26,91 @@ namespace IT.Stats
             }
         }
 
-        public float Modifier => _modifier;
-        public float MaxValue => _maxValue * _modifier;
-        public StatID ID => _id;
+        public float MaxValue
+        {
+            get => _maxValue * _modifiersValue;
+            set
+            {
+                _maxValue = value;
 
-        public SingleStat(StatID id, float maxValue, float modifier = 1.0f)
+                if (_maxValue < 0f)
+                    _maxValue = 0f;
+            }
+        }
+
+        public float Modifier => _modifiersValue;
+
+        public SingleStat(StatID id, float maxValue, IEnumerable<StatModifier> modifiers = null)
         {
             _id = id;
+
+            if (modifiers != null)
+                _modifierList = modifiers.ToList();
+            
+            CalculateModifiersValue();
             _maxValue = maxValue;
-            _modifier = modifier;
-            _currentValue = maxValue * modifier;
+            _currentValue = MaxValue;
         }
 
-        public void UpdateMaxValue(float newMaxValue, bool shouldChangeValue = false)
+        ~SingleStat()
         {
-            var maxValueCache = MaxValue;
-            _maxValue = Mathf.Clamp(newMaxValue, 0f, Mathf.Infinity);
-            
-            if(!shouldChangeValue)
-                return;
-            
-            var maxValueDelta = MaxValue - maxValueCache;
-            CurrentValue += maxValueDelta;
+            _modifierList.Clear();
         }
 
-        public void UpdateModifier(float newModifierValue, bool shouldChangeValue = false)
+        public bool AddModifier(StatModifier modifier, bool updateCurrentValue = false)
         {
-            var maxValueCache = MaxValue;
-            _modifier = Mathf.Clamp(newModifierValue, 0f, Mathf.Infinity);
+            if(modifier.ID != _id)
+                return false;
             
-            if(!shouldChangeValue)
+            _modifierList.Add(modifier);
+            var cacheMaxValue = MaxValue;
+            CalculateModifiersValue();
+            
+            if(!updateCurrentValue)
+                return true;
+
+            var deltaMaxValue = MaxValue - cacheMaxValue;
+            CurrentValue += deltaMaxValue;
+            return true;
+        }
+
+        public bool RemoveModifier(StatModifier modifier, bool updateCurrentValue = false)
+        {
+            if (_modifierList == null || modifier.ID != _id)
+                return false;
+
+            var result = _modifierList.Remove(modifier);
+
+            if (!result)
+                return false;
+            
+            var maxValueCache = MaxValue;
+            CalculateModifiersValue();
+            
+            if (_currentValue > MaxValue)
+            {
+                _currentValue = MaxValue;
+                return true;
+            }
+
+            if (!updateCurrentValue)
+                return true;
+
+            var deltaMaxValue = MaxValue - maxValueCache;
+            CurrentValue += deltaMaxValue;
+            
+            return true;
+        }
+        
+        private void CalculateModifiersValue()
+        {
+            if(_modifierList == null)
                 return;
 
-            var maxValueDelta = MaxValue - maxValueCache;
-            CurrentValue += maxValueDelta;
+            _modifiersValue = _modifierList.Sum(modifier => modifier.Value);
+
+            if (_modifiersValue == 0)
+                _modifiersValue = 1f;
         }
     }
 }

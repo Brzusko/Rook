@@ -23,7 +23,11 @@ namespace IT.Utils
         {
             await LoadScenes();
             ServiceContainer.FetchDependency();
-            await LoadMainScene();
+
+#if UNITY_STANDALONE_LINUX
+            ServiceContainer.Get<INetworkBridge>().StartServer();
+#endif
+            UnloadSceneBySceneRef(_bootstrapSceneRef);
         }
 
         private async Task LoadScenes()
@@ -39,15 +43,6 @@ namespace IT.Utils
                     QuitOnError(ex);
                 }
             }
-        }
-
-        private async Task LoadMainScene()
-        {
-            var sceneName = _scenesToLoad.GameplayScenes.First();
-            await LoadSceneByName(sceneName);
-            var sceneRef = SceneManager.GetSceneByName(sceneName);
-            SceneManager.SetActiveScene(sceneRef);
-            await UnloadSceneBySceneRef(_bootstrapSceneRef);
         }
 
         private async Task LoadSceneByName(string sceneName)

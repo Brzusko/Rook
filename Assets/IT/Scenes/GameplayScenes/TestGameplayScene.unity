@@ -123,50 +123,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &58700004
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 58700005}
-  - component: {fileID: 58700006}
-  m_Layer: 0
-  m_Name: MainObject
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &58700005
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 58700004}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &58700006
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 58700004}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 659b03186a128fc46aa12e9896a9b85e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &204163507
 GameObject:
   m_ObjectHideFlags: 0
@@ -541,7 +497,7 @@ PrefabInstance:
     - target: {fileID: 3574710831091095001, guid: 73b16883fd88c634991532c2ec112a66,
         type: 3}
       propertyPath: m_RootOrder
-      value: 5
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3574710831091095001, guid: 73b16883fd88c634991532c2ec112a66,
         type: 3}
@@ -566,17 +522,17 @@ PrefabInstance:
     - target: {fileID: 3574710831091095001, guid: 73b16883fd88c634991532c2ec112a66,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0.4949311
+      value: 0.49493107
       objectReference: {fileID: 0}
     - target: {fileID: 3574710831091095001, guid: 73b16883fd88c634991532c2ec112a66,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.000000014404461
+      value: 0.00000003935371
       objectReference: {fileID: 0}
     - target: {fileID: 3574710831091095001, guid: 73b16883fd88c634991532c2ec112a66,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.000000008204569
+      value: -0.000000022415296
       objectReference: {fileID: 0}
     - target: {fileID: 3574710831091095001, guid: 73b16883fd88c634991532c2ec112a66,
         type: 3}
@@ -614,7 +570,7 @@ PrefabInstance:
     - target: {fileID: 5741962896962598200, guid: 8650f10746a66024999b95f817e65672,
         type: 3}
       propertyPath: m_RootOrder
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 5741962896962598200, guid: 8650f10746a66024999b95f817e65672,
         type: 3}
@@ -732,17 +688,17 @@ PrefabInstance:
     - target: {fileID: 7161831772323260839, guid: 11fb81becb7232d4b82cfd85b29e10e8,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0.4949311
+      value: 0.49493107
       objectReference: {fileID: 0}
     - target: {fileID: 7161831772323260839, guid: 11fb81becb7232d4b82cfd85b29e10e8,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.000000014404461
+      value: 0.00000003935371
       objectReference: {fileID: 0}
     - target: {fileID: 7161831772323260839, guid: 11fb81becb7232d4b82cfd85b29e10e8,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.000000008204569
+      value: -0.000000022415296
       objectReference: {fileID: 0}
     - target: {fileID: 7161831772323260839, guid: 11fb81becb7232d4b82cfd85b29e10e8,
         type: 3}
@@ -780,7 +736,7 @@ PrefabInstance:
     - target: {fileID: 8081205651919335546, guid: ed42ef2dba2560b4d83d35b56ebf03a5,
         type: 3}
       propertyPath: m_RootOrder
-      value: 4
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 8081205651919335546, guid: ed42ef2dba2560b4d83d35b56ebf03a5,
         type: 3}

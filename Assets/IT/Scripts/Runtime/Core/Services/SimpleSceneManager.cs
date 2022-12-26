@@ -26,13 +26,23 @@ namespace IT
         private void Start()
         {
             RegisterToServiceContainer();
+        }
+
+        private void OnEnable()
+        {
+            
             BindNetworkEvents();
+        }
+
+        private void OnDisable()
+        {
+            UnbindNetworkEvents();
         }
 
         private void OnDestroy()
         {
             UnregisterToServiceContainer();
-            UnbindNetworkEvents();
+            
         }
 
         private IEnumerator UnloadMainSceneOnClient()

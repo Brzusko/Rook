@@ -27,7 +27,7 @@ namespace IT.Utils
 #if UNITY_STANDALONE_LINUX
             ServiceContainer.Get<INetworkBridge>().StartServer();
 #endif
-            UnloadSceneBySceneRef(_bootstrapSceneRef);
+            await UnloadSceneBySceneRef(_bootstrapSceneRef);
         }
 
         private async Task LoadScenes()

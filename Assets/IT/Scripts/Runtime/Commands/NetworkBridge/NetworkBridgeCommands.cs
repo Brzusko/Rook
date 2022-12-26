@@ -59,5 +59,21 @@ namespace IT.Commands
         
         [Command("stop-client")]
         public static void StopClient() => ServiceContainer.Get<INetworkBridge>().StopClient();
+        
+        [Command("start-host")]
+        public static void StartHost()
+        {
+            INetworkBridge _networkBridge = ServiceContainer.Get<INetworkBridge>();
+            _networkBridge.StartServer();
+            _networkBridge.StartClient();
+        }
+        
+        [Command("stop-host")]
+        public static void StopHost()
+        {
+            INetworkBridge _networkBridge = ServiceContainer.Get<INetworkBridge>();
+            _networkBridge.StopServer();
+            _networkBridge.StopClient();
+        }
     }
 }

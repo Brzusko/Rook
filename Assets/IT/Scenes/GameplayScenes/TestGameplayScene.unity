@@ -500,7 +500,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-1318816
+  m_Name: pb_Mesh-86748
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -703,6 +703,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1696877027}
   - component: {fileID: 1696877026}
+  - component: {fileID: 1696877028}
   m_Layer: 0
   m_Name: PlayerSpawner
   m_TagString: Untagged
@@ -722,7 +723,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 162bd093f205cb84bb8ea0fb5cfbf280, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _playerPrefab: {fileID: 8081205651919335550, guid: ed42ef2dba2560b4d83d35b56ebf03a5,
+  _playerPrefab: {fileID: 7849939560007978409, guid: 8bc1b292271c57c419084be68d4cabfb,
     type: 3}
   _spawnLocations:
   - {fileID: 1936655447}
@@ -743,6 +744,25 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1696877028
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1696877025}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 211a9f6ec51ddc14f908f5acc0cd0423, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _playerPrefab: {fileID: 4265627090277212498, guid: 896922db2bc05db48be2962a74ef8f44,
+    type: 3}
+  _addToDefaultScene: 1
+  Spawns:
+  - {fileID: 1936655447}
+  - {fileID: 720550261}
+  - {fileID: 1720525173}
 --- !u!1001 &1720525172
 PrefabInstance:
   m_ObjectHideFlags: 0

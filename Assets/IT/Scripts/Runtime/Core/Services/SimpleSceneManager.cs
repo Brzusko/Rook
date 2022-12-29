@@ -30,7 +30,6 @@ namespace IT
 
         private void OnEnable()
         {
-            
             BindNetworkEvents();
         }
 
@@ -42,7 +41,6 @@ namespace IT
         private void OnDestroy()
         {
             UnregisterToServiceContainer();
-            
         }
 
         private IEnumerator UnloadMainSceneOnClient()

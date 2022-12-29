@@ -30,86 +30,70 @@ namespace IT.Input
             ""id"": ""9723cd3e-2460-40e9-b8f6-a80aa9c79b7c"",
             ""actions"": [
                 {
-                    ""name"": ""MoveForward"",
-                    ""type"": ""Button"",
-                    ""id"": ""5a40b855-48e6-4a16-830d-1976765e0d6d"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
+                    ""name"": ""Movement"",
+                    ""type"": ""Value"",
+                    ""id"": ""28b487e5-a0dc-4757-8dc1-bedaf096fc31"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": ""NormalizeVector2"",
                     ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""MoveBackward"",
-                    ""type"": ""Button"",
-                    ""id"": ""e36d6805-eac9-4b0d-9459-8146264cfcac"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""MoveLeft"",
-                    ""type"": ""Button"",
-                    ""id"": ""376df196-10de-4e91-bbe5-8bcb2bd8d80d"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""MoveRight"",
-                    ""type"": ""Button"",
-                    ""id"": ""2ca5f5af-0ba8-4da7-9aa1-4bf155b8e1c0"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
                 {
-                    ""name"": """",
-                    ""id"": ""a7908c56-15d3-404d-a82c-9e61ee335d78"",
+                    ""name"": ""Keyboard"",
+                    ""id"": ""4c6a98c8-40e3-4be6-b060-b68666c8c064"",
+                    ""path"": ""2DVector"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Movement"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""up"",
+                    ""id"": ""dafbd3e6-4545-42cb-8e21-5f4afd3d32f4"",
                     ""path"": ""<Keyboard>/w"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""MoveForward"",
+                    ""action"": ""Movement"",
                     ""isComposite"": false,
-                    ""isPartOfComposite"": false
+                    ""isPartOfComposite"": true
                 },
                 {
-                    ""name"": """",
-                    ""id"": ""4e03c15d-9af3-48cb-ae94-42e7938cb4e8"",
+                    ""name"": ""down"",
+                    ""id"": ""9b880c79-5cd4-40df-a02f-c456e130bf3a"",
                     ""path"": ""<Keyboard>/s"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""MoveBackward"",
+                    ""action"": ""Movement"",
                     ""isComposite"": false,
-                    ""isPartOfComposite"": false
+                    ""isPartOfComposite"": true
                 },
                 {
-                    ""name"": """",
-                    ""id"": ""6ebb866b-f8fc-4ae6-903d-77552f562ade"",
+                    ""name"": ""left"",
+                    ""id"": ""9902205b-ad70-4481-8329-f08762236eda"",
                     ""path"": ""<Keyboard>/a"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""MoveLeft"",
+                    ""action"": ""Movement"",
                     ""isComposite"": false,
-                    ""isPartOfComposite"": false
+                    ""isPartOfComposite"": true
                 },
                 {
-                    ""name"": """",
-                    ""id"": ""c3882eac-4838-45fd-bda2-13f12e11ff02"",
+                    ""name"": ""right"",
+                    ""id"": ""180acfa6-e2e0-4bef-92cb-d0a640744f5e"",
                     ""path"": ""<Keyboard>/d"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""MoveRight"",
+                    ""action"": ""Movement"",
                     ""isComposite"": false,
-                    ""isPartOfComposite"": false
+                    ""isPartOfComposite"": true
                 }
             ]
         },
@@ -168,10 +152,7 @@ namespace IT.Input
 }");
             // Gameplay
             m_Gameplay = asset.FindActionMap("Gameplay", throwIfNotFound: true);
-            m_Gameplay_MoveForward = m_Gameplay.FindAction("MoveForward", throwIfNotFound: true);
-            m_Gameplay_MoveBackward = m_Gameplay.FindAction("MoveBackward", throwIfNotFound: true);
-            m_Gameplay_MoveLeft = m_Gameplay.FindAction("MoveLeft", throwIfNotFound: true);
-            m_Gameplay_MoveRight = m_Gameplay.FindAction("MoveRight", throwIfNotFound: true);
+            m_Gameplay_Movement = m_Gameplay.FindAction("Movement", throwIfNotFound: true);
             // Camera
             m_Camera = asset.FindActionMap("Camera", throwIfNotFound: true);
             m_Camera_CameraMovement = m_Camera.FindAction("Camera Movement", throwIfNotFound: true);
@@ -234,18 +215,12 @@ namespace IT.Input
         // Gameplay
         private readonly InputActionMap m_Gameplay;
         private IGameplayActions m_GameplayActionsCallbackInterface;
-        private readonly InputAction m_Gameplay_MoveForward;
-        private readonly InputAction m_Gameplay_MoveBackward;
-        private readonly InputAction m_Gameplay_MoveLeft;
-        private readonly InputAction m_Gameplay_MoveRight;
+        private readonly InputAction m_Gameplay_Movement;
         public struct GameplayActions
         {
             private @MainInput m_Wrapper;
             public GameplayActions(@MainInput wrapper) { m_Wrapper = wrapper; }
-            public InputAction @MoveForward => m_Wrapper.m_Gameplay_MoveForward;
-            public InputAction @MoveBackward => m_Wrapper.m_Gameplay_MoveBackward;
-            public InputAction @MoveLeft => m_Wrapper.m_Gameplay_MoveLeft;
-            public InputAction @MoveRight => m_Wrapper.m_Gameplay_MoveRight;
+            public InputAction @Movement => m_Wrapper.m_Gameplay_Movement;
             public InputActionMap Get() { return m_Wrapper.m_Gameplay; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
@@ -255,34 +230,16 @@ namespace IT.Input
             {
                 if (m_Wrapper.m_GameplayActionsCallbackInterface != null)
                 {
-                    @MoveForward.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnMoveForward;
-                    @MoveForward.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnMoveForward;
-                    @MoveForward.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnMoveForward;
-                    @MoveBackward.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnMoveBackward;
-                    @MoveBackward.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnMoveBackward;
-                    @MoveBackward.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnMoveBackward;
-                    @MoveLeft.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnMoveLeft;
-                    @MoveLeft.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnMoveLeft;
-                    @MoveLeft.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnMoveLeft;
-                    @MoveRight.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnMoveRight;
-                    @MoveRight.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnMoveRight;
-                    @MoveRight.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnMoveRight;
+                    @Movement.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnMovement;
+                    @Movement.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnMovement;
+                    @Movement.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnMovement;
                 }
                 m_Wrapper.m_GameplayActionsCallbackInterface = instance;
                 if (instance != null)
                 {
-                    @MoveForward.started += instance.OnMoveForward;
-                    @MoveForward.performed += instance.OnMoveForward;
-                    @MoveForward.canceled += instance.OnMoveForward;
-                    @MoveBackward.started += instance.OnMoveBackward;
-                    @MoveBackward.performed += instance.OnMoveBackward;
-                    @MoveBackward.canceled += instance.OnMoveBackward;
-                    @MoveLeft.started += instance.OnMoveLeft;
-                    @MoveLeft.performed += instance.OnMoveLeft;
-                    @MoveLeft.canceled += instance.OnMoveLeft;
-                    @MoveRight.started += instance.OnMoveRight;
-                    @MoveRight.performed += instance.OnMoveRight;
-                    @MoveRight.canceled += instance.OnMoveRight;
+                    @Movement.started += instance.OnMovement;
+                    @Movement.performed += instance.OnMovement;
+                    @Movement.canceled += instance.OnMovement;
                 }
             }
         }
@@ -322,10 +279,7 @@ namespace IT.Input
         public CameraActions @Camera => new CameraActions(this);
         public interface IGameplayActions
         {
-            void OnMoveForward(InputAction.CallbackContext context);
-            void OnMoveBackward(InputAction.CallbackContext context);
-            void OnMoveLeft(InputAction.CallbackContext context);
-            void OnMoveRight(InputAction.CallbackContext context);
+            void OnMovement(InputAction.CallbackContext context);
         }
         public interface ICameraActions
         {

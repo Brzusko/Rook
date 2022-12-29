@@ -16,8 +16,7 @@ public class InputTest : MonoBehaviour
 
     private void Update()
     {
-        NetworkedInput input = _inputReader.NetworkedInput;
-        Debug.Log(input.DecodeMovementInput().ToString());
+
     }
 
     private void OnDestroy()

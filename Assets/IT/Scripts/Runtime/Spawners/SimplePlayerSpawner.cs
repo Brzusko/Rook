@@ -55,16 +55,9 @@ namespace IT.Spawners
             int randomIndex = Random.Range(0, _spawnLocations.Count);
             Transform spawnLocation = _spawnLocations[randomIndex];
             GameObject playerInstance = Instantiate(_playerPrefab, spawnLocation.position, Quaternion.identity);
-            NetworkObject networkObject = playerInstance.GetComponent<NetworkObject>();
 
-            if (networkObject == null)
-            {
-                Debug.LogError("Provide player prefab with network object attached!!");
-                Destroy(playerInstance);
-                return;
-            }
 
-            InstanceFinder.ServerManager.Spawn(networkObject, conn);
+            InstanceFinder.ServerManager.Spawn(playerInstance, conn);
         }
     }
 }

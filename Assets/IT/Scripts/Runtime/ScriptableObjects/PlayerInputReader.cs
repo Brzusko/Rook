@@ -12,19 +12,10 @@ namespace IT.Input
     public class PlayerInputReader : ScriptableObject, MainInput.IGameplayActions
     {
         private MainInput _mainInput;
-        private bool _isForwardPressed;
-        private bool _isBackwardPressed;
-        private bool _isLeftPressed;
-        private bool _isRightPressed;
+        private Vector2 _movementInput = Vector2.zero;
 
-        public NetworkedInput NetworkedInput => new NetworkedInput
-        (
-            _isForwardPressed, 
-            _isBackwardPressed, 
-            _isLeftPressed,
-            _isRightPressed
-        );
-        
+        public NetworkedInput NetworkedInput => new NetworkedInput { MovementInput = _movementInput };
+
         private void OnEnable()
         {
             ConstructInput();
@@ -33,6 +24,7 @@ namespace IT.Input
         private void OnDisable()
         {
             DisableGameplayInput();
+            DisableCameraInput();
         }
 
         private void ConstructInput()
@@ -42,6 +34,8 @@ namespace IT.Input
 
             _mainInput = new MainInput();
             _mainInput.Gameplay.SetCallbacks(this);
+            EnableCameraInput();
+            EnableGameplayInput();
         }
 
         public void EnableGameplayInput()
@@ -64,46 +58,14 @@ namespace IT.Input
             _mainInput.Camera.Disable();
         }
 
-        public void OnMoveForward(InputAction.CallbackContext context)
+        public void OnMovement(InputAction.CallbackContext context)
         {
-            _isForwardPressed = context.phase == InputActionPhase.Performed;
-        }
-
-        public void OnMoveBackward(InputAction.CallbackContext context)
-        {
-            _isBackwardPressed = context.phase == InputActionPhase.Performed;
-        }
-
-        public void OnMoveLeft(InputAction.CallbackContext context)
-        {
-            _isLeftPressed = context.phase == InputActionPhase.Performed;
-        }
-
-        public void OnMoveRight(InputAction.CallbackContext context)
-        {
-            _isRightPressed = context.phase == InputActionPhase.Performed;
+            _movementInput = context.ReadValue<Vector2>();
         }
     }
 
-    public readonly struct NetworkedInput
+    public struct NetworkedInput
     {
-        private readonly byte _input;
-        public NetworkedInput(bool forwardState, bool backwardState, bool leftState, bool rightState)
-        {
-            _input = 0;
-            _input |= forwardState ? Constants.FORWARD_FLAG : Constants.NULL;
-            _input |= backwardState ? Constants.BACKWARD_FLAG : Constants.NULL;
-            _input |= leftState ? Constants.LEFT_FLAG : Constants.NULL;
-            _input |= rightState ? Constants.RIGHT_FLAG : Constants.NULL;
-        }
-
-        public Vector2 DecodeMovementInput()
-        {
-            int forward = (_input & Constants.FORWARD_FLAG) > Constants.NULL ? 1 : 0;
-            int backward = (_input & Constants.BACKWARD_FLAG) > Constants.NULL ? -1 : 0;
-            int left = (_input & Constants.LEFT_FLAG) > Constants.NULL ? -1 : 0;
-            int right = (_input & Constants.RIGHT_FLAG) > Constants.NULL ? 1 : 0;
-            return new Vector2((left + right), (forward + backward)).normalized;
-        }
+        public Vector2 MovementInput;
     }
 }

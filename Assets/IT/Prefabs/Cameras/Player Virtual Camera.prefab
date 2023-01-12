@@ -32,7 +32,7 @@ Transform:
   m_Children:
   - {fileID: 3574710832361665396}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 59.33, y: 0, z: 0}
 --- !u!114 &3574710831091095000
 MonoBehaviour:
@@ -86,8 +86,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PlayerIndex: -1
   AutoEnableInputs: 0
-  XYAxis: {fileID: 3486976545584189954, guid: 087f794e8c91d0e4cac50aa6f3f2fecf, type: 3}
-  ZAxis: {fileID: 0}
+  XYAxis: {fileID: 7510278863092357968, guid: 087f794e8c91d0e4cac50aa6f3f2fecf, type: 3}
+  ZAxis: {fileID: 7510278863092357968, guid: 087f794e8c91d0e4cac50aa6f3f2fecf, type: 3}
 --- !u!1 &3574710832361665399
 GameObject:
   m_ObjectHideFlags: 0

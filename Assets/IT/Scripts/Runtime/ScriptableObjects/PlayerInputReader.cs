@@ -9,8 +9,11 @@ using UnityEngine.InputSystem;
 namespace IT.Input
 {
     [CreateAssetMenu(fileName = "InputReader", menuName = "IT/Input/Input Reader")]
-    public class PlayerInputReader : ScriptableObject, MainInput.IGameplayActions
+    public class PlayerInputReader : ScriptableObject, MainInput.IGameplayActions, MainInput.ICameraActions
     {
+        public event Action<Vector2> CameraRotation;
+        public event Action FreeLookRequest;
+
         private MainInput _mainInput;
         private Vector2 _movementInput = Vector2.zero;
 
@@ -34,6 +37,7 @@ namespace IT.Input
 
             _mainInput = new MainInput();
             _mainInput.Gameplay.SetCallbacks(this);
+            _mainInput.Camera.SetCallbacks(this);
             EnableCameraInput();
             EnableGameplayInput();
         }
@@ -61,6 +65,22 @@ namespace IT.Input
         public void OnMovement(InputAction.CallbackContext context)
         {
             _movementInput = context.ReadValue<Vector2>();
+        }
+
+        public void OnCameraMovement(InputAction.CallbackContext context)
+        {
+            if(context.phase != InputActionPhase.Performed)
+                return;
+            
+            CameraRotation?.Invoke(context.ReadValue<Vector2>());
+        }
+
+        public void OnRequestFreeLook(InputAction.CallbackContext context)
+        {
+            if(context.phase != InputActionPhase.Performed)
+                return;
+            
+            FreeLookRequest?.Invoke();
         }
     }
 

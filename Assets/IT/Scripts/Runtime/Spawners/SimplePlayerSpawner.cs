@@ -10,23 +10,24 @@ using Random = UnityEngine.Random;
 
 namespace IT.Spawners
 {
-    public class SimplePlayerSpawner : MonoBehaviour
+    public class SimplePlayerSpawner : NetworkBehaviour
     {
-        [SerializeField] private GameObject _playerPrefab;
+        [SerializeField] private NetworkObject _playerPrefab;
         [SerializeField] private List<Transform> _spawnLocations;
-
         private bool _areEventsBound;
 
-        private void OnEnable()
+        public override void OnStartServer()
         {
+            base.OnStartServer();
             BindEvents();
         }
 
-        private void OnDisable()
+        public override void OnStopServer()
         {
+            base.OnStopServer();
             UnbindEvents();
         }
-
+        
         private void BindEvents()
         {
             if (_areEventsBound)
@@ -54,10 +55,9 @@ namespace IT.Spawners
         {
             int randomIndex = Random.Range(0, _spawnLocations.Count);
             Transform spawnLocation = _spawnLocations[randomIndex];
-            GameObject playerInstance = Instantiate(_playerPrefab, spawnLocation.position, Quaternion.identity);
+            NetworkObject playerInstance = Instantiate(_playerPrefab, spawnLocation.position, Quaternion.identity);
 
-
-            InstanceFinder.ServerManager.Spawn(playerInstance, conn);
+            InstanceFinder.ServerManager.Spawn(playerInstance);
         }
     }
 }

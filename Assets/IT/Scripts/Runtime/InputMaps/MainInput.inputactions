@@ -85,6 +85,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
+                },
+                {
+                    "name": "Request Free Look",
+                    "type": "Button",
+                    "id": "06048597-84ec-4525-ae20-2c6e33cc75dc",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -120,6 +129,17 @@
                     "action": "Camera Movement",
                     "isComposite": false,
                     "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "180e3ec8-3230-4285-b218-459cea3fc68f",
+                    "path": "<Keyboard>/f8",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Request Free Look",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         }

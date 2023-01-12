@@ -109,6 +109,15 @@ namespace IT.Input
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Request Free Look"",
+                    ""type"": ""Button"",
+                    ""id"": ""06048597-84ec-4525-ae20-2c6e33cc75dc"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -144,6 +153,17 @@ namespace IT.Input
                     ""action"": ""Camera Movement"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""180e3ec8-3230-4285-b218-459cea3fc68f"",
+                    ""path"": ""<Keyboard>/f8"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Request Free Look"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -156,6 +176,7 @@ namespace IT.Input
             // Camera
             m_Camera = asset.FindActionMap("Camera", throwIfNotFound: true);
             m_Camera_CameraMovement = m_Camera.FindAction("Camera Movement", throwIfNotFound: true);
+            m_Camera_RequestFreeLook = m_Camera.FindAction("Request Free Look", throwIfNotFound: true);
         }
 
         public void Dispose()
@@ -249,11 +270,13 @@ namespace IT.Input
         private readonly InputActionMap m_Camera;
         private ICameraActions m_CameraActionsCallbackInterface;
         private readonly InputAction m_Camera_CameraMovement;
+        private readonly InputAction m_Camera_RequestFreeLook;
         public struct CameraActions
         {
             private @MainInput m_Wrapper;
             public CameraActions(@MainInput wrapper) { m_Wrapper = wrapper; }
             public InputAction @CameraMovement => m_Wrapper.m_Camera_CameraMovement;
+            public InputAction @RequestFreeLook => m_Wrapper.m_Camera_RequestFreeLook;
             public InputActionMap Get() { return m_Wrapper.m_Camera; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
@@ -266,6 +289,9 @@ namespace IT.Input
                     @CameraMovement.started -= m_Wrapper.m_CameraActionsCallbackInterface.OnCameraMovement;
                     @CameraMovement.performed -= m_Wrapper.m_CameraActionsCallbackInterface.OnCameraMovement;
                     @CameraMovement.canceled -= m_Wrapper.m_CameraActionsCallbackInterface.OnCameraMovement;
+                    @RequestFreeLook.started -= m_Wrapper.m_CameraActionsCallbackInterface.OnRequestFreeLook;
+                    @RequestFreeLook.performed -= m_Wrapper.m_CameraActionsCallbackInterface.OnRequestFreeLook;
+                    @RequestFreeLook.canceled -= m_Wrapper.m_CameraActionsCallbackInterface.OnRequestFreeLook;
                 }
                 m_Wrapper.m_CameraActionsCallbackInterface = instance;
                 if (instance != null)
@@ -273,6 +299,9 @@ namespace IT.Input
                     @CameraMovement.started += instance.OnCameraMovement;
                     @CameraMovement.performed += instance.OnCameraMovement;
                     @CameraMovement.canceled += instance.OnCameraMovement;
+                    @RequestFreeLook.started += instance.OnRequestFreeLook;
+                    @RequestFreeLook.performed += instance.OnRequestFreeLook;
+                    @RequestFreeLook.canceled += instance.OnRequestFreeLook;
                 }
             }
         }
@@ -284,6 +313,7 @@ namespace IT.Input
         public interface ICameraActions
         {
             void OnCameraMovement(InputAction.CallbackContext context);
+            void OnRequestFreeLook(InputAction.CallbackContext context);
         }
     }
 }

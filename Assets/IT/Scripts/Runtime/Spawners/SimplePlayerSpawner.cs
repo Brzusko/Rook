@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using FishNet;
 using FishNet.Connection;
 using FishNet.Managing.Scened;
+using FishNet.Managing.Server;
 using FishNet.Object;
+using IT.Interfaces;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -14,7 +16,19 @@ namespace IT.Spawners
     {
         [SerializeField] private NetworkObject _playerPrefab;
         [SerializeField] private List<Transform> _spawnLocations;
+        [SerializeField] private GameObject _playersConsciousnessGameObject;
+        [SerializeField] private GameObject _playerFactoryGameObject;
+            
         private bool _areEventsBound;
+        private SceneManager _sceneManager;
+        private ServerManager _serverManager;
+        private IPlayersConsciousness _playersConsciousness;
+        private IPlayerFactory _playerFactory;
+
+        private void Start()
+        {
+            InitializeOnce();
+        }
 
         public override void OnStartServer()
         {
@@ -34,7 +48,7 @@ namespace IT.Spawners
                 return;
 
             _areEventsBound = true;
-            InstanceFinder.SceneManager.OnClientLoadedStartScenes += OnClientPresenceChangeEnd;
+            _sceneManager.OnClientLoadedStartScenes += OnClientPresenceChangeEnd;
         }
 
         private void UnbindEvents()
@@ -43,7 +57,15 @@ namespace IT.Spawners
                 return;
 
             _areEventsBound = false;
-            InstanceFinder.SceneManager.OnClientLoadedStartScenes -= OnClientPresenceChangeEnd;
+            _sceneManager.OnClientLoadedStartScenes -= OnClientPresenceChangeEnd;
+        }
+
+        private void InitializeOnce()
+        {
+            _sceneManager = InstanceFinder.SceneManager;
+            _serverManager = InstanceFinder.ServerManager;
+            _playersConsciousness = _playersConsciousnessGameObject.GetComponent<IPlayersConsciousness>();
+            //_playerFactory = _playerFactoryGameObject.GetComponent<IPlayerFactory>();
         }
 
         private void OnClientPresenceChangeEnd(NetworkConnection conn, bool asServer)
@@ -53,11 +75,18 @@ namespace IT.Spawners
 
         private void SpawnPlayer(NetworkConnection conn)
         {
-            int randomIndex = Random.Range(0, _spawnLocations.Count);
-            Transform spawnLocation = _spawnLocations[randomIndex];
-            NetworkObject playerInstance = Instantiate(_playerPrefab, spawnLocation.position, Quaternion.identity);
+            IPlayerConsciousness playerConsciousness = _playersConsciousness.CreatePlayerConsciousness(conn);
 
-            InstanceFinder.ServerManager.Spawn(playerInstance);
+            if (playerConsciousness == null)
+            {
+                Debug.LogError("Could not spawn player consciousness");
+                return;
+            }
+
+            playerConsciousness.NetworkObject.name =
+                $"{playerConsciousness.NetworkObject.name}[{conn.ClientId.ToString()}]";
+            
+            _serverManager.Spawn(playerConsciousness.NetworkObject, conn);
         }
     }
 }

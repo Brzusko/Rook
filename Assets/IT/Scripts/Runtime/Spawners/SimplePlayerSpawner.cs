@@ -18,11 +18,13 @@ namespace IT.Spawners
         [SerializeField] private List<Transform> _spawnLocations;
         [SerializeField] private GameObject _playersConsciousnessGameObject;
         [SerializeField] private GameObject _playerFactoryGameObject;
+
+        [SerializeField] private NetworkObject _playerEntityPrefab;
             
         private bool _areEventsBound;
         private SceneManager _sceneManager;
         private ServerManager _serverManager;
-        private IPlayersConsciousness _playersConsciousness;
+        private IConsciousnessCreator _playersConsciousnessCreator;
         private IPlayerFactory _playerFactory;
 
         private void Start()
@@ -64,7 +66,7 @@ namespace IT.Spawners
         {
             _sceneManager = InstanceFinder.SceneManager;
             _serverManager = InstanceFinder.ServerManager;
-            _playersConsciousness = _playersConsciousnessGameObject.GetComponent<IPlayersConsciousness>();
+            _playersConsciousnessCreator = _playersConsciousnessGameObject.GetComponent<IConsciousnessCreator>();
             //_playerFactory = _playerFactoryGameObject.GetComponent<IPlayerFactory>();
         }
 
@@ -75,7 +77,7 @@ namespace IT.Spawners
 
         private void SpawnPlayer(NetworkConnection conn)
         {
-            IPlayerConsciousness playerConsciousness = _playersConsciousness.CreatePlayerConsciousness(conn);
+            IPlayerConsciousness playerConsciousness = _playersConsciousnessCreator.CreateConsciousness(conn);
 
             if (playerConsciousness == null)
             {
@@ -83,10 +85,15 @@ namespace IT.Spawners
                 return;
             }
 
-            playerConsciousness.NetworkObject.name =
-                $"{playerConsciousness.NetworkObject.name}[{conn.ClientId.ToString()}]";
+            int spawnIndex = Random.Range(0, _spawnLocations.Count - 1);
+            Vector3 spawnLocation = _spawnLocations[spawnIndex].position;
+            NetworkObject playerEntityInstance = Instantiate(_playerEntityPrefab, spawnLocation, Quaternion.identity);
+            IEntityToPossess playerEntity = playerEntityInstance.GetComponent<IEntityToPossess>();
             
             _serverManager.Spawn(playerConsciousness.NetworkObject, conn);
+            _serverManager.Spawn(playerEntityInstance);
+            
+            playerConsciousness.Possess(playerEntity);
         }
     }
 }

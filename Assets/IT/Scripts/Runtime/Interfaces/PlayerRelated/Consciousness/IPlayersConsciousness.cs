@@ -7,6 +7,5 @@ namespace IT.Interfaces
 {
     public interface IPlayersConsciousness
     {
-        public IPlayerConsciousness CreatePlayerConsciousness(NetworkConnection connection);
     }
 }

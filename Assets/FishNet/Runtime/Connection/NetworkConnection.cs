@@ -12,7 +12,7 @@ namespace FishNet.Connection
     /// <summary>
     /// A container for a connected client used to perform actions on and gather information for the declared client.
     /// </summary>
-    public partial class NetworkConnection : IEquatable<NetworkConnection>
+    public partial class NetworkConnection : IEquatable<NetworkConnection>, IComparable<NetworkConnection>
     {
 
         #region Public.
@@ -144,6 +144,12 @@ namespace FishNet.Connection
         #endregion
 
         #region Comparers.
+
+        public int CompareTo(NetworkConnection other)
+        {
+            return ClientId.CompareTo(other.ClientId);
+        }
+
         public override bool Equals(object obj)
         {
             if (obj is NetworkConnection nc)

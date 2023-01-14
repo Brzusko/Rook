@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using FishNet;
 using FishNet.Connection;
 using FishNet.Managing.Server;
 using FishNet.Object;
@@ -10,17 +11,20 @@ using UnityEngine;
 
 namespace IT
 {
-    public class PlayersConsciousness : NetworkBehaviour, IPlayersConsciousness
+    public class PlayersConsciousness : NetworkBehaviour, IPlayersConsciousness, IConsciousnessCreator
     {
         [SerializeField] private NetworkObject _playerConsciousnessReference;
 
         private ServerManager _serverManager;
-        private Dictionary<NetworkConnection, IPlayerConsciousness> _playerConsciousnesses;
         private bool _areEventsBound;
+
+        private SortedList<NetworkConnection, IPlayerConsciousness> _playerConsciousnesses;
 
         private void Initialize()
         {
-            _playerConsciousnesses = new Dictionary<NetworkConnection, IPlayerConsciousness>();
+            _serverManager = InstanceFinder.ServerManager;
+            int maxClients = ServiceContainer.Get<INetworkBridge>().MaxClients;
+            _playerConsciousnesses = new SortedList<NetworkConnection, IPlayerConsciousness>(maxClients);
         }
 
         private void Clear()
@@ -33,7 +37,8 @@ namespace IT
         {
             if(_areEventsBound)
                 return;
-
+            
+            _serverManager.OnRemoteConnectionState += OnRemoteConnectionState;
             _areEventsBound = true;
         }
 
@@ -42,7 +47,7 @@ namespace IT
             if(!_areEventsBound)
                 return;
 
-            _serverManager.OnRemoteConnectionState += OnRemoteConnectionState;
+            _serverManager.OnRemoteConnectionState -= OnRemoteConnectionState;
             _areEventsBound = false;
         }
 
@@ -51,6 +56,11 @@ namespace IT
             if(args.ConnectionState != RemoteConnectionState.Stopped)
                 return;
             
+            ClearConsciousnessForConnection(connection);
+        }
+
+        private void ClearConsciousnessForConnection(NetworkConnection connection)
+        {
             if(!_playerConsciousnesses.ContainsKey(connection))
                 return;
             
@@ -74,27 +84,30 @@ namespace IT
             UnbindEvents();
         }
 
-        public IPlayerConsciousness CreatePlayerConsciousness(NetworkConnection connection)
+        #region Interfaces
+
+        public IPlayerConsciousness CreateConsciousness(NetworkConnection connection)
         {
             if (_playerConsciousnesses.ContainsKey(connection))
-            {
-                Debug.LogError("Could not create consciousness!");
                 return null;
+
+            NetworkObject playerConsciousnessInstance = Instantiate(_playerConsciousnessReference);
+            playerConsciousnessInstance.name = $"{nameof(IPlayerConsciousness)}[{connection.ClientId.ToString()}]";
+            IPlayerConsciousness playerConsciousness = playerConsciousnessInstance.GetComponent<IPlayerConsciousness>();
+
+            if (playerConsciousness != null)
+            {
+                _playerConsciousnesses.Add(connection, playerConsciousness);
+                return playerConsciousness;
             }
 
-            NetworkObject networkObject = Instantiate(_playerConsciousnessReference);
-            IPlayerConsciousness playerConsciousness = networkObject.GetComponent<IPlayerConsciousness>();
-
-            if (playerConsciousness == null)
-            {
-                Debug.LogError($"Provided network object is not implementing {nameof(IPlayerConsciousness)}");
-                Destroy(networkObject);
-                return null;
-            }
+            Debug.LogError($"{nameof(playerConsciousness)} is null, provide correct prefab");
+            Destroy(playerConsciousnessInstance);
             
-            return playerConsciousness;
+            return null;
         }
-        
-        
+
+        #endregion
+
     }
 }

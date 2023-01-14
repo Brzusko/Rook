@@ -3,9 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using FishNet;
+using FishNet.Managing.Client;
 using FishNet.Managing.Scened;
 using FishNet.Transporting;
 using FishNet.Managing.Scened;
+using FishNet.Managing.Server;
 using IT.Interfaces;
 using IT.ScriptableObjects;
 using UnityEngine;
@@ -19,28 +21,25 @@ namespace IT
         
         private bool _registered;
         private bool _areNetworkEventsBound;
+        private ServerManager _serverManager;
+        private ClientManager _clientManager;
 
         public Type Type => typeof(ISceneManager);
         public GameObject GameObject => gameObject;
 
         private void Start()
         {
+            _serverManager = InstanceFinder.ServerManager;
+            _clientManager = InstanceFinder.ClientManager;
+            
             RegisterToServiceContainer();
-        }
-
-        private void OnEnable()
-        {
             BindNetworkEvents();
-        }
-
-        private void OnDisable()
-        {
-            UnbindNetworkEvents();
         }
 
         private void OnDestroy()
         {
             UnregisterToServiceContainer();
+            UnbindNetworkEvents();
         }
 
         private IEnumerator UnloadMainSceneOnClient()
@@ -75,8 +74,8 @@ namespace IT
                 return;
 
             _areNetworkEventsBound = true;
-            InstanceFinder.ServerManager.OnServerConnectionState += OnInternalServerState;
-            InstanceFinder.ClientManager.OnClientConnectionState += OnInternalClientState;
+            _serverManager.OnServerConnectionState += OnInternalServerState;
+            _clientManager.OnClientConnectionState += OnInternalClientState;
         }
 
         private void UnbindNetworkEvents()
@@ -85,8 +84,8 @@ namespace IT
                 return;
             
             _areNetworkEventsBound = false;
-            InstanceFinder.ServerManager.OnServerConnectionState -= OnInternalServerState;
-            InstanceFinder.ClientManager.OnClientConnectionState -= OnInternalClientState;
+            _serverManager.OnServerConnectionState -= OnInternalServerState;
+            _clientManager.OnClientConnectionState -= OnInternalClientState;
         }
 
         private void OnInternalServerState(ServerConnectionStateArgs args)

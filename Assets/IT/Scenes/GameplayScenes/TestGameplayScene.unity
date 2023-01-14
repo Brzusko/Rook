@@ -752,6 +752,8 @@ MonoBehaviour:
   - {fileID: 1720525173}
   _playersConsciousnessGameObject: {fileID: 1218216419}
   _playerFactoryGameObject: {fileID: 0}
+  _playerEntityPrefab: {fileID: 6389048003031209733, guid: 3c750c475ce87894196b6d2ab95a56aa,
+    type: 3}
 --- !u!4 &1696877027
 Transform:
   m_ObjectHideFlags: 0
@@ -794,6 +796,8 @@ MonoBehaviour:
   <SceneId>k__BackingField: 6782125727962205185
   <AssetPathHash>k__BackingField: 0
   _sceneNetworkObjects:
+  - {fileID: 0}
+  - {fileID: 1218216421}
   - {fileID: 1696877028}
 --- !u!1001 &1720525172
 PrefabInstance:
@@ -951,7 +955,7 @@ PrefabInstance:
     - target: {fileID: 3574710831091095003, guid: 73b16883fd88c634991532c2ec112a66,
         type: 3}
       propertyPath: m_Name
-      value: Player Virtual Camera
+      value: Map Virtual Camera
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

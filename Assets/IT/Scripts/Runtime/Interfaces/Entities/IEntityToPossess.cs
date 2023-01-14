@@ -2,17 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class IEntityToPossess : MonoBehaviour
+namespace IT.Interfaces
 {
-    // Start is called before the first frame update
-    void Start()
+    public interface IEntityToPossess : INetworkObject
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        public bool CanBePossessed { get; }
+        public void PossessBy(IPlayerConsciousness playerConsciousness);
+        public void RevokePossession();
     }
 }

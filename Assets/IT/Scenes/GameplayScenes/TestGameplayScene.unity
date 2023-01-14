@@ -500,7 +500,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-1494590
+  m_Name: pb_Mesh-1975582
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -795,9 +795,7 @@ MonoBehaviour:
   _scenePathHash: 1579086698
   <SceneId>k__BackingField: 6782125727962205185
   <AssetPathHash>k__BackingField: 0
-  _sceneNetworkObjects:
-  - {fileID: 1218216421}
-  - {fileID: 1696877028}
+  _sceneNetworkObjects: []
 --- !u!1001 &1720525172
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1144,6 +1142,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: PlayersConsciousness
+      objectReference: {fileID: 0}
+    - target: {fileID: 6101977016044155395, guid: c056b245f9390d546b4a7a22ccc08702,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6101977016044155396, guid: c056b245f9390d546b4a7a22ccc08702,
         type: 3}

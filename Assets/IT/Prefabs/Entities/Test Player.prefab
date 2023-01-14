@@ -125,9 +125,10 @@ GameObject:
   m_Component:
   - component: {fileID: 1283863882254217425}
   - component: {fileID: 3436592032921280632}
+  - component: {fileID: 5905720989401216359}
+  - component: {fileID: 5446920144164943184}
   - component: {fileID: 8762922411594502046}
   - component: {fileID: 8733617499463994584}
-  - component: {fileID: 5446920144164943184}
   - component: {fileID: 2139183522537339524}
   - component: {fileID: 1912049324724089206}
   - component: {fileID: 1961820169530306613}
@@ -170,6 +171,61 @@ MonoBehaviour:
   _componentIndexCache: 0
   _addedNetworkObject: {fileID: 1912049324724089206}
   _networkObjectCache: {fileID: 1912049324724089206}
+--- !u!114 &5905720989401216359
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7849939560007978409}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 577a3e6a71e801a4aa3a9b55022a670e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cameraPrefabToSpawn: {fileID: 3574710831091095003, guid: 73b16883fd88c634991532c2ec112a66,
+    type: 3}
+  _lookAt: {fileID: 3564965828190545619}
+  _follow: {fileID: 3564965828190545619}
+  _entityGameObject: {fileID: 7849939560007978409}
+--- !u!114 &5446920144164943184
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7849939560007978409}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a5e05c5b0509214d911dd005a610d9a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _planeConstraint: 0
+  _rootTransform: {fileID: 0}
+  _rootTransformOffset: {x: 0, y: 0, z: 0}
+  _radius: 0.5
+  _height: 2
+  _slopeLimit: 50
+  _stepOffset: 0.45
+  _perchOffset: 0.5
+  _perchAdditionalHeight: 0.4
+  _slopeLimitOverride: 0
+  _useFlatTop: 0
+  _useFlatBaseForGroundChecks: 0
+  _collisionLayers:
+    serializedVersion: 2
+    m_Bits: 1
+  _triggerInteraction: 1
+  _advanced:
+    minMoveDistance: 0
+    maxMovementIterations: 5
+    maxDepenetrationIterations: 1
+    enablePhysicsInteraction: 0
+    allowPushCharacters: 0
+    impartPlatformMovement: 0
+    impartPlatformRotation: 0
+    impartPlatformVelocity: 0
+  _minSlopeLimit: 0.6426539
 --- !u!54 &8762922411594502046
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -220,44 +276,6 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 1, z: 0}
---- !u!114 &5446920144164943184
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7849939560007978409}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8a5e05c5b0509214d911dd005a610d9a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _planeConstraint: 0
-  _rootTransform: {fileID: 0}
-  _rootTransformOffset: {x: 0, y: 0, z: 0}
-  _radius: 0.5
-  _height: 2
-  _slopeLimit: 50
-  _stepOffset: 0.45
-  _perchOffset: 0.5
-  _perchAdditionalHeight: 0.4
-  _slopeLimitOverride: 0
-  _useFlatTop: 0
-  _useFlatBaseForGroundChecks: 0
-  _collisionLayers:
-    serializedVersion: 2
-    m_Bits: 1
-  _triggerInteraction: 1
-  _advanced:
-    minMoveDistance: 0
-    maxMovementIterations: 5
-    maxDepenetrationIterations: 1
-    enablePhysicsInteraction: 0
-    allowPushCharacters: 0
-    impartPlatformMovement: 0
-    impartPlatformRotation: 0
-    impartPlatformVelocity: 0
-  _minSlopeLimit: 0.6426539
 --- !u!114 &2139183522537339524
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -426,6 +444,12 @@ PrefabInstance:
 --- !u!4 &3560006844415069515 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4580766925885248, guid: 2f3e27eecb190e44a9af50723c394274,
+    type: 3}
+  m_PrefabInstance: {fileID: 3564574306295562763}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &3564965828190545619 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4122045328614616, guid: 2f3e27eecb190e44a9af50723c394274,
     type: 3}
   m_PrefabInstance: {fileID: 3564574306295562763}
   m_PrefabAsset: {fileID: 0}

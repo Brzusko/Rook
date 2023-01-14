@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using FishNet.Connection;
 using FishNet.Object;
 using IT.Interfaces;
 using UnityEngine;
@@ -30,5 +31,11 @@ public class PlayerEntity : NetworkBehaviour, IEntityToPossess
         
         RemoveOwnership();
         ServerPossessChanged?.Invoke(false);
+    }
+    
+    public override void OnOwnershipClient(NetworkConnection prevOwner)
+    {
+        base.OnOwnershipClient(prevOwner);
+        ClientPossessChanged?.Invoke(IsOwner);
     }
 }

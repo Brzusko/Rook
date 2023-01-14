@@ -9,6 +9,9 @@ using UnityEngine;
 
 public class SimplePossessableEntity : NetworkBehaviour, IEntityToPossess
 {
+    public event Action<bool> ServerPossessChanged;
+    public event Action<bool> ClientPossessChanged;
+    
     [SerializeField] private CameraSpawner _cameraSpawner;
     
     private CinemachineVirtualCamera _virtualCamera;
@@ -32,14 +35,16 @@ public class SimplePossessableEntity : NetworkBehaviour, IEntityToPossess
     }
 
     [Server]
-    public void PossessBy(IPlayerConsciousness playerConsciousness)
+    public bool PossessBy(IPlayerConsciousness playerConsciousness)
     {
         if(_isPossessed)
-            return;
+            return false;
         
         NetworkObject.GiveOwnership(playerConsciousness.NetworkObject.Owner);
-
+        ServerPossessChanged?.Invoke(true);
+        
         _isPossessed = true;
+        return true;
     }
     
     [Server]
@@ -49,6 +54,7 @@ public class SimplePossessableEntity : NetworkBehaviour, IEntityToPossess
             return;
 
         NetworkObject.RemoveOwnership();
+        ServerPossessChanged?.Invoke(false);
         
         _isPossessed = false;
     }
@@ -56,7 +62,8 @@ public class SimplePossessableEntity : NetworkBehaviour, IEntityToPossess
     public override void OnOwnershipClient(NetworkConnection prevOwner)
     {
         base.OnOwnershipClient(prevOwner);
-
+        ClientPossessChanged?.Invoke(IsOwner);
+        
         if (IsOwner)
         {
             _virtualCamera.Priority = 10;

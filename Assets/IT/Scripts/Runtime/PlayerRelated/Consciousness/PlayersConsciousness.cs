@@ -98,6 +98,7 @@ namespace IT
             if (playerConsciousness != null)
             {
                 _playerConsciousnesses.Add(connection, playerConsciousness);
+                playerConsciousness.Initialize(this);
                 return playerConsciousness;
             }
 

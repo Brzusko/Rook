@@ -8,6 +8,7 @@ public class PlayerConsciousness : NetworkBehaviour, IPlayerConsciousness
 {
     private IPlayersConsciousness _playersConsciousness;
     private IEntityToPossess _currentPossession;
+    public bool HasPossession => _currentPossession != null;
     
     [Server]
     public void Initialize(IPlayersConsciousness playersConsciousness)
@@ -20,9 +21,9 @@ public class PlayerConsciousness : NetworkBehaviour, IPlayerConsciousness
     {
         if(!entityToPossess.CanBePossessed || _currentPossession != null)
             return;
-
-        _currentPossession = entityToPossess;
-        entityToPossess.PossessBy(this);
+        
+        if(entityToPossess.PossessBy(this))
+            _currentPossession = entityToPossess;
     }
     
     [Server]

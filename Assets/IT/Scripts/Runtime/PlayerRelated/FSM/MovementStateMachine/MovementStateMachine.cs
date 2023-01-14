@@ -8,6 +8,7 @@ using FishNet.Object;
 using FishNet.Object.Prediction;
 using IT.FSM.States;
 using IT.Input;
+using IT.Interfaces;
 using IT.Interfaces.FSM;
 using Mono.CSharp;
 using UnityEngine;
@@ -19,16 +20,20 @@ namespace IT.FSM
         [SerializeField] private CharacterMovement _characterMovement;
         [SerializeField] private PlayerInputReader _input;
         [SerializeField] private MovementStateID _startingState;
+        [SerializeField] private GameObject _playerEntityGameObject;
 
         private Dictionary<MovementStateID, IState<NetworkedInput>> _states;
         private MovementStateID _currentStateID;
         private IState<NetworkedInput> _currentState;
         private MovementContext _context;
         private TimeManager _timeManager;
+        
+        private IEntityToPossess _playerEntity;
         public MovementContext Context => _context;
         
         private void Awake()
         {
+            InitializeOnce();
             InitializeStateMachine();
             ChangeState(_startingState);
         }
@@ -39,32 +44,41 @@ namespace IT.FSM
             
             _timeManager.OnTick += OnTick;
             _timeManager.OnPreTick += OnPreTick;
-            //_timeManager.OnPostTick += OnTick;
+            _playerEntity.ClientPossessChanged += OnClientPossessChanged;
         }
 
         private void OnDestroy()
         {
             _timeManager.OnTick -= OnTick;
             _timeManager.OnPreTick -= OnPreTick;
-            //_timeManager.OnPostTick -= OnPostTick;
+            _playerEntity.ClientPossessChanged -= OnClientPossessChanged;
         }
 
         public override void OnStartClient()
         {
             base.OnStartClient();
-            
+            CheckMovementComponentState();
+        }
+
+        private void InitializeOnce()
+        {
+            _playerEntity = _playerEntityGameObject.GetComponent<IEntityToPossess>();
+        }
+
+        private void CheckMovementComponentState()
+        {
             _characterMovement.enabled = (base.IsServer || base.IsOwner);
         }
-        
+
         private void InitializeStateMachine()
         {
             _context = new MovementContext(_characterMovement);
                 
             _states = new Dictionary<MovementStateID, IState<NetworkedInput>>
             {
-                {
-                  MovementStateID.IDLE,
-                  new MovementIdleState(this)
+                { 
+                    MovementStateID.IDLE, 
+                    new MovementIdleState(this)
                 },
                 {
                     MovementStateID.MOVING,
@@ -72,6 +86,8 @@ namespace IT.FSM
                 }
             };
         }
+
+        #region Event Handlers
 
         private void OnPreTick()
         {
@@ -88,19 +104,21 @@ namespace IT.FSM
                 Simulation(input, false);
             }
 
-            if (IsServer)
-            {
-                Simulation(default, true);
-                Reconcile(GenerateReconcileData(), true);
-            }
+            if (!IsServer) return;
+            
+            Simulation(default, true);
+            Reconcile(GenerateReconcileData(), true);
         }
 
-        private void OnPostTick()
+        private void OnClientPossessChanged(bool possessionGained)
         {
-            if(!IsServer)
-                return;
+            CheckMovementComponentState();
         }
-        
+
+        #endregion
+
+        #region Client side prediction
+
         [Replicate]
         private void Simulation(NetworkedInput input, bool asServer, bool isReplaying = false)
         {
@@ -117,7 +135,9 @@ namespace IT.FSM
             _characterMovement.SetState(state);
             ChangeState(data.StateID);
         }
-        
+
+        #endregion
+
         private ReconcileData GenerateReconcileData()
         {
             CharacterMovement.State state = _characterMovement.GetState();
@@ -136,20 +156,7 @@ namespace IT.FSM
             };
         }
 
-        private struct ReconcileData
-        {
-            public Vector3 Velocity;
-            public Vector3 Position;
-            public Vector3 GroundNormal;
-            public Quaternion Rotation;
-            public bool IsConstrainedToGround;
-            public float UnconstrainedTimer;
-            public bool HitGround;
-            public bool IsWalkable;
-            public MovementStateID StateID;
-        }
-
-        
+        #region Interfaces
         public void ChangeState(MovementStateID stateID)
         {
             _currentStateID = stateID;
@@ -164,6 +171,24 @@ namespace IT.FSM
             _currentState = _states[_currentStateID];
             _currentState?.Enter();
         }
+        #endregion
+
+        #region Structs
+        
+        private struct ReconcileData
+        {
+            public Vector3 Velocity;
+            public Vector3 Position;
+            public Vector3 GroundNormal;
+            public Quaternion Rotation;
+            public bool IsConstrainedToGround;
+            public float UnconstrainedTimer;
+            public bool HitGround;
+            public bool IsWalkable;
+            public MovementStateID StateID;
+        }
+        
+        #endregion
     }
 
     public class MovementContext
@@ -177,4 +202,5 @@ namespace IT.FSM
         public float MaxSpeed => 9f;
         public float Acceleration => 20f;
     }
+    
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace IT.FSM
 {
-    public enum MovementStateID : byte
+    public enum PlayerStateID : byte
     {
         IDLE,
         MOVING,

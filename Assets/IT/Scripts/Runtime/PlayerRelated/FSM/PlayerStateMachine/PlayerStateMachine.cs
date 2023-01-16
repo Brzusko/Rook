@@ -15,20 +15,22 @@ using UnityEngine;
 
 namespace IT.FSM
 {
-    public class MovementStateMachine : NetworkBehaviour, IStateMachine<MovementStateID, MovementContext>
+    public class PlayerStateMachine : NetworkBehaviour, IStateMachine<PlayerStateID, MovementContext>
     {
         [SerializeField] private CharacterMovement _characterMovement;
         [SerializeField] private PlayerInputReader _input;
-        [SerializeField] private MovementStateID _startingState;
+        [SerializeField] private PlayerStateID _startingState;
         [SerializeField] private GameObject _playerEntityGameObject;
+        [SerializeField] private GameObject _raycasterGameObject;
 
-        private Dictionary<MovementStateID, IState<NetworkedInput>> _states;
-        private MovementStateID _currentStateID;
+        private Dictionary<PlayerStateID, IState<NetworkedInput>> _states;
+        private PlayerStateID _currentStateID;
         private IState<NetworkedInput> _currentState;
         private MovementContext _context;
         private TimeManager _timeManager;
         
         private IEntityToPossess _playerEntity;
+        private IRaycaster _raycaster;
         public MovementContext Context => _context;
         
         private void Awake()
@@ -63,6 +65,7 @@ namespace IT.FSM
         private void InitializeOnce()
         {
             _playerEntity = _playerEntityGameObject.GetComponent<IEntityToPossess>();
+            _raycaster = _raycasterGameObject.GetComponent<IRaycaster>();
         }
 
         private void CheckMovementComponentState()
@@ -72,17 +75,17 @@ namespace IT.FSM
 
         private void InitializeStateMachine()
         {
-            _context = new MovementContext(_characterMovement);
+            _context = new MovementContext(_characterMovement, _raycaster);
                 
-            _states = new Dictionary<MovementStateID, IState<NetworkedInput>>
+            _states = new Dictionary<PlayerStateID, IState<NetworkedInput>>
             {
                 { 
-                    MovementStateID.IDLE, 
-                    new MovementIdleState(this)
+                    PlayerStateID.IDLE, 
+                    new PlayerIdleState(this)
                 },
                 {
-                    MovementStateID.MOVING,
-                    new MovementMovingState(this)
+                    PlayerStateID.MOVING,
+                    new PlayerWalkingState(this)
                 }
             };
         }
@@ -157,7 +160,7 @@ namespace IT.FSM
         }
 
         #region Interfaces
-        public void ChangeState(MovementStateID stateID)
+        public void ChangeState(PlayerStateID stateID)
         {
             _currentStateID = stateID;
             _currentState?.Exit();
@@ -185,7 +188,7 @@ namespace IT.FSM
             public float UnconstrainedTimer;
             public bool HitGround;
             public bool IsWalkable;
-            public MovementStateID StateID;
+            public PlayerStateID StateID;
         }
         
         #endregion
@@ -193,12 +196,14 @@ namespace IT.FSM
 
     public class MovementContext
     {
-        public MovementContext(CharacterMovement characterMovement)
+        public MovementContext(CharacterMovement characterMovement, IRaycaster raycaster)
         {
             CharacterMovement = characterMovement;
+            Raycaster = raycaster;
         }
         
         public CharacterMovement CharacterMovement { get; }
+        public IRaycaster Raycaster { get; }
         public float MaxSpeed => 9f;
         public float Acceleration => 20f;
     }

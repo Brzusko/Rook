@@ -5,11 +5,11 @@ using UnityEngine;
 
 namespace IT.FSM.States
 {
-    public class MovementMovingState: IState<NetworkedInput>
+    public class PlayerIdleState: IState<NetworkedInput>
     {
-        private IStateMachine<MovementStateID, MovementContext> _stateMachine;
+        private IStateMachine<PlayerStateID, MovementContext> _stateMachine;
 
-        public MovementMovingState(IStateMachine<MovementStateID, MovementContext> stateMachine)
+        public PlayerIdleState(IStateMachine<PlayerStateID, MovementContext> stateMachine)
         {
             _stateMachine = stateMachine;
         }
@@ -26,8 +26,6 @@ namespace IT.FSM.States
 
             currentVelocity.x = xComponent;
             currentVelocity.z = zComponent;
-            
-            _stateMachine.Context.CharacterMovement.velocity = currentVelocity;
 
             _stateMachine.Context.CharacterMovement.Move(currentVelocity, deltaTime);
         }
@@ -46,11 +44,12 @@ namespace IT.FSM.States
         {
             Vector3 velocity = _stateMachine.Context.CharacterMovement.velocity;
 
-            if (velocity.sqrMagnitude == 0)
+            if (velocity.sqrMagnitude > 0)
             {
-                _stateMachine.ChangeState(MovementStateID.IDLE);
+                _stateMachine.ChangeState(PlayerStateID.MOVING);
                 return;
             }
+
         }
     }
 }

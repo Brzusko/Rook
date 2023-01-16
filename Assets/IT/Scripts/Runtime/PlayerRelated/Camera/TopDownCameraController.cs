@@ -2,10 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Cinemachine;
+using FishNet.Object;
 using IT.Interfaces;
 using UnityEngine;
 
-public class TopDownCameraController : MonoBehaviour, ICameraController
+public class TopDownCameraController : NetworkBehaviour, ICameraController
 {
     [SerializeField] private GameObject _cameraPrefabToSpawn;
     [SerializeField] private Transform _lookAt;
@@ -18,8 +19,10 @@ public class TopDownCameraController : MonoBehaviour, ICameraController
 
     public Vector3 CameraForward => _virtualCamera.State.CorrectedOrientation * Vector3.forward;
 
-    private void Start()
+    public override void OnStartClient()
     {
+        base.OnStartClient();
+        
         InitializeOnce();
         BindEvents();
     }

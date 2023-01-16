@@ -91,7 +91,7 @@ namespace IT.Spawners
             IEntityToPossess playerEntity = playerEntityInstance.GetComponent<IEntityToPossess>();
             
             _serverManager.Spawn(playerConsciousness.NetworkObject, conn);
-            _serverManager.Spawn(playerEntityInstance);
+            _serverManager.Spawn(playerEntityInstance, conn);
             
             playerConsciousness.Possess(playerEntity);
         }

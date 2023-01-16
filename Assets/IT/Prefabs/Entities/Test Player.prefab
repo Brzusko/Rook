@@ -76,12 +76,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1027bc3218e351a4dae3f78c2f4d2397, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 5
+  _componentIndexCache: 6
   _addedNetworkObject: {fileID: 1912049324724089206}
   _networkObjectCache: {fileID: 1912049324724089206}
   _characterMovement: {fileID: 5446920144164943184}
   _input: {fileID: 11400000, guid: 057187fa28e15c846a0787d460386507, type: 2}
   _movementStatsModule: {fileID: 2902755330639871743}
+  _transformRotator: {fileID: 8540963238160560455}
   _startingState: 0
   _playerEntityGameObject: {fileID: 7849939560007978409}
   _raycasterGameObject: {fileID: 7849939560007978409}
@@ -94,6 +95,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3628084287093846931}
+  - component: {fileID: 8540963238160560455}
   m_Layer: 0
   m_Name: Player Model
   m_TagString: Untagged
@@ -117,6 +119,22 @@ Transform:
   m_Father: {fileID: 2066412421744531934}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8540963238160560455
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4720426297937606841}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0796ace38345b9b4e855ffb0c512f363, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _rotateXAxis: 0
+  _rotateYAxis: 1
+  _rotateZAxis: 0
+  _transformToUpdate: {fileID: 1283863882254217425}
 --- !u!1 &7849939560007978409
 GameObject:
   m_ObjectHideFlags: 0
@@ -224,9 +242,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 85db6b938349c2c45936f007a6d0c963, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 255
+  _componentIndexCache: 3
   _addedNetworkObject: {fileID: 1912049324724089206}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 1912049324724089206}
 --- !u!114 &5446920144164943184
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -327,7 +345,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 402926ef33e0a894d9fec352693988ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 3
+  _componentIndexCache: 4
   _addedNetworkObject: {fileID: 1912049324724089206}
   _networkObjectCache: {fileID: 1912049324724089206}
   _graphicalObject: {fileID: 2066412421744531934}
@@ -364,6 +382,7 @@ MonoBehaviour:
   - {fileID: 3436592032921280632}
   - {fileID: 5905720989401216359}
   - {fileID: 4176736697030555468}
+  - {fileID: 2902755330639871743}
   - {fileID: 2139183522537339524}
   - {fileID: 1961820169530306613}
   - {fileID: 1467469930188945514}
@@ -391,7 +410,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2836e36774ca1c4bbbee976e17b649c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 4
+  _componentIndexCache: 5
   _addedNetworkObject: {fileID: 1912049324724089206}
   _networkObjectCache: {fileID: 1912049324724089206}
   _synchronizeParent: 0

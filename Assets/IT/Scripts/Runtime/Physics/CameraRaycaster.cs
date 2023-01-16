@@ -20,10 +20,10 @@ public class CameraRaycaster : NetworkBehaviour, IRaycaster
     private bool _foundRaycastHitThisTick;
     private Camera _camera;
 
-    private RaycastHit? _recentRaycastHit;
+    private RaycastHit _recentRaycastHit;
 
     public bool FoundRaycastHitThisTick => _foundRaycastHitThisTick;
-    public RaycastHit? RaycastHit => _recentRaycastHit;
+    public RaycastHit RaycastHit => _recentRaycastHit;
     
     public override void OnStartClient()
     {
@@ -84,7 +84,7 @@ public class CameraRaycaster : NetworkBehaviour, IRaycaster
         Camera currentCamera = brain.OutputCamera;
         Ray screenPointToRay = currentCamera.ScreenPointToRay(_playerInputReader.PointerPosition);
         _foundRaycastHitThisTick = Physics.Raycast(screenPointToRay, out RaycastHit hit);
-        _recentRaycastHit = _foundRaycastHitThisTick ? hit : null;
+        _recentRaycastHit = hit;
     }
 
     private void OnClientPossessChanged(bool gainedPossession)
@@ -96,6 +96,5 @@ public class CameraRaycaster : NetworkBehaviour, IRaycaster
         }
         
         UnbindEntityEvents();
-        _recentRaycastHit = null;
     }
 }

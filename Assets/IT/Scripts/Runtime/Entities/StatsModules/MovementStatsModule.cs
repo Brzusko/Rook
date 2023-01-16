@@ -18,6 +18,7 @@ public class MovementStatsModule : NetworkBehaviour
     public float Gravity => - Constants.GRAVITY_FORCE;
     public float InAirAcceleration => Acceleration * Constants.AIR_CONTROL;
     public float AdditionalSpeedModifiers => _additionalSpeedModifiers;
+    public float RotationSpeed => Constants.MAX_ROTATION;
 
     public override void OnStartNetwork()
     {

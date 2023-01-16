@@ -17,10 +17,13 @@ namespace IT.FSM
 {
     public class PlayerStateMachine : NetworkBehaviour, IStateMachine<PlayerStateID, MovementContext>
     {
+        [Header("General")]
         [SerializeField] private CharacterMovement _characterMovement;
         [SerializeField] private PlayerInputReader _input;
         [SerializeField] private MovementStatsModule _movementStatsModule;
+        [SerializeField] private TransformRotator _transformRotator;
         [SerializeField] private PlayerStateID _startingState;
+        [Header("Interfaces")]
         [SerializeField] private GameObject _playerEntityGameObject;
         [SerializeField] private GameObject _raycasterGameObject;
 
@@ -76,7 +79,7 @@ namespace IT.FSM
 
         private void InitializeStateMachine()
         {
-            _context = new MovementContext(_characterMovement, _movementStatsModule, _raycaster);
+            _context = new MovementContext(_characterMovement, _movementStatsModule, _transformRotator, _raycaster);
                 
             _states = new Dictionary<PlayerStateID, IState<NetworkedInput>>
             {
@@ -200,15 +203,17 @@ namespace IT.FSM
 
     public class MovementContext
     {
-        public MovementContext(CharacterMovement characterMovement, MovementStatsModule movementStatsModule ,IRaycaster raycaster)
+        public MovementContext(CharacterMovement characterMovement, MovementStatsModule movementStatsModule, TransformRotator rotator, IRaycaster raycaster)
         {
             CharacterMovement = characterMovement;
             MovementStatsModule = movementStatsModule;
+            Rotator = rotator;
             Raycaster = raycaster;
         }
         
         public CharacterMovement CharacterMovement { get; }
         public MovementStatsModule MovementStatsModule { get; }
+        public TransformRotator Rotator { get; }
         public IRaycaster Raycaster { get; }
     }
     

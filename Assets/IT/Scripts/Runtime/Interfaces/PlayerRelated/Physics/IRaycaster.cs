@@ -7,6 +7,6 @@ namespace IT.Interfaces
     public interface IRaycaster
     {
         public bool FoundRaycastHitThisTick { get; }
-        public RaycastHit? RaycastHit { get; }
+        public RaycastHit RaycastHit { get; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using EasyCharacterMovement;
 using IT.Input;
+using IT.Interfaces;
 using IT.Interfaces.FSM;
 using IT.Utils;
 using UnityEngine;
@@ -8,7 +9,7 @@ namespace IT.FSM.States
 {
     public class PlayerIdleState: IState<NetworkedInput>
     {
-        private IStateMachine<PlayerStateID, MovementContext> _stateMachine;
+        private readonly IStateMachine<PlayerStateID, MovementContext> _stateMachine;
 
         public PlayerIdleState(IStateMachine<PlayerStateID, MovementContext> stateMachine)
         {
@@ -18,17 +19,22 @@ namespace IT.FSM.States
         {
             MovementContext context = _stateMachine.Context;
             MovementStatsModule movementStatsModule = context.MovementStatsModule;
+            CharacterMovement characterMovement = context.CharacterMovement;
+            IRaycaster raycaster = context.Raycaster;
             
-            if (!asServer)
+            if (!asServer && raycaster.FoundRaycastHitThisTick)
             {
+                RaycastHit hit = raycaster.RaycastHit;
+                Vector3 hitPoint = hit.point;
                 
+                context.Rotator.Rotate(hitPoint, movementStatsModule.RotationSpeed, deltaTime);
             }
 
             float maxSpeed = movementStatsModule.MovementSpeed;
 
             Vector3 desiredVelocity = new Vector3(input.MovementInput.x, 0f, input.MovementInput.y) * maxSpeed;
                                       
-            context.CharacterMovement.SimpleMove(desiredVelocity, 
+            characterMovement.SimpleMove(desiredVelocity, 
                 maxSpeed, 
                 movementStatsModule.Acceleration, 
                 movementStatsModule.Deceleration, 

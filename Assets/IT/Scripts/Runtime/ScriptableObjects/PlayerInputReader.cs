@@ -16,8 +16,10 @@ namespace IT.Input
 
         private MainInput _mainInput;
         private Vector2 _movementInput = Vector2.zero;
+        private Vector2 _pointerPositionInput = Vector2.zero;
 
         public NetworkedInput NetworkedInput => new NetworkedInput { MovementInput = _movementInput };
+        public Vector2 PointerPosition => _pointerPositionInput;
 
         private void OnEnable()
         {
@@ -65,6 +67,11 @@ namespace IT.Input
         public void OnMovement(InputAction.CallbackContext context)
         {
             _movementInput = context.ReadValue<Vector2>();
+        }
+
+        public void OnPointerMovement(InputAction.CallbackContext context)
+        {
+            _pointerPositionInput = context.ReadValue<Vector2>();
         }
 
         public void OnCameraMovement(InputAction.CallbackContext context)

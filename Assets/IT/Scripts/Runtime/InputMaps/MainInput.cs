@@ -37,6 +37,15 @@ namespace IT.Input
                     ""processors"": ""NormalizeVector2"",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""PointerMovement"",
+                    ""type"": ""Value"",
+                    ""id"": ""85a5aa45-efe1-453b-9ade-2317a11a2deb"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -94,6 +103,17 @@ namespace IT.Input
                     ""action"": ""Movement"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a9d3fec4-182d-4f12-9b18-7c2f6a901c2e"",
+                    ""path"": ""<Mouse>/position"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""PointerMovement"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -173,6 +193,7 @@ namespace IT.Input
             // Gameplay
             m_Gameplay = asset.FindActionMap("Gameplay", throwIfNotFound: true);
             m_Gameplay_Movement = m_Gameplay.FindAction("Movement", throwIfNotFound: true);
+            m_Gameplay_PointerMovement = m_Gameplay.FindAction("PointerMovement", throwIfNotFound: true);
             // Camera
             m_Camera = asset.FindActionMap("Camera", throwIfNotFound: true);
             m_Camera_CameraMovement = m_Camera.FindAction("Camera Movement", throwIfNotFound: true);
@@ -237,11 +258,13 @@ namespace IT.Input
         private readonly InputActionMap m_Gameplay;
         private IGameplayActions m_GameplayActionsCallbackInterface;
         private readonly InputAction m_Gameplay_Movement;
+        private readonly InputAction m_Gameplay_PointerMovement;
         public struct GameplayActions
         {
             private @MainInput m_Wrapper;
             public GameplayActions(@MainInput wrapper) { m_Wrapper = wrapper; }
             public InputAction @Movement => m_Wrapper.m_Gameplay_Movement;
+            public InputAction @PointerMovement => m_Wrapper.m_Gameplay_PointerMovement;
             public InputActionMap Get() { return m_Wrapper.m_Gameplay; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
@@ -254,6 +277,9 @@ namespace IT.Input
                     @Movement.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnMovement;
                     @Movement.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnMovement;
                     @Movement.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnMovement;
+                    @PointerMovement.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnPointerMovement;
+                    @PointerMovement.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnPointerMovement;
+                    @PointerMovement.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnPointerMovement;
                 }
                 m_Wrapper.m_GameplayActionsCallbackInterface = instance;
                 if (instance != null)
@@ -261,6 +287,9 @@ namespace IT.Input
                     @Movement.started += instance.OnMovement;
                     @Movement.performed += instance.OnMovement;
                     @Movement.canceled += instance.OnMovement;
+                    @PointerMovement.started += instance.OnPointerMovement;
+                    @PointerMovement.performed += instance.OnPointerMovement;
+                    @PointerMovement.canceled += instance.OnPointerMovement;
                 }
             }
         }
@@ -309,6 +338,7 @@ namespace IT.Input
         public interface IGameplayActions
         {
             void OnMovement(InputAction.CallbackContext context);
+            void OnPointerMovement(InputAction.CallbackContext context);
         }
         public interface ICameraActions
         {

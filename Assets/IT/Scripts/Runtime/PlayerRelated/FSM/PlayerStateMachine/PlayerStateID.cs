@@ -7,8 +7,7 @@ namespace IT.FSM
     public enum PlayerStateID : byte
     {
         IDLE,
-        MOVING,
-        JUMPING,
-        AIR,
+        WALKING,
+        SNEAKING,
     }
 }

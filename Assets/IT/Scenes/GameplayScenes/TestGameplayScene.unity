@@ -500,7 +500,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-1975582
+  m_Name: pb_Mesh-803412
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -744,8 +744,6 @@ MonoBehaviour:
   _componentIndexCache: 0
   _addedNetworkObject: {fileID: 1696877028}
   _networkObjectCache: {fileID: 1696877028}
-  _playerPrefab: {fileID: 1912049324724089206, guid: 8bc1b292271c57c419084be68d4cabfb,
-    type: 3}
   _spawnLocations:
   - {fileID: 1936655447}
   - {fileID: 720550261}
@@ -795,7 +793,10 @@ MonoBehaviour:
   _scenePathHash: 1579086698
   <SceneId>k__BackingField: 6782125727962205185
   <AssetPathHash>k__BackingField: 0
-  _sceneNetworkObjects: []
+  _sceneNetworkObjects:
+  - {fileID: 0}
+  - {fileID: 1218216421}
+  - {fileID: 1696877028}
 --- !u!1001 &1720525172
 PrefabInstance:
   m_ObjectHideFlags: 0

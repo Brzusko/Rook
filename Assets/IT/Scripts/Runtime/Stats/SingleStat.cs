@@ -107,10 +107,12 @@ namespace IT.Stats
             if(_modifierList == null)
                 return;
 
-            _modifiersValue = _modifierList.Sum(modifier => modifier.Value);
+            float multiplicationResult = 1.0f;
 
-            if (_modifiersValue == 0)
-                _modifiersValue = 1f;
+            foreach (StatModifier modifier in _modifierList)
+                multiplicationResult *= modifier.Value;
+
+            _modifiersValue = multiplicationResult;
         }
     }
 }

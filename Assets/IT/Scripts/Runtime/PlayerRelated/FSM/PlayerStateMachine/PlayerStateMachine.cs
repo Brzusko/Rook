@@ -19,6 +19,7 @@ namespace IT.FSM
     {
         [SerializeField] private CharacterMovement _characterMovement;
         [SerializeField] private PlayerInputReader _input;
+        [SerializeField] private MovementStatsModule _movementStatsModule;
         [SerializeField] private PlayerStateID _startingState;
         [SerializeField] private GameObject _playerEntityGameObject;
         [SerializeField] private GameObject _raycasterGameObject;
@@ -75,7 +76,7 @@ namespace IT.FSM
 
         private void InitializeStateMachine()
         {
-            _context = new MovementContext(_characterMovement, _raycaster);
+            _context = new MovementContext(_characterMovement, _movementStatsModule, _raycaster);
                 
             _states = new Dictionary<PlayerStateID, IState<NetworkedInput>>
             {
@@ -84,7 +85,7 @@ namespace IT.FSM
                     new PlayerIdleState(this)
                 },
                 {
-                    PlayerStateID.MOVING,
+                    PlayerStateID.WALKING,
                     new PlayerWalkingState(this)
                 }
             };
@@ -135,6 +136,7 @@ namespace IT.FSM
                 data.IsConstrainedToGround, data.UnconstrainedTimer, data.HitGround, data.IsWalkable,
                 data.GroundNormal);
             
+            _movementStatsModule.SetAdditionalSpeedModifiers(data.AdditionalMovementMultiplier);
             _characterMovement.SetState(state);
             ChangeState(data.StateID);
         }
@@ -156,6 +158,7 @@ namespace IT.FSM
                 HitGround = state.hitGround,
                 IsWalkable = state.isWalkable,
                 StateID = _currentStateID,
+                AdditionalMovementMultiplier = _movementStatsModule.AdditionalSpeedModifiers
             };
         }
 
@@ -189,6 +192,7 @@ namespace IT.FSM
             public bool HitGround;
             public bool IsWalkable;
             public PlayerStateID StateID;
+            public float AdditionalMovementMultiplier;
         }
         
         #endregion
@@ -196,16 +200,16 @@ namespace IT.FSM
 
     public class MovementContext
     {
-        public MovementContext(CharacterMovement characterMovement, IRaycaster raycaster)
+        public MovementContext(CharacterMovement characterMovement, MovementStatsModule movementStatsModule ,IRaycaster raycaster)
         {
             CharacterMovement = characterMovement;
+            MovementStatsModule = movementStatsModule;
             Raycaster = raycaster;
         }
         
         public CharacterMovement CharacterMovement { get; }
+        public MovementStatsModule MovementStatsModule { get; }
         public IRaycaster Raycaster { get; }
-        public float MaxSpeed => 9f;
-        public float Acceleration => 20f;
     }
     
 }

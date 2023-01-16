@@ -14,7 +14,6 @@ namespace IT.Spawners
 {
     public class SimplePlayerSpawner : NetworkBehaviour
     {
-        [SerializeField] private NetworkObject _playerPrefab;
         [SerializeField] private List<Transform> _spawnLocations;
         [SerializeField] private GameObject _playersConsciousnessGameObject;
         [SerializeField] private GameObject _playerFactoryGameObject;

@@ -1,4 +1,5 @@
-﻿using IT.Input;
+﻿using EasyCharacterMovement;
+using IT.Input;
 using IT.Interfaces.FSM;
 using IT.Utils;
 using UnityEngine;
@@ -15,19 +16,27 @@ namespace IT.FSM.States
         }
         public void Tick(NetworkedInput input, bool asServer, bool isReplaying, float deltaTime)
         {
-            Vector2 decodedInput = input.MovementInput;
-            Vector3 currentVelocity = _stateMachine.Context.CharacterMovement.velocity;
-            float maxSpeed = _stateMachine.Context.MaxSpeed * Constants.FRICTION;
-            float acceleration = _stateMachine.Context.Acceleration * Constants.AIR_CONTROL;
+            MovementContext context = _stateMachine.Context;
+            MovementStatsModule movementStatsModule = context.MovementStatsModule;
+            
+            if (!asServer)
+            {
+                
+            }
 
-            float xComponent = Mathf.MoveTowards(currentVelocity.x, decodedInput.x * maxSpeed, acceleration * deltaTime);
-            float zComponent =
-                Mathf.MoveTowards(currentVelocity.z, decodedInput.y * maxSpeed, acceleration * deltaTime);
+            float maxSpeed = movementStatsModule.MovementSpeed;
 
-            currentVelocity.x = xComponent;
-            currentVelocity.z = zComponent;
-
-            _stateMachine.Context.CharacterMovement.Move(currentVelocity, deltaTime);
+            Vector3 desiredVelocity = new Vector3(input.MovementInput.x, 0f, input.MovementInput.y) * maxSpeed;
+                                      
+            context.CharacterMovement.SimpleMove(desiredVelocity, 
+                maxSpeed, 
+                movementStatsModule.Acceleration, 
+                movementStatsModule.Deceleration, 
+                movementStatsModule.Friction, 
+                movementStatsModule.Drag, 
+                new Vector3(0f, movementStatsModule.Gravity, 0f), 
+                true, 
+                deltaTime);
         }
 
         public void Enter()
@@ -42,14 +51,12 @@ namespace IT.FSM.States
 
         public void CheckStateChange()
         {
-            Vector3 velocity = _stateMachine.Context.CharacterMovement.velocity;
+            CharacterMovement characterMovement = _stateMachine.Context.CharacterMovement;
 
-            if (velocity.sqrMagnitude > 0)
+            if (characterMovement.velocity.sqrMagnitude > 0f)
             {
-                _stateMachine.ChangeState(PlayerStateID.MOVING);
-                return;
+                _stateMachine.ChangeState(PlayerStateID.WALKING);
             }
-
         }
     }
 }

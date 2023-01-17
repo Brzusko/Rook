@@ -14,6 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _TransitionPreviewWindow:
     _AutoClose: 1
+    _SceneLighting: 0
+    _ShowSkybox: 0
+    _SceneEnvironment: {fileID: 0}
     _Models: []
   _AnimationTimeFields:
     showApproximations: 1

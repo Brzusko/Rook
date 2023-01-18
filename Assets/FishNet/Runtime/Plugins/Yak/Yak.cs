@@ -270,8 +270,7 @@ namespace FishNet.Transporting.Yak
         {
             if (_server.GetLocalConnectionState() != LocalConnectionState.Stopped)
             {
-                if (NetworkManager.CanLog(LoggingType.Error))
-                    Debug.LogError("Server is already running.");
+                NetworkManager.LogError("Server is already running.");
                 return false;
             }
 
@@ -300,8 +299,7 @@ namespace FishNet.Transporting.Yak
         {
             if (_client.GetLocalConnectionState() != LocalConnectionState.Stopped)
             {
-                if (NetworkManager.CanLog(LoggingType.Error))
-                    Debug.LogError("Client is already running.");
+                NetworkManager.LogError("Client is already running.");
                 return false;
             }
 

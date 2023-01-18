@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using FishNet.Utility.Extension;
 using UnityEngine;
 
 public class TransformRotator : MonoBehaviour
@@ -19,5 +20,12 @@ public class TransformRotator : MonoBehaviour
         desiredRotation = Quaternion.Euler(eulerAngles);
 
         _transformToUpdate.rotation = Quaternion.Slerp(_transformToUpdate.rotation, desiredRotation, rotateSpeed * deltaTime);
+    }
+
+    public void RotateY(float yValue, float rotateSpeed, float deltaTime)
+    {
+        Quaternion desiredRotation = Quaternion.Euler(0f, yValue, 0f);
+        _transformToUpdate.rotation =
+            Quaternion.Slerp(_transformToUpdate.rotation, desiredRotation, rotateSpeed * deltaTime);
     }
 }

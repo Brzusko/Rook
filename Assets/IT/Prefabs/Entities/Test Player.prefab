@@ -95,9 +95,11 @@ MonoBehaviour:
   _addedNetworkObject: {fileID: 1912049324724089206}
   _networkObjectCache: {fileID: 1912049324724089206}
   _animancerComponent: {fileID: 1565092988270009306}
-  _defaultMixer:
+  _characterMovement: {fileID: 5446920144164943184}
+  _playerMainSpaceTransform: {fileID: 1283863882254217425}
+  _basicGroundMixer:
     _Asset: {fileID: 11400000, guid: c1fa2484af7908946ad74b3f58568814, type: 2}
-  _debugVector: {x: 0, y: 0}
+  _maxAnimationVectorMagnitude: 2
 --- !u!1 &3066851563343315535
 GameObject:
   m_ObjectHideFlags: 0
@@ -277,8 +279,8 @@ MonoBehaviour:
   _networkObjectCache: {fileID: 1912049324724089206}
   _cameraPrefabToSpawn: {fileID: 3574710831091095003, guid: 73b16883fd88c634991532c2ec112a66,
     type: 3}
-  _lookAt: {fileID: 3564965828190545619}
-  _follow: {fileID: 3564965828190545619}
+  _lookAt: {fileID: 2066412421744531934}
+  _follow: {fileID: 2066412421744531934}
   _entityGameObject: {fileID: 7849939560007978409}
 --- !u!114 &4176736697030555468
 MonoBehaviour:
@@ -458,9 +460,12 @@ MonoBehaviour:
   <ChildNetworkObjects>k__BackingField: []
   _isNetworked: 1
   _isGlobal: 0
+  _initializeOrder: 0
+  _predictedSpawningType: 0
   _defaultDespawnType: 0
   NetworkObserver: {fileID: 0}
   <PrefabId>k__BackingField: -1
+  <SpawnableCollectionId>k__BackingField: 0
   _scenePathHash: 0
   <SceneId>k__BackingField: 0
   <AssetPathHash>k__BackingField: 8229251258211534065
@@ -578,12 +583,6 @@ Animator:
 --- !u!4 &3560006844415069515 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4580766925885248, guid: 2f3e27eecb190e44a9af50723c394274,
-    type: 3}
-  m_PrefabInstance: {fileID: 3564574306295562763}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &3564965828190545619 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 4122045328614616, guid: 2f3e27eecb190e44a9af50723c394274,
     type: 3}
   m_PrefabInstance: {fileID: 3564574306295562763}
   m_PrefabAsset: {fileID: 0}

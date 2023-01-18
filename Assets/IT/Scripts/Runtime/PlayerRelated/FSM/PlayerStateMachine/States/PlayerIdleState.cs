@@ -1,4 +1,5 @@
 ﻿using EasyCharacterMovement;
+using IT.Data.Networking;
 using IT.Input;
 using IT.Interfaces;
 using IT.Interfaces.FSM;
@@ -7,7 +8,7 @@ using UnityEngine;
 
 namespace IT.FSM.States
 {
-    public class PlayerIdleState: IState<NetworkedInput>
+    public class PlayerIdleState: IState<NetworkInput>
     {
         private readonly IStateMachine<PlayerStateID, MovementContext> _stateMachine;
 
@@ -15,20 +16,13 @@ namespace IT.FSM.States
         {
             _stateMachine = stateMachine;
         }
-        public void Tick(NetworkedInput input, bool asServer, bool isReplaying, float deltaTime)
+        public void Tick(NetworkInput input, bool asServer, bool isReplaying, float deltaTime)
         {
             MovementContext context = _stateMachine.Context;
             MovementStatsModule movementStatsModule = context.MovementStatsModule;
             CharacterMovement characterMovement = context.CharacterMovement;
-            IRaycaster raycaster = context.Raycaster;
             
-            if (!asServer && raycaster.FoundRaycastHitThisTick)
-            {
-                RaycastHit hit = raycaster.RaycastHit;
-                Vector3 hitPoint = hit.point;
-                
-                context.Rotator.Rotate(hitPoint, movementStatsModule.RotationSpeed, deltaTime);
-            }
+            context.Rotator.RotateY(input.YRotation, movementStatsModule.RotationSpeed, deltaTime);
 
             float maxSpeed = movementStatsModule.MovementSpeed;
 

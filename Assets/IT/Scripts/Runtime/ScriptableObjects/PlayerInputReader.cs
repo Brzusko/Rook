@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using FishNet.Object;
+using IT.Data.Networking;
 using IT.Utils;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -18,7 +19,7 @@ namespace IT.Input
         private Vector2 _movementInput = Vector2.zero;
         private Vector2 _pointerPositionInput = Vector2.zero;
 
-        public NetworkedInput NetworkedInput => new NetworkedInput { MovementInput = _movementInput };
+        public Vector2 MovementInput => _movementInput;
         public Vector2 PointerPosition => _pointerPositionInput;
 
         private void OnEnable()
@@ -89,10 +90,5 @@ namespace IT.Input
             
             FreeLookRequest?.Invoke();
         }
-    }
-
-    public struct NetworkedInput
-    {
-        public Vector2 MovementInput;
     }
 }

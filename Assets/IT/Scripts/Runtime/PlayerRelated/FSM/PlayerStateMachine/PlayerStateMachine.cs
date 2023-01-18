@@ -6,6 +6,8 @@ using FishNet;
 using FishNet.Managing.Timing;
 using FishNet.Object;
 using FishNet.Object.Prediction;
+using FishNet.Transporting;
+using IT.Data.Networking;
 using IT.FSM.States;
 using IT.Input;
 using IT.Interfaces;
@@ -27,9 +29,9 @@ namespace IT.FSM
         [SerializeField] private GameObject _playerEntityGameObject;
         [SerializeField] private GameObject _raycasterGameObject;
 
-        private Dictionary<PlayerStateID, IState<NetworkedInput>> _states;
+        private Dictionary<PlayerStateID, IState<NetworkInput>> _states;
         private PlayerStateID _currentStateID;
-        private IState<NetworkedInput> _currentState;
+        private IState<NetworkInput> _currentState;
         private MovementContext _context;
         private TimeManager _timeManager;
         
@@ -81,7 +83,7 @@ namespace IT.FSM
         {
             _context = new MovementContext(_characterMovement, _movementStatsModule, _transformRotator, _raycaster);
                 
-            _states = new Dictionary<PlayerStateID, IState<NetworkedInput>>
+            _states = new Dictionary<PlayerStateID, IState<NetworkInput>>
             {
                 { 
                     PlayerStateID.IDLE, 
@@ -107,7 +109,9 @@ namespace IT.FSM
             if (IsOwner)
             {
                 Reconcile(default, false);
-                NetworkedInput input = _input.NetworkedInput;
+
+                NetworkInput input = GenerateInput();
+                
                 Simulation(input, false);
             }
 
@@ -127,13 +131,13 @@ namespace IT.FSM
         #region Client side prediction
 
         [Replicate]
-        private void Simulation(NetworkedInput input, bool asServer, bool isReplaying = false)
+        private void Simulation(NetworkInput input, bool asServer, Channel channel = Channel.Unreliable, bool isReplaying = false)
         {
             _currentState.Tick(input, asServer, isReplaying, (float)_timeManager.TickDelta);
         }
         
         [Reconcile]
-        private void Reconcile(ReconcileData data, bool asServer)
+        private void Reconcile(PlayerStateReconcileData data,  bool asServer, Channel channel = Channel.Unreliable)
         {
             CharacterMovement.State state = new CharacterMovement.State(data.Position, data.Rotation, data.Velocity,
                 data.IsConstrainedToGround, data.UnconstrainedTimer, data.HitGround, data.IsWalkable,
@@ -146,11 +150,11 @@ namespace IT.FSM
 
         #endregion
 
-        private ReconcileData GenerateReconcileData()
+        private PlayerStateReconcileData GenerateReconcileData()
         {
             CharacterMovement.State state = _characterMovement.GetState();
     
-            return new ReconcileData
+            return new PlayerStateReconcileData
             {
                 Velocity = state.velocity,
                 Position = state.position,
@@ -162,6 +166,19 @@ namespace IT.FSM
                 IsWalkable = state.isWalkable,
                 StateID = _currentStateID,
                 AdditionalMovementMultiplier = _movementStatsModule.AdditionalSpeedModifiers
+            };
+        }
+
+        private NetworkInput GenerateInput()
+        {
+            RaycastHit hit = _raycaster.RaycastHit;
+            Quaternion rotation = Quaternion.LookRotation(hit.point - transform.position);
+            float yRotation = rotation.eulerAngles.y;
+            
+            return new NetworkInput
+            {
+                MovementInput = _input.MovementInput,
+                YRotation = yRotation
             };
         }
 
@@ -180,24 +197,6 @@ namespace IT.FSM
             _currentState = _states[_currentStateID];
             _currentState?.Enter();
         }
-        #endregion
-
-        #region Structs
-        
-        private struct ReconcileData
-        {
-            public Vector3 Velocity;
-            public Vector3 Position;
-            public Vector3 GroundNormal;
-            public Quaternion Rotation;
-            public bool IsConstrainedToGround;
-            public float UnconstrainedTimer;
-            public bool HitGround;
-            public bool IsWalkable;
-            public PlayerStateID StateID;
-            public float AdditionalMovementMultiplier;
-        }
-        
         #endregion
     }
 

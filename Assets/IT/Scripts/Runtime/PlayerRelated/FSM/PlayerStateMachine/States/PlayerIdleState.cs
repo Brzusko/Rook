@@ -23,9 +23,8 @@ namespace IT.FSM.States
             CharacterMovement characterMovement = context.CharacterMovement;
             
             context.Rotator.RotateY(input.YRotation, movementStatsModule.RotationSpeed, deltaTime);
-
+            
             float maxSpeed = movementStatsModule.MovementSpeed;
-
             Vector3 desiredVelocity = new Vector3(input.MovementInput.x, 0f, input.MovementInput.y) * maxSpeed;
                                       
             characterMovement.SimpleMove(desiredVelocity, 

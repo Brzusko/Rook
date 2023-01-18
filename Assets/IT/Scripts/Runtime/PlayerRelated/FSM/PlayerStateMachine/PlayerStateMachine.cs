@@ -115,10 +115,17 @@ namespace IT.FSM
                 Simulation(input, false);
             }
 
-            if (!IsServer) return;
-            
-            Simulation(default, true);
-            Reconcile(GenerateReconcileData(), true);
+            if (IsServer)
+            {
+                Simulation(default, true);
+
+                uint tick = base.TimeManager.LocalTick;
+
+                if ((tick % TestNetworkSharedData.Instance.ReconcileSendRate) == 0)
+                {
+                    Reconcile(GenerateReconcileData(), true);
+                }
+            }
         }
 
         private void OnClientPossessChanged(bool possessionGained)
@@ -137,14 +144,16 @@ namespace IT.FSM
         }
         
         [Reconcile]
-        private void Reconcile(PlayerStateReconcileData data,  bool asServer, Channel channel = Channel.Unreliable)
+        private void Reconcile(PlayerStateReconcileData data, bool asServer, Channel channel = Channel.Unreliable)
         {
             CharacterMovement.State state = new CharacterMovement.State(data.Position, data.Rotation, data.Velocity,
                 data.IsConstrainedToGround, data.UnconstrainedTimer, data.HitGround, data.IsWalkable,
                 data.GroundNormal);
-            
+
+
             _movementStatsModule.SetAdditionalSpeedModifiers(data.AdditionalMovementMultiplier);
             _characterMovement.SetState(state);
+            
             ChangeState(data.StateID);
         }
 

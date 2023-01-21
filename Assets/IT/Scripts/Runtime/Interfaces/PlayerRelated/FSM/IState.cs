@@ -10,6 +10,6 @@ namespace IT.Interfaces.FSM
         public void Enter();
         public void Exit();
 
-        public void CheckStateChange();
+        public void CheckStateChange(TInput input);
     }
 }

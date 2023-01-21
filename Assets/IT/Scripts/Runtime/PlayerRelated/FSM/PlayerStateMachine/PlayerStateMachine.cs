@@ -14,6 +14,7 @@ using IT.Interfaces;
 using IT.Interfaces.FSM;
 using Mono.CSharp;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace IT.FSM
 {
@@ -28,6 +29,10 @@ namespace IT.FSM
         [Header("Interfaces")]
         [SerializeField] private GameObject _playerEntityGameObject;
         [SerializeField] private GameObject _raycasterGameObject;
+        [Range(0, 100)]
+        [SerializeField] private uint _reconcileRate = 1;
+
+        [SerializeField] private PlayerAnimations _playerAnimations;
 
         private Dictionary<PlayerStateID, IState<NetworkInput>> _states;
         private PlayerStateID _currentStateID;
@@ -38,7 +43,7 @@ namespace IT.FSM
         private IEntityToPossess _playerEntity;
         private IRaycaster _raycaster;
         public MovementContext Context => _context;
-        
+
         private void Awake()
         {
             InitializeOnce();
@@ -81,7 +86,7 @@ namespace IT.FSM
 
         private void InitializeStateMachine()
         {
-            _context = new MovementContext(_characterMovement, _movementStatsModule, _transformRotator, _raycaster);
+            _context = new MovementContext(_characterMovement, _movementStatsModule, _transformRotator, _playerAnimations, _raycaster);
                 
             _states = new Dictionary<PlayerStateID, IState<NetworkInput>>
             {
@@ -92,6 +97,10 @@ namespace IT.FSM
                 {
                     PlayerStateID.WALKING,
                     new PlayerWalkingState(this)
+                },
+                {
+                    PlayerStateID.SCUTTER,
+                    new PlayerScutterState(this)
                 }
             };
         }
@@ -100,8 +109,7 @@ namespace IT.FSM
 
         private void OnPreTick()
         {
-            if(IsOwner || IsServer)
-                _currentState.CheckStateChange();
+
         }
         
         private void OnTick()
@@ -121,7 +129,7 @@ namespace IT.FSM
 
                 uint tick = base.TimeManager.LocalTick;
 
-                if ((tick % TestNetworkSharedData.Instance.ReconcileSendRate) == 0)
+                if ((tick % _reconcileRate) == 0)
                 {
                     Reconcile(GenerateReconcileData(), true);
                 }
@@ -140,7 +148,9 @@ namespace IT.FSM
         [Replicate]
         private void Simulation(NetworkInput input, bool asServer, Channel channel = Channel.Unreliable, bool isReplaying = false)
         {
+            _playerAnimations.CacheInput(input, _movementStatsModule.Acceleration, _movementStatsModule.Deceleration);
             _currentState.Tick(input, asServer, isReplaying, (float)_timeManager.TickDelta);
+            _currentState.CheckStateChange(input);
         }
         
         [Reconcile]
@@ -149,8 +159,7 @@ namespace IT.FSM
             CharacterMovement.State state = new CharacterMovement.State(data.Position, data.Rotation, data.Velocity,
                 data.IsConstrainedToGround, data.UnconstrainedTimer, data.HitGround, data.IsWalkable,
                 data.GroundNormal);
-
-
+            
             _movementStatsModule.SetAdditionalSpeedModifiers(data.AdditionalMovementMultiplier);
             _characterMovement.SetState(state);
             
@@ -174,7 +183,7 @@ namespace IT.FSM
                 HitGround = state.hitGround,
                 IsWalkable = state.isWalkable,
                 StateID = _currentStateID,
-                AdditionalMovementMultiplier = _movementStatsModule.AdditionalSpeedModifiers
+                AdditionalMovementMultiplier = _movementStatsModule.AdditionalSpeedModifiers,
             };
         }
 
@@ -187,7 +196,8 @@ namespace IT.FSM
             return new NetworkInput
             {
                 MovementInput = _input.MovementInput,
-                YRotation = yRotation
+                YRotation = yRotation,
+                IsWalkingPressed = _input.IsWalkingPressed
             };
         }
 
@@ -211,17 +221,19 @@ namespace IT.FSM
 
     public class MovementContext
     {
-        public MovementContext(CharacterMovement characterMovement, MovementStatsModule movementStatsModule, TransformRotator rotator, IRaycaster raycaster)
+        public MovementContext(CharacterMovement characterMovement, MovementStatsModule movementStatsModule, TransformRotator rotator, PlayerAnimations playerAnimations, IRaycaster raycaster)
         {
             CharacterMovement = characterMovement;
             MovementStatsModule = movementStatsModule;
             Rotator = rotator;
             Raycaster = raycaster;
+            PlayerAnimations = playerAnimations;
         }
         
         public CharacterMovement CharacterMovement { get; }
         public MovementStatsModule MovementStatsModule { get; }
         public TransformRotator Rotator { get; }
+        public PlayerAnimations PlayerAnimations { get; }
         public IRaycaster Raycaster { get; }
     }
     

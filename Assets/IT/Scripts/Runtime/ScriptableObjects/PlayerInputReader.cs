@@ -18,9 +18,11 @@ namespace IT.Input
         private MainInput _mainInput;
         private Vector2 _movementInput = Vector2.zero;
         private Vector2 _pointerPositionInput = Vector2.zero;
+        private bool _isWalkingPressed;
 
         public Vector2 MovementInput => _movementInput;
         public Vector2 PointerPosition => _pointerPositionInput;
+        public bool IsWalkingPressed => _isWalkingPressed;
 
         private void OnEnable()
         {
@@ -73,6 +75,11 @@ namespace IT.Input
         public void OnPointerMovement(InputAction.CallbackContext context)
         {
             _pointerPositionInput = context.ReadValue<Vector2>();
+        }
+
+        public void OnWalking(InputAction.CallbackContext context)
+        {
+            _isWalkingPressed = context.phase == InputActionPhase.Performed;
         }
 
         public void OnCameraMovement(InputAction.CallbackContext context)

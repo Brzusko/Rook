@@ -1,18 +1,20 @@
-﻿using EasyCharacterMovement;
+﻿using System.Linq;
+using System.Numerics;
+using EasyCharacterMovement;
 using IT.Data.Networking;
 using IT.Input;
 using IT.Interfaces;
 using IT.Interfaces.FSM;
 using IT.Utils;
-using UnityEngine;
+using Vector3 = UnityEngine.Vector3;
 
 namespace IT.FSM.States
 {
-    public class PlayerWalkingState: IState<NetworkInput>
+    public class PlayerIdleState: IState<NetworkInput>
     {
         private readonly IStateMachine<PlayerStateID, MovementContext> _stateMachine;
 
-        public PlayerWalkingState(IStateMachine<PlayerStateID, MovementContext> stateMachine)
+        public PlayerIdleState(IStateMachine<PlayerStateID, MovementContext> stateMachine)
         {
             _stateMachine = stateMachine;
         }
@@ -25,10 +27,8 @@ namespace IT.FSM.States
             context.Rotator.RotateY(input.YRotation, movementStatsModule.RotationSpeed, deltaTime);
 
             float maxSpeed = movementStatsModule.MovementSpeed;
-
-            Vector3 desiredVelocity = new Vector3(input.MovementInput.x, 0f, input.MovementInput.y) * maxSpeed;
-                                      
-            characterMovement.SimpleMove(desiredVelocity, 
+            
+            characterMovement.SimpleMove(Vector3.zero, 
                 maxSpeed, 
                 movementStatsModule.Acceleration, 
                 movementStatsModule.Deceleration, 
@@ -49,14 +49,20 @@ namespace IT.FSM.States
             
         }
 
-        public void CheckStateChange()
+        public void CheckStateChange(NetworkInput input)
         {
             CharacterMovement characterMovement = _stateMachine.Context.CharacterMovement;
 
-            if (characterMovement.velocity.sqrMagnitude == 0f)
+            if (input.MovementInput.sqrMagnitude == 0 && characterMovement.isGrounded)
+                return;
+
+            if (input.IsWalkingPressed)
             {
-                _stateMachine.ChangeState(PlayerStateID.IDLE);
+                _stateMachine.ChangeState(PlayerStateID.WALKING);
+                return;
             }
+            
+            _stateMachine.ChangeState(PlayerStateID.SCUTTER);
         }
     }
 }

@@ -8,6 +8,6 @@ namespace IT.FSM
     {
         IDLE,
         WALKING,
-        SNEAKING,
+        SCUTTER,
     }
 }

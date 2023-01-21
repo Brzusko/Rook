@@ -91,11 +91,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 196890d00168a0649bd4709036051e2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 6
+  _componentIndexCache: 7
   _addedNetworkObject: {fileID: 1912049324724089206}
   _networkObjectCache: {fileID: 1912049324724089206}
   _animancerComponent: {fileID: 1565092988270009306}
-  _characterMovement: {fileID: 5446920144164943184}
   _playerMainSpaceTransform: {fileID: 1283863882254217425}
   _basicGroundMixer:
     _Asset: {fileID: 11400000, guid: c1fa2484af7908946ad74b3f58568814, type: 2}
@@ -144,7 +143,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1027bc3218e351a4dae3f78c2f4d2397, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 5
+  _componentIndexCache: 6
   _addedNetworkObject: {fileID: 1912049324724089206}
   _networkObjectCache: {fileID: 1912049324724089206}
   _characterMovement: {fileID: 5446920144164943184}
@@ -154,6 +153,10 @@ MonoBehaviour:
   _startingState: 0
   _playerEntityGameObject: {fileID: 7849939560007978409}
   _raycasterGameObject: {fileID: 7849939560007978409}
+  _reconcileRate: 1
+  _playerAnimations: {fileID: 6034007255074437676}
+  IsLaunchedUP: 0
+  IsTriggerUP: 0
 --- !u!1 &4720426297937606841
 GameObject:
   m_ObjectHideFlags: 0
@@ -314,6 +317,7 @@ MonoBehaviour:
   _componentIndexCache: 3
   _addedNetworkObject: {fileID: 1912049324724089206}
   _networkObjectCache: {fileID: 1912049324724089206}
+  _walkingSpeedModifier: 0.6
 --- !u!114 &5446920144164943184
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -422,6 +426,7 @@ MonoBehaviour:
   - {fileID: 4176736697030555468}
   - {fileID: 2902755330639871743}
   - {fileID: 1961820169530306613}
+  - {fileID: 1246725671637114553}
   - {fileID: 1467469930188945514}
   - {fileID: 6034007255074437676}
   <ParentNetworkObject>k__BackingField: {fileID: 0}
@@ -493,9 +498,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 402926ef33e0a894d9fec352693988ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 255
+  _componentIndexCache: 5
   _addedNetworkObject: {fileID: 1912049324724089206}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 1912049324724089206}
   _graphicalObject: {fileID: 2066412421744531934}
   _enableTeleport: 0
   _teleportThreshold: 1

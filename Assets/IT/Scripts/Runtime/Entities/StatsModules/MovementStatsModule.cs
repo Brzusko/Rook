@@ -9,6 +9,9 @@ public class MovementStatsModule : NetworkBehaviour
 {
     private SingleStat _movementSpeed;
     private float _additionalSpeedModifiers = 1f;
+    
+    [SerializeField]
+    private float _walkingSpeedModifier = 0.6f;
 
     public float MovementSpeed => _movementSpeed.CurrentValue * _additionalSpeedModifiers;
     public float Acceleration => Constants.ACCELERATION;
@@ -19,6 +22,7 @@ public class MovementStatsModule : NetworkBehaviour
     public float InAirAcceleration => Acceleration * Constants.AIR_CONTROL;
     public float AdditionalSpeedModifiers => _additionalSpeedModifiers;
     public float RotationSpeed => Constants.MAX_ROTATION;
+    public float WalkingSpeedModifier => _walkingSpeedModifier;
 
     public override void OnStartNetwork()
     {
@@ -28,7 +32,7 @@ public class MovementStatsModule : NetworkBehaviour
     
     private void InitializeOnce()
     {
-        _movementSpeed = new SingleStat(StatID.MOVEMENT_SPEED, 2.5f);
+        _movementSpeed = new SingleStat(StatID.MOVEMENT_SPEED, 4.5f);
         _additionalSpeedModifiers = 1f;
     }
 

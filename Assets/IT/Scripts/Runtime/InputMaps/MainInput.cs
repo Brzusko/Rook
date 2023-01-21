@@ -46,6 +46,15 @@ namespace IT.Input
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Walking"",
+                    ""type"": ""Button"",
+                    ""id"": ""55ba9f49-875d-43bf-aa55-4f09963824c3"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -112,6 +121,17 @@ namespace IT.Input
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""PointerMovement"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""caeca6c8-5283-426e-9a89-49079a5824b6"",
+                    ""path"": ""<Keyboard>/shift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Walking"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -194,6 +214,7 @@ namespace IT.Input
             m_Gameplay = asset.FindActionMap("Gameplay", throwIfNotFound: true);
             m_Gameplay_Movement = m_Gameplay.FindAction("Movement", throwIfNotFound: true);
             m_Gameplay_PointerMovement = m_Gameplay.FindAction("PointerMovement", throwIfNotFound: true);
+            m_Gameplay_Walking = m_Gameplay.FindAction("Walking", throwIfNotFound: true);
             // Camera
             m_Camera = asset.FindActionMap("Camera", throwIfNotFound: true);
             m_Camera_CameraMovement = m_Camera.FindAction("Camera Movement", throwIfNotFound: true);
@@ -259,12 +280,14 @@ namespace IT.Input
         private IGameplayActions m_GameplayActionsCallbackInterface;
         private readonly InputAction m_Gameplay_Movement;
         private readonly InputAction m_Gameplay_PointerMovement;
+        private readonly InputAction m_Gameplay_Walking;
         public struct GameplayActions
         {
             private @MainInput m_Wrapper;
             public GameplayActions(@MainInput wrapper) { m_Wrapper = wrapper; }
             public InputAction @Movement => m_Wrapper.m_Gameplay_Movement;
             public InputAction @PointerMovement => m_Wrapper.m_Gameplay_PointerMovement;
+            public InputAction @Walking => m_Wrapper.m_Gameplay_Walking;
             public InputActionMap Get() { return m_Wrapper.m_Gameplay; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
@@ -280,6 +303,9 @@ namespace IT.Input
                     @PointerMovement.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnPointerMovement;
                     @PointerMovement.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnPointerMovement;
                     @PointerMovement.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnPointerMovement;
+                    @Walking.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnWalking;
+                    @Walking.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnWalking;
+                    @Walking.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnWalking;
                 }
                 m_Wrapper.m_GameplayActionsCallbackInterface = instance;
                 if (instance != null)
@@ -290,6 +316,9 @@ namespace IT.Input
                     @PointerMovement.started += instance.OnPointerMovement;
                     @PointerMovement.performed += instance.OnPointerMovement;
                     @PointerMovement.canceled += instance.OnPointerMovement;
+                    @Walking.started += instance.OnWalking;
+                    @Walking.performed += instance.OnWalking;
+                    @Walking.canceled += instance.OnWalking;
                 }
             }
         }
@@ -339,6 +368,7 @@ namespace IT.Input
         {
             void OnMovement(InputAction.CallbackContext context);
             void OnPointerMovement(InputAction.CallbackContext context);
+            void OnWalking(InputAction.CallbackContext context);
         }
         public interface ICameraActions
         {

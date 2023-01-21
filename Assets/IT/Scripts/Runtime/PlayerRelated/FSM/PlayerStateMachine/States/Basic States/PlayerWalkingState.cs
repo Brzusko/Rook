@@ -8,11 +8,11 @@ using UnityEngine;
 
 namespace IT.FSM.States
 {
-    public class PlayerIdleState: IState<NetworkInput>
+    public class PlayerWalkingState: IState<NetworkInput>
     {
         private readonly IStateMachine<PlayerStateID, MovementContext> _stateMachine;
 
-        public PlayerIdleState(IStateMachine<PlayerStateID, MovementContext> stateMachine)
+        public PlayerWalkingState(IStateMachine<PlayerStateID, MovementContext> stateMachine)
         {
             _stateMachine = stateMachine;
         }
@@ -21,10 +21,11 @@ namespace IT.FSM.States
             MovementContext context = _stateMachine.Context;
             MovementStatsModule movementStatsModule = context.MovementStatsModule;
             CharacterMovement characterMovement = context.CharacterMovement;
-            
+
             context.Rotator.RotateY(input.YRotation, movementStatsModule.RotationSpeed, deltaTime);
-            
-            float maxSpeed = movementStatsModule.MovementSpeed;
+
+            float maxSpeed = movementStatsModule.MovementSpeed * movementStatsModule.WalkingSpeedModifier;
+
             Vector3 desiredVelocity = new Vector3(input.MovementInput.x, 0f, input.MovementInput.y) * maxSpeed;
                                       
             characterMovement.SimpleMove(desiredVelocity, 
@@ -48,13 +49,18 @@ namespace IT.FSM.States
             
         }
 
-        public void CheckStateChange()
+        public void CheckStateChange(NetworkInput input)
         {
-            CharacterMovement characterMovement = _stateMachine.Context.CharacterMovement;
 
-            if (characterMovement.velocity.sqrMagnitude > 0f)
+            if (!input.IsWalkingPressed && input.MovementInput.sqrMagnitude > 0f)
             {
-                _stateMachine.ChangeState(PlayerStateID.WALKING);
+                _stateMachine.ChangeState(PlayerStateID.SCUTTER);
+                return;
+            }
+            
+            if (input.MovementInput.sqrMagnitude == 0f)
+            {
+                _stateMachine.ChangeState(PlayerStateID.IDLE);
             }
         }
     }

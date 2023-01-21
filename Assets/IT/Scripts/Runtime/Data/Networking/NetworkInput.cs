@@ -9,6 +9,7 @@ namespace IT.Data.Networking
     {
         public Vector2 MovementInput;
         public float YRotation;
+        public bool IsWalkingPressed;
 
         #region Default
 

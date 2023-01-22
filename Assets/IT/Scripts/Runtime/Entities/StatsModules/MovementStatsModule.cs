@@ -11,7 +11,7 @@ public class MovementStatsModule : NetworkBehaviour
     private float _additionalSpeedModifiers = 1f;
     
     [SerializeField]
-    private float _walkingSpeedModifier = 0.6f;
+    private float _walkingSpeedModifier = 0.75f;
 
     public float MovementSpeed => _movementSpeed.CurrentValue * _additionalSpeedModifiers;
     public float Acceleration => Constants.ACCELERATION;
@@ -32,7 +32,7 @@ public class MovementStatsModule : NetworkBehaviour
     
     private void InitializeOnce()
     {
-        _movementSpeed = new SingleStat(StatID.MOVEMENT_SPEED, 4.5f);
+        _movementSpeed = new SingleStat(StatID.MOVEMENT_SPEED, 3.0f);
         _additionalSpeedModifiers = 1f;
     }
 

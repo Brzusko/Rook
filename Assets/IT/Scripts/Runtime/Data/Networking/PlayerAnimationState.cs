@@ -7,5 +7,6 @@ namespace IT.Data.Networking
     public struct PlayerAnimationState
     {
         public Vector2 AnimationVector;
+        public uint Tick;
     }
 }

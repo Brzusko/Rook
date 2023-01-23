@@ -22,6 +22,7 @@ public class MovementStatsModule : NetworkBehaviour
     public float InAirAcceleration => Acceleration * Constants.AIR_CONTROL;
     public float AdditionalSpeedModifiers => _additionalSpeedModifiers;
     public float RotationSpeed => Constants.MAX_ROTATION;
+    public float InAirFriction => Friction * 0.5f;
     public float WalkingSpeedModifier => _walkingSpeedModifier;
 
     public override void OnStartNetwork()

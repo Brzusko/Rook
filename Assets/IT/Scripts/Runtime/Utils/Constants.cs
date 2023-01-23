@@ -12,7 +12,7 @@ namespace IT.Utils
         public static readonly float DECELERATION = 20f;
         public static readonly float DRAG = 30f;
         public static readonly float GRAVITY_FORCE = 9.81f;
-        public static readonly float AIR_CONTROL = 0.4f;
+        public static readonly float AIR_CONTROL = 0.1f;
         public static readonly float MAX_ROTATION = 100f;
     }
 }

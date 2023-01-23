@@ -17,19 +17,25 @@ public class PlayerAnimations : NetworkBehaviour
     [SerializeField] private Transform _playerMainSpaceTransform;
     [Header("Animation Assets")]
     [SerializeField] private MixerTransition2DAsset.UnShared _basicGroundMixer;
+    [SerializeField] private ClipTransitionAsset.UnShared _fallingAnimation;
+    [SerializeField] private ClipTransitionAsset.UnShared _landingAnimation;
     
     [Range(0.00f, 100f)]
     [SerializeField]
     private float _interpolationSpeed = 0.1f;
+    
+    [Range(1, 1000)]
+    [SerializeField] private uint _sendRate;
 
-    private MixerState<Vector2> _basicGroundState;
+    private Dictionary<PlayerAnimationStateID, AnimancerState> _animationStates;
+    private PlayerAnimationStateID _currentAnimancerStateID;
     private bool _areEventsBound;
-
     private NetworkInput _cachedInput;
     private Vector2 _animationVector = Vector2.zero;
     private float _cachedAcceleration;
     private float _cachedDeceleration;
     private PlayerAnimationState _currentState;
+    private PlayerAnimationState _lastState;
     private Vector2 _puppetAnimationVector;
     private readonly RingBuffer<PlayerAnimationState> _puppetAnimationStates = new RingBuffer<PlayerAnimationState>(1024);
     private float _lerpValue = 0.0f;
@@ -43,8 +49,7 @@ public class PlayerAnimations : NetworkBehaviour
     {
         base.OnStartNetwork();
         BindEvents();
-        
-        _animancerComponent.Play(_basicGroundState);
+        PlayAnimation(PlayerAnimationStateID.GROUNDED);
     }
 
     public override void OnStopNetwork()
@@ -55,7 +60,18 @@ public class PlayerAnimations : NetworkBehaviour
 
     private void BuildAnimator()
     {
-        _basicGroundState = (MixerState<Vector2>)_animancerComponent.States.GetOrCreate(_basicGroundMixer);
+        _animationStates = new Dictionary<PlayerAnimationStateID, AnimancerState>
+        {
+            {
+                PlayerAnimationStateID.GROUNDED, _animancerComponent.States.GetOrCreate(_basicGroundMixer)
+            },
+            {
+                PlayerAnimationStateID.FALLING, _animancerComponent.States.GetOrCreate(_fallingAnimation)
+            },
+            {
+                PlayerAnimationStateID.LANDING, _animancerComponent.States.GetOrCreate(_landingAnimation)
+            }
+        };
     }
 
     private void BindEvents()
@@ -84,9 +100,6 @@ public class PlayerAnimations : NetworkBehaviour
     {
         if(PredictionManager.IsReplaying())
             return;
-
-        if(!_basicGroundState.IsPlaying)
-            return;
         
         if (!IsOwner && !IsServer)
         {
@@ -94,7 +107,7 @@ public class PlayerAnimations : NetworkBehaviour
             return;
         }
         
-        ProcessAnimation();
+        ProcessGroundAnimation();
     }
 
     private void OnPreTick()
@@ -107,11 +120,16 @@ public class PlayerAnimations : NetworkBehaviour
     
     private void OnPostTick()
     {
-        if (IsServer)
-        {
-            uint currentTick = TimeManager.LocalTick;
-            Server_SendAnimationState(new PlayerAnimationState{ AnimationVector = _animationVector, Tick = currentTick});
-        }
+        if (!IsServer) return;
+        uint currentTick = TimeManager.LocalTick;
+        
+        if((currentTick % _sendRate) != 0)
+            return;
+
+        float speed = _animationStates[_currentAnimancerStateID].Speed;
+        float duration = _animationStates[_currentAnimancerStateID].Duration;
+        
+        Server_SendAnimationState(new PlayerAnimationState{ AnimationVector = _animationVector, Tick = currentTick, Speed = speed, Duration = duration, StateID = _currentAnimancerStateID});
     }
 
     public void CacheInput(NetworkInput input, float acceleration, float deceleration)
@@ -119,6 +137,19 @@ public class PlayerAnimations : NetworkBehaviour
         _cachedInput = input;
         _cachedAcceleration = acceleration;
         _cachedDeceleration = deceleration;
+    }
+
+    public void PlayAnimation(PlayerAnimationStateID animID)
+    {
+        if(_animationStates == null || !_animationStates.ContainsKey(animID))
+            return;
+        
+        if(animID == _currentAnimancerStateID)
+            return;
+        
+        _currentAnimancerStateID = animID;
+
+        _animancerComponent.Play(_animationStates[animID], 0.25f);
     }
     
     [ObserversRpc(BufferLast = true, IncludeOwner = false)]
@@ -139,8 +170,11 @@ public class PlayerAnimations : NetworkBehaviour
         _puppetAnimationStates.Write(animationState);
     }
 
-    private void ProcessAnimation()
+    private void ProcessGroundAnimation()
     {
+        if(_currentAnimancerStateID != PlayerAnimationStateID.GROUNDED)
+            return;
+        
         Vector3 transformedVelocity =
             _playerMainSpaceTransform.InverseTransformDirection(new Vector3(_cachedInput.MovementInput.x, 0,
                 _cachedInput.MovementInput.y));
@@ -157,22 +191,34 @@ public class PlayerAnimations : NetworkBehaviour
         float desiredY = Mathf.MoveTowards(_animationVector.y, targetY, maxDelta);
 
         _animationVector = new Vector2(desiredX, desiredY);
-        _basicGroundState.Parameter = _animationVector;
+        ((MixerState<Vector2>)_animationStates[_currentAnimancerStateID]).Parameter = _animationVector;
     }
-
+    
+    //TODO process one-shot animations
     private void ProcessAnimationPuppet()
     {
+        if (_lastState.StateID != _currentState.StateID)
+        {
+            PlayAnimation(_currentState.StateID);    
+        }
+        
+        if(_currentAnimancerStateID != PlayerAnimationStateID.GROUNDED)
+            return;
+
         _lerpValue += Time.deltaTime * _interpolationSpeed;
         _puppetAnimationVector = Vector2.Lerp(_puppetAnimationVector, _currentState.AnimationVector,
             _lerpValue);
-        _basicGroundState.Parameter = _puppetAnimationVector;
+        
+        ((MixerState<Vector2>)_animationStates[_currentAnimancerStateID]).Parameter = _puppetAnimationVector;
     }
 
     private void GrabAnimationStates()
     {
         while (_puppetAnimationStates.Count > 1)
         {
+            _lastState = _currentState;
             _currentState = _puppetAnimationStates.Read();
+            Debug.Log($"{_lastState.StateID.ToString()}, {_currentState.StateID.ToString()}");
             _lerpValue = 0;
         }
     }

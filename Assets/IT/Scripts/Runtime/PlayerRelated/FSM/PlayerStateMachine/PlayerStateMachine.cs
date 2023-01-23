@@ -101,6 +101,10 @@ namespace IT.FSM
                 {
                     PlayerStateID.SCUTTER,
                     new PlayerScutterState(this)
+                },
+                {
+                    PlayerStateID.FALLING,
+                    new PlayerFallingState(this)
                 }
             };
         }
@@ -217,6 +221,14 @@ namespace IT.FSM
             _currentState?.Enter();
         }
         #endregion
+
+        private void OnDrawGizmos()
+        {
+            Ray ray = new Ray(_characterMovement.GetFootPosition(), Vector3.down);
+            
+            Gizmos.color = Color.red;
+            Gizmos.DrawRay(ray);
+        }
     }
 
     public class MovementContext

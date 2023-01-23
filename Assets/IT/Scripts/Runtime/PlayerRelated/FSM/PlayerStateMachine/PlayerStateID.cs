@@ -9,5 +9,6 @@ namespace IT.FSM
         IDLE,
         WALKING,
         SCUTTER,
+        FALLING,
     }
 }

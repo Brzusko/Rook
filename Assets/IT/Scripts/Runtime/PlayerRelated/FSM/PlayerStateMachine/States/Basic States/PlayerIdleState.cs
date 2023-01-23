@@ -41,7 +41,7 @@ namespace IT.FSM.States
 
         public void Enter()
         {
-            
+            _stateMachine.Context.PlayerAnimations.PlayAnimation(PlayerAnimationStateID.GROUNDED);
         }
 
         public void Exit()
@@ -53,6 +53,12 @@ namespace IT.FSM.States
         {
             CharacterMovement characterMovement = _stateMachine.Context.CharacterMovement;
 
+            if (characterMovement.wasGrounded && !characterMovement.isGrounded)
+            {
+                _stateMachine.ChangeState(PlayerStateID.FALLING);
+                return;
+            }
+            
             if (input.MovementInput.sqrMagnitude == 0 && characterMovement.isGrounded)
                 return;
 

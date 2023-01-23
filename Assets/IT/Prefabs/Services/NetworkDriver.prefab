@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 7696058605773559384}
   - component: {fileID: 7696058605773559385}
   - component: {fileID: 7696058605773559390}
+  - component: {fileID: 2086750880}
   m_Layer: 0
   m_Name: NetworkDriver
   m_TagString: Untagged
@@ -36,7 +37,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7696058605773559380
 MonoBehaviour:
@@ -94,6 +95,7 @@ MonoBehaviour:
   _shareIds: 1
   _startOnHeadless: 1
   _limitClientMTU: 1
+  _allowPredictedSpawning: 1
 --- !u!114 &7696058605773559387
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -121,6 +123,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _updateOrder: 0
+  _timingType: 0
   _allowTickDropping: 0
   _maximumFrameTicks: 2
   _tickRate: 30
@@ -141,11 +144,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Transport: {fileID: 7696058605773559390}
   _latencySimulator:
-    _enabled: 0
+    _enabled: 1
     _simulateHost: 1
-    _latency: 0
+    _latency: 100
     _outOfOrder: 0
-    _packetLoss: 0
+    _packetLoss: 0.019999999552965164
 --- !u!114 &7696058605773559390
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -165,3 +168,19 @@ MonoBehaviour:
   _maximumClients: 4095
   _clientAddress: localhost
   _timeout: 15
+--- !u!114 &2086750880
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7696058605773559388}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 756c28cd3141c4140ae776188ee26729, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  NetworkTraffic:
+    _updateInteval: 1
+    _updateClient: 1
+    _updateServer: 1

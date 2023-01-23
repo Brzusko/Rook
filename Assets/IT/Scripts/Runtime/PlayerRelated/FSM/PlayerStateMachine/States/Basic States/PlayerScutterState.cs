@@ -39,7 +39,7 @@ public class PlayerScutterState : IState<NetworkInput>
 
     public void Enter()
     {
-        
+        _stateMachine.Context.PlayerAnimations.PlayAnimation(PlayerAnimationStateID.GROUNDED);
     }
 
     public void Exit()
@@ -49,6 +49,14 @@ public class PlayerScutterState : IState<NetworkInput>
 
     public void CheckStateChange(NetworkInput input)
     {
+        CharacterMovement characterMovement = _stateMachine.Context.CharacterMovement;
+            
+        if (characterMovement.wasGrounded && !characterMovement.isGrounded)
+        {
+            _stateMachine.ChangeState(PlayerStateID.FALLING);
+            return;
+        }
+        
         if (input.IsWalkingPressed && input.MovementInput.sqrMagnitude > 0f)
         {
             _stateMachine.ChangeState(PlayerStateID.WALKING);

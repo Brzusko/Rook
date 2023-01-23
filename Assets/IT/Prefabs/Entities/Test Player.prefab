@@ -91,14 +91,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 196890d00168a0649bd4709036051e2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 7
+  _componentIndexCache: 6
   _addedNetworkObject: {fileID: 1912049324724089206}
   _networkObjectCache: {fileID: 1912049324724089206}
   _animancerComponent: {fileID: 1565092988270009306}
   _playerMainSpaceTransform: {fileID: 1283863882254217425}
   _basicGroundMixer:
     _Asset: {fileID: 11400000, guid: c1fa2484af7908946ad74b3f58568814, type: 2}
-  _maxAnimationVectorMagnitude: 2
+  _fallingAnimation:
+    _Asset: {fileID: 11400000, guid: 717abd7fed08b784d87fe28bc1e66257, type: 2}
+  _landingAnimation:
+    _Asset: {fileID: 11400000, guid: fcc75892e3ff7ad40b8cab665879faa3, type: 2}
+  _interpolationSpeed: 15
+  _sendRate: 2
 --- !u!1 &3066851563343315535
 GameObject:
   m_ObjectHideFlags: 0
@@ -143,7 +148,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1027bc3218e351a4dae3f78c2f4d2397, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 6
+  _componentIndexCache: 7
   _addedNetworkObject: {fileID: 1912049324724089206}
   _networkObjectCache: {fileID: 1912049324724089206}
   _characterMovement: {fileID: 5446920144164943184}
@@ -153,10 +158,8 @@ MonoBehaviour:
   _startingState: 0
   _playerEntityGameObject: {fileID: 7849939560007978409}
   _raycasterGameObject: {fileID: 7849939560007978409}
-  _reconcileRate: 1
+  _reconcileRate: 5
   _playerAnimations: {fileID: 6034007255074437676}
-  IsLaunchedUP: 0
-  IsTriggerUP: 0
 --- !u!1 &4720426297937606841
 GameObject:
   m_ObjectHideFlags: 0
@@ -244,9 +247,9 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 8681690450026466375}
   - {fileID: 2066412421744531934}
   - {fileID: 5099359456849757885}
-  - {fileID: 8681690450026466375}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -333,12 +336,12 @@ MonoBehaviour:
   _planeConstraint: 0
   _rootTransform: {fileID: 0}
   _rootTransformOffset: {x: 0, y: 0, z: 0}
-  _radius: 0.5
+  _radius: 0.25
   _height: 2
   _slopeLimit: 50
   _stepOffset: 0.45
-  _perchOffset: 0.5
-  _perchAdditionalHeight: 0.4
+  _perchOffset: 0.06
+  _perchAdditionalHeight: 0.31
   _slopeLimitOverride: 0
   _useFlatTop: 0
   _useFlatBaseForGroundChecks: 0
@@ -402,7 +405,7 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.5
+  m_Radius: 0.25
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 1, z: 0}
@@ -427,8 +430,8 @@ MonoBehaviour:
   - {fileID: 2902755330639871743}
   - {fileID: 1961820169530306613}
   - {fileID: 1246725671637114553}
-  - {fileID: 1467469930188945514}
   - {fileID: 6034007255074437676}
+  - {fileID: 1467469930188945514}
   <ParentNetworkObject>k__BackingField: {fileID: 0}
   <ChildNetworkObjects>k__BackingField: []
   _isNetworked: 1

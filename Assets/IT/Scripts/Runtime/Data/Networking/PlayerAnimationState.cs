@@ -37,7 +37,7 @@ namespace IT.Data.Networking
             if(value.StateID != PlayerAnimationStateID.GROUNDED)
                 return;
 
-            byte speed = (byte)(value.Speed * 10f);
+            byte speed = (byte)(value.Speed * 100f);
             byte duration = (byte)(value.Duration * 10f);
             
             writer.WriteByte(speed);
@@ -46,8 +46,8 @@ namespace IT.Data.Networking
 
         public static PlayerAnimationState ReadPlayerAnimationState(this Reader reader)
         {
-            float xAnimComponent = (float)(reader.ReadInt16() / 100f);
-            float yAnimComponent = (float)(reader.ReadInt16() / 100f);
+            float xAnimComponent = (reader.ReadInt16() / 100f);
+            float yAnimComponent = (reader.ReadInt16() / 100f);
             Vector2 animVector = new Vector2(xAnimComponent, yAnimComponent);
             uint tick = reader.ReadUInt32(AutoPackType.Unpacked);
             PlayerAnimationStateID stateID = (PlayerAnimationStateID)reader.ReadByte();

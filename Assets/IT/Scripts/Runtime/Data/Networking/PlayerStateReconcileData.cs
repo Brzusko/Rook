@@ -17,7 +17,6 @@ namespace IT.Data.Networking
         public bool IsWalkable;
         public PlayerStateID StateID;
         public float AdditionalMovementMultiplier;
-        public bool IsTriggerUP;
 
         #region Default
         private uint _tick;

@@ -39,6 +39,7 @@ public class PlayerAnimations : NetworkBehaviour
     private Vector2 _puppetAnimationVector;
     private readonly RingBuffer<PlayerAnimationState> _puppetAnimationStates = new RingBuffer<PlayerAnimationState>(1024);
     private float _lerpValue = 0.0f;
+    private Vector3 _lastTransformPosition;
 
     private void Awake()
     {
@@ -112,7 +113,7 @@ public class PlayerAnimations : NetworkBehaviour
 
     private void OnPreTick()
     {
-        if (!IsOwner && !IsServer)
+        if (!IsOwner && !IsServer && !PredictionManager.IsReplaying())
         {
             GrabAnimationStates();
         }
@@ -218,7 +219,6 @@ public class PlayerAnimations : NetworkBehaviour
         {
             _lastState = _currentState;
             _currentState = _puppetAnimationStates.Read();
-            Debug.Log($"{_lastState.StateID.ToString()}, {_currentState.StateID.ToString()}");
             _lerpValue = 0;
         }
     }

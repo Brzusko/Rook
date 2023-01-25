@@ -8,6 +8,7 @@ namespace IT.Data.Networking
 
     public enum PlayerAnimationStateID : byte
     {
+        NONE,
         GROUNDED,
         FALLING,
         LANDING,

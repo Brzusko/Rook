@@ -38,8 +38,7 @@ namespace IT.FSM
         private PlayerStateID _currentStateID;
         private IState<NetworkInput> _currentState;
         private MovementContext _context;
-        private TimeManager _timeManager;
-        
+
         private IEntityToPossess _playerEntity;
         private IRaycaster _raycaster;
         public MovementContext Context => _context;
@@ -53,17 +52,13 @@ namespace IT.FSM
 
         private void Start()
         {
-            _timeManager = InstanceFinder.TimeManager;
-            
-            _timeManager.OnTick += OnTick;
-            _timeManager.OnPreTick += OnPreTick;
+            TimeManager.OnTick += OnTick;
             _playerEntity.ClientPossessChanged += OnClientPossessChanged;
         }
 
         private void OnDestroy()
         {
-            _timeManager.OnTick -= OnTick;
-            _timeManager.OnPreTick -= OnPreTick;
+            TimeManager.OnTick -= OnTick;
             _playerEntity.ClientPossessChanged -= OnClientPossessChanged;
         }
 
@@ -111,18 +106,13 @@ namespace IT.FSM
 
         #region Event Handlers
 
-        private void OnPreTick()
-        {
-
-        }
-        
         private void OnTick()
         {
             if (IsOwner)
             {
                 Reconcile(default, false);
 
-                NetworkInput input = GenerateInput();
+                GenerateInput(out NetworkInput input);
                 
                 Simulation(input, false);
             }
@@ -153,7 +143,7 @@ namespace IT.FSM
         private void Simulation(NetworkInput input, bool asServer, Channel channel = Channel.Unreliable, bool isReplaying = false)
         {
             _playerAnimations.CacheInput(input, _movementStatsModule.Acceleration, _movementStatsModule.Deceleration);
-            _currentState.Tick(input, asServer, isReplaying, (float)_timeManager.TickDelta);
+            _currentState.Tick(input, asServer, isReplaying, (float)TimeManager.TickDelta);
             _currentState.CheckStateChange(input);
         }
         
@@ -191,18 +181,20 @@ namespace IT.FSM
             };
         }
 
-        private NetworkInput GenerateInput()
+        private void GenerateInput(out NetworkInput input)
         {
+            input = default;
+            
             RaycastHit hit = _raycaster.RaycastHit;
             Quaternion rotation = Quaternion.LookRotation(hit.point - transform.position);
             float yRotation = rotation.eulerAngles.y;
             
-            return new NetworkInput
-            {
-                MovementInput = _input.MovementInput,
-                YRotation = yRotation,
-                IsWalkingPressed = _input.IsWalkingPressed
-            };
+            if(yRotation == 0 || _input.MovementInput == default)
+                return;
+
+            input.YRotation = yRotation;
+            input.MovementInput = _input.MovementInput;
+            input.IsWalkingPressed = _input.IsWalkingPressed;
         }
 
         #region Interfaces
@@ -221,14 +213,6 @@ namespace IT.FSM
             _currentState?.Enter();
         }
         #endregion
-
-        private void OnDrawGizmos()
-        {
-            Ray ray = new Ray(_characterMovement.GetFootPosition(), Vector3.down);
-            
-            Gizmos.color = Color.red;
-            Gizmos.DrawRay(ray);
-        }
     }
 
     public class MovementContext
@@ -238,7 +222,6 @@ namespace IT.FSM
             CharacterMovement = characterMovement;
             MovementStatsModule = movementStatsModule;
             Rotator = rotator;
-            Raycaster = raycaster;
             PlayerAnimations = playerAnimations;
         }
         
@@ -246,7 +229,6 @@ namespace IT.FSM
         public MovementStatsModule MovementStatsModule { get; }
         public TransformRotator Rotator { get; }
         public PlayerAnimations PlayerAnimations { get; }
-        public IRaycaster Raycaster { get; }
     }
     
 }

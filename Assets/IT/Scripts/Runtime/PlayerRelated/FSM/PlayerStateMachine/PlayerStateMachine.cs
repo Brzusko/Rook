@@ -18,7 +18,7 @@ using UnityEngine.InputSystem;
 
 namespace IT.FSM
 {
-    public class PlayerStateMachine : NetworkBehaviour, IStateMachine<PlayerBaseStateID, PlayerStateMachineContext>
+    public class PlayerStateMachine : NetworkBehaviour, IStateMachine<PlayerBaseStateID, PlayerCombatStateID, PlayerStateMachineContext>
     {
         [Header("General")]
         [SerializeField] private CharacterMovement _characterMovement;
@@ -35,8 +35,11 @@ namespace IT.FSM
         [SerializeField] private PlayerAnimations _playerAnimations;
 
         private Dictionary<PlayerBaseStateID, IState<NetworkInput>> _baseStates;
+        private Dictionary<PlayerCombatStateID, IState<NetworkInput>> _combatStates;
         private IState<NetworkInput> _currentBaseState;
+        private IState<NetworkInput> _currentCombatState;
         private PlayerBaseStateID _currentBaseStateID;
+        private PlayerCombatStateID _currentCombatStateID;
         private PlayerStateMachineContext _context;
 
         private IEntityToPossess _playerEntity;
@@ -104,6 +107,26 @@ namespace IT.FSM
                 {
                     PlayerBaseStateID.JUMPING,
                     new MovementJumpState(this)
+                }
+            };
+
+            _combatStates = new Dictionary<PlayerCombatStateID, IState<NetworkInput>>
+            {
+                {
+                    PlayerCombatStateID.IDLE,
+                    new IdleCombatState(this)
+                },
+                {
+                    PlayerCombatStateID.SWING,
+                    new SwingCombatState(this)
+                },
+                {
+                    PlayerCombatStateID.PREPARE_SWING,
+                    new PrepareSwingCombatState(this)
+                },
+                {
+                    PlayerCombatStateID.BLOCK,
+                    new BlockCombatState(this)
                 }
             };
         }
@@ -201,7 +224,7 @@ namespace IT.FSM
             input.IsWalkingPressed = _input.IsWalkingPressed;
             input.isJumpPressed = _input.IsJumpPressed;
         }
-
+    
         #region Interfaces
         public void ChangeBaseState(PlayerBaseStateID baseStateID)
         {
@@ -217,6 +240,22 @@ namespace IT.FSM
             _currentBaseState = _baseStates[_currentBaseStateID];
             _currentBaseState?.Enter();
         }
+
+        public void ChangeSecondaryState(PlayerCombatStateID stateID)
+        {
+            _currentCombatStateID = stateID;
+            _currentCombatState?.Exit();
+
+            if (!_combatStates.ContainsKey(stateID))
+            {
+                Debug.LogError("Could not find given state!");
+                return;
+            }
+
+            _currentCombatState = _combatStates[_currentCombatStateID];
+            _currentBaseState?.Enter();
+        }
+
         #endregion
     }
 }

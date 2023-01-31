@@ -10,10 +10,10 @@ namespace IT.FSM.States
 {
     public class MovementFallingState : IState<NetworkInput>
     {
-        private readonly IStateMachine<PlayerBaseStateID, PlayerStateMachineContext> _stateMachine;
+        private readonly IStateMachine<PlayerBaseStateID, PlayerCombatStateID, PlayerStateMachineContext> _stateMachine;
         private float _inTheAir = 0f;
         
-        public MovementFallingState(IStateMachine<PlayerBaseStateID, PlayerStateMachineContext> stateMachine)
+        public MovementFallingState(IStateMachine<PlayerBaseStateID, PlayerCombatStateID, PlayerStateMachineContext> stateMachine)
         {
             _stateMachine = stateMachine;
         }

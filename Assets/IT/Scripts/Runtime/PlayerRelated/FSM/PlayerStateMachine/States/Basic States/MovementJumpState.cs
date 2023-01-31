@@ -9,9 +9,9 @@ namespace IT.FSM.States
 {
     public class MovementJumpState : IState<NetworkInput>
     {
-        private readonly IStateMachine<PlayerBaseStateID, PlayerStateMachineContext> _stateMachine;
+        private readonly IStateMachine<PlayerBaseStateID, PlayerCombatStateID, PlayerStateMachineContext> _stateMachine;
 
-        public MovementJumpState(IStateMachine<PlayerBaseStateID, PlayerStateMachineContext> stateMachine)
+        public MovementJumpState(IStateMachine<PlayerBaseStateID, PlayerCombatStateID, PlayerStateMachineContext> stateMachine)
         {
             _stateMachine = stateMachine;
         }

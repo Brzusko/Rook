@@ -10,9 +10,9 @@ namespace IT.FSM.States
 {
     public class MovementScutterState : IState<NetworkInput>
     {
-        private readonly IStateMachine<PlayerBaseStateID, PlayerStateMachineContext> _stateMachine;
+        private readonly IStateMachine<PlayerBaseStateID, PlayerCombatStateID, PlayerStateMachineContext> _stateMachine;
 
-        public MovementScutterState(IStateMachine<PlayerBaseStateID, PlayerStateMachineContext> stateMachine)
+        public MovementScutterState(IStateMachine<PlayerBaseStateID, PlayerCombatStateID, PlayerStateMachineContext> stateMachine)
         {
             _stateMachine = stateMachine;
         }

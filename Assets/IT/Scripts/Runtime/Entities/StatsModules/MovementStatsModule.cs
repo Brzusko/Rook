@@ -7,23 +7,38 @@ using UnityEngine;
 
 public class MovementStatsModule : NetworkBehaviour
 {
-    private SingleStat _movementSpeed;
-    private float _additionalSpeedModifiers = 1f;
-    
-    [SerializeField]
-    private float _walkingSpeedModifier = 0.75f;
+    [Header("Grounded Movement Stats")]
+    [SerializeField] private float _movementSpeed = 1f;
+    [SerializeField] private float _walkingSpeedModifier = 0.75f;
+    [SerializeField]private float _additionalSpeedModifiers = 1f;
+    [SerializeField] private float _jumpForce = 3f;
+    [SerializeField] private float _acceleration = 1f;
+    [SerializeField] private float _deceleration = 1f;
+    [SerializeField] private float _friction = 1f;
+    [SerializeField] private float _drag = 1f;
+    [SerializeField] private float _gravity = 1f;
+    [Header("In Air Movement Stats")]
+    [SerializeField] private float _inAirAcceleration = 1f;
+    [SerializeField] private float _inAirDeceleration = 1f;
+    [SerializeField] private float _inAirFriction = 1f;
+    [SerializeField] private float _inAirDrag = 1f;
+    [SerializeField] private float _inAirControl = 1f;
 
-    public float MovementSpeed => _movementSpeed.CurrentValue * _additionalSpeedModifiers;
-    public float Acceleration => Constants.ACCELERATION;
-    public float Deceleration => Constants.DECELERATION;
-    public float Friction => Constants.FRICTION;
-    public float Drag => Constants.DRAG;
-    public float Gravity => - Constants.GRAVITY_FORCE;
-    public float InAirAcceleration => Acceleration * Constants.AIR_CONTROL;
-    public float AdditionalSpeedModifiers => _additionalSpeedModifiers;
+    public float MovementSpeed => _movementSpeed * _additionalSpeedModifiers;
     public float RotationSpeed => Constants.MAX_ROTATION;
-    public float InAirFriction => Friction * 0.5f;
     public float WalkingSpeedModifier => _walkingSpeedModifier;
+    public float JumpForce => _jumpForce;
+    public float AdditionalSpeedModifiers => _additionalSpeedModifiers;
+    public float Acceleration => _acceleration;
+    public float Deceleration => _deceleration;
+    public float Friction => _friction;
+    public float Drag => _drag;
+    public float Gravity => - _gravity;
+    public float InAirAcceleration => _inAirAcceleration;
+    public float InAirDeceleration => _inAirDeceleration;
+    public float InAirDrag => _inAirDrag;
+    public float InAirFriction => _inAirFriction;
+    public float InAirControl => _inAirControl;
 
     public override void OnStartNetwork()
     {
@@ -33,8 +48,6 @@ public class MovementStatsModule : NetworkBehaviour
     
     private void InitializeOnce()
     {
-        _movementSpeed = new SingleStat(StatID.MOVEMENT_SPEED, 3.0f);
-        _additionalSpeedModifiers = 1f;
     }
 
     public void ResetAdditionalSpeedModifiers() => _additionalSpeedModifiers = 1f;

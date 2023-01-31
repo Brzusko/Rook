@@ -7,6 +7,6 @@ namespace IT.Interfaces.FSM
     public interface IStateMachine<in TID, out TContext>
     {
         public TContext Context { get; }
-        public void ChangeState(TID stateID);
+        public void ChangeBaseState(TID stateID);
     }
 }

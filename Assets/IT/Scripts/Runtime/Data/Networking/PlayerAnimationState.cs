@@ -12,6 +12,7 @@ namespace IT.Data.Networking
         GROUNDED,
         FALLING,
         LANDING,
+        JUMPING,
     }
     
     public struct PlayerAnimationState

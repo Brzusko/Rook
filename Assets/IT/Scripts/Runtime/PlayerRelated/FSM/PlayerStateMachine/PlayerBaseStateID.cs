@@ -4,11 +4,17 @@ using UnityEngine;
 
 namespace IT.FSM
 {
-    public enum PlayerStateID : byte
+    public enum PlayerBaseStateID : byte
     {
         IDLE,
         WALKING,
         SCUTTER,
         FALLING,
+        JUMPING,
+    }
+
+    public enum PlayerSecondaryStateID : byte
+    {
+        
     }
 }

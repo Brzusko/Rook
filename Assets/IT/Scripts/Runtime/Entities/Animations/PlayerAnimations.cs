@@ -19,6 +19,8 @@ public class PlayerAnimations : NetworkBehaviour
     [SerializeField] private MixerTransition2DAsset.UnShared _basicGroundMixer;
     [SerializeField] private ClipTransitionAsset.UnShared _fallingAnimation;
     [SerializeField] private ClipTransitionAsset.UnShared _landingAnimation;
+    [SerializeField] private ClipTransitionAsset.UnShared _jumpingAnimation;
+    [SerializeField] private AvatarMask _avatarMask;
     [Range(0.00f, 100f)]
     [SerializeField]
     private float _interpolationSpeed = 0.1f;
@@ -32,6 +34,8 @@ public class PlayerAnimations : NetworkBehaviour
     private Vector2 _animationVector = Vector2.zero;
     private float _cachedAcceleration;
     private float _cachedDeceleration;
+    private AnimancerLayer _mainLayer;
+    private AnimancerLayer _weaponLayer;
     
     //Puppet/non owner variables 
     private PlayerAnimationState _currentState;
@@ -58,6 +62,9 @@ public class PlayerAnimations : NetworkBehaviour
 
     private void BuildAnimator()
     {
+        _mainLayer = _animancerComponent.Layers[0];
+        _weaponLayer = _animancerComponent.Layers[1];
+        
         _animationStates = new Dictionary<PlayerAnimationStateID, AnimancerState>
         {
             {
@@ -68,6 +75,9 @@ public class PlayerAnimations : NetworkBehaviour
             },
             {
                 PlayerAnimationStateID.LANDING, _animancerComponent.States.GetOrCreate(_landingAnimation)
+            },
+            {
+                PlayerAnimationStateID.JUMPING, _animancerComponent.States.GetOrCreate(_jumpingAnimation)
             }
         };
     }
@@ -181,7 +191,7 @@ public class PlayerAnimations : NetworkBehaviour
     //TODO process one-shot animations
     private void ProcessAnimationPuppet()
     {
-        if (_lastState.StateID != _currentState.StateID)
+        if (_currentAnimancerStateID != _currentState.StateID)
         {
             PlayAnimation(_currentState.StateID);    
         }

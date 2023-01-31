@@ -55,6 +55,15 @@ namespace IT.Input
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Jump"",
+                    ""type"": ""Button"",
+                    ""id"": ""c6e96840-6cc8-4c12-b71b-cea2a64f9270"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -132,6 +141,17 @@ namespace IT.Input
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Walking"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e49ef55a-ca71-4423-9ad2-be5e82f37f2e"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Jump"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -215,6 +235,7 @@ namespace IT.Input
             m_Gameplay_Movement = m_Gameplay.FindAction("Movement", throwIfNotFound: true);
             m_Gameplay_PointerMovement = m_Gameplay.FindAction("PointerMovement", throwIfNotFound: true);
             m_Gameplay_Walking = m_Gameplay.FindAction("Walking", throwIfNotFound: true);
+            m_Gameplay_Jump = m_Gameplay.FindAction("Jump", throwIfNotFound: true);
             // Camera
             m_Camera = asset.FindActionMap("Camera", throwIfNotFound: true);
             m_Camera_CameraMovement = m_Camera.FindAction("Camera Movement", throwIfNotFound: true);
@@ -281,6 +302,7 @@ namespace IT.Input
         private readonly InputAction m_Gameplay_Movement;
         private readonly InputAction m_Gameplay_PointerMovement;
         private readonly InputAction m_Gameplay_Walking;
+        private readonly InputAction m_Gameplay_Jump;
         public struct GameplayActions
         {
             private @MainInput m_Wrapper;
@@ -288,6 +310,7 @@ namespace IT.Input
             public InputAction @Movement => m_Wrapper.m_Gameplay_Movement;
             public InputAction @PointerMovement => m_Wrapper.m_Gameplay_PointerMovement;
             public InputAction @Walking => m_Wrapper.m_Gameplay_Walking;
+            public InputAction @Jump => m_Wrapper.m_Gameplay_Jump;
             public InputActionMap Get() { return m_Wrapper.m_Gameplay; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
@@ -306,6 +329,9 @@ namespace IT.Input
                     @Walking.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnWalking;
                     @Walking.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnWalking;
                     @Walking.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnWalking;
+                    @Jump.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnJump;
+                    @Jump.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnJump;
+                    @Jump.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnJump;
                 }
                 m_Wrapper.m_GameplayActionsCallbackInterface = instance;
                 if (instance != null)
@@ -319,6 +345,9 @@ namespace IT.Input
                     @Walking.started += instance.OnWalking;
                     @Walking.performed += instance.OnWalking;
                     @Walking.canceled += instance.OnWalking;
+                    @Jump.started += instance.OnJump;
+                    @Jump.performed += instance.OnJump;
+                    @Jump.canceled += instance.OnJump;
                 }
             }
         }
@@ -369,6 +398,7 @@ namespace IT.Input
             void OnMovement(InputAction.CallbackContext context);
             void OnPointerMovement(InputAction.CallbackContext context);
             void OnWalking(InputAction.CallbackContext context);
+            void OnJump(InputAction.CallbackContext context);
         }
         public interface ICameraActions
         {

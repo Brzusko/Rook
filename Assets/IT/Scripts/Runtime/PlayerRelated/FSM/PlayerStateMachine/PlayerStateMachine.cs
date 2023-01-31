@@ -18,14 +18,14 @@ using UnityEngine.InputSystem;
 
 namespace IT.FSM
 {
-    public class PlayerStateMachine : NetworkBehaviour, IStateMachine<PlayerStateID, MovementContext>
+    public class PlayerStateMachine : NetworkBehaviour, IStateMachine<PlayerBaseStateID, PlayerStateMachineContext>
     {
         [Header("General")]
         [SerializeField] private CharacterMovement _characterMovement;
         [SerializeField] private PlayerInputReader _input;
         [SerializeField] private MovementStatsModule _movementStatsModule;
         [SerializeField] private TransformRotator _transformRotator;
-        [SerializeField] private PlayerStateID _startingState;
+        [SerializeField] private PlayerBaseStateID startingBaseState;
         [Header("Interfaces")]
         [SerializeField] private GameObject _playerEntityGameObject;
         [SerializeField] private GameObject _raycasterGameObject;
@@ -34,20 +34,20 @@ namespace IT.FSM
 
         [SerializeField] private PlayerAnimations _playerAnimations;
 
-        private Dictionary<PlayerStateID, IState<NetworkInput>> _states;
-        private PlayerStateID _currentStateID;
-        private IState<NetworkInput> _currentState;
-        private MovementContext _context;
+        private Dictionary<PlayerBaseStateID, IState<NetworkInput>> _baseStates;
+        private IState<NetworkInput> _currentBaseState;
+        private PlayerBaseStateID _currentBaseStateID;
+        private PlayerStateMachineContext _context;
 
         private IEntityToPossess _playerEntity;
         private IRaycaster _raycaster;
-        public MovementContext Context => _context;
+        public PlayerStateMachineContext Context => _context;
 
         private void Awake()
         {
             InitializeOnce();
             InitializeStateMachine();
-            ChangeState(_startingState);
+            ChangeBaseState(startingBaseState);
         }
 
         private void Start()
@@ -81,25 +81,29 @@ namespace IT.FSM
 
         private void InitializeStateMachine()
         {
-            _context = new MovementContext(_characterMovement, _movementStatsModule, _transformRotator, _playerAnimations, _raycaster);
+            _context = new PlayerStateMachineContext(_characterMovement, _movementStatsModule, _transformRotator, _playerAnimations, _raycaster);
                 
-            _states = new Dictionary<PlayerStateID, IState<NetworkInput>>
+            _baseStates = new Dictionary<PlayerBaseStateID, IState<NetworkInput>>
             {
                 { 
-                    PlayerStateID.IDLE, 
-                    new PlayerIdleState(this)
+                    PlayerBaseStateID.IDLE, 
+                    new MovementIdleState(this)
                 },
                 {
-                    PlayerStateID.WALKING,
-                    new PlayerWalkingState(this)
+                    PlayerBaseStateID.WALKING,
+                    new MovementWalkingState(this)
                 },
                 {
-                    PlayerStateID.SCUTTER,
-                    new PlayerScutterState(this)
+                    PlayerBaseStateID.SCUTTER,
+                    new MovementScutterState(this)
                 },
                 {
-                    PlayerStateID.FALLING,
-                    new PlayerFallingState(this)
+                    PlayerBaseStateID.FALLING,
+                    new MovementFallingState(this)
+                },
+                {
+                    PlayerBaseStateID.JUMPING,
+                    new MovementJumpState(this)
                 }
             };
         }
@@ -143,8 +147,8 @@ namespace IT.FSM
         private void Simulation(NetworkInput input, bool asServer, Channel channel = Channel.Unreliable, bool isReplaying = false)
         {
             _playerAnimations.CacheInput(input, _movementStatsModule.Acceleration, _movementStatsModule.Deceleration);
-            _currentState.Tick(input, asServer, isReplaying, (float)TimeManager.TickDelta);
-            _currentState.CheckStateChange(input);
+            _currentBaseState.Tick(input, asServer, isReplaying, (float)TimeManager.TickDelta);
+            _currentBaseState.CheckStateChange(input);
         }
         
         [Reconcile]
@@ -157,7 +161,7 @@ namespace IT.FSM
             _movementStatsModule.SetAdditionalSpeedModifiers(data.AdditionalMovementMultiplier);
             _characterMovement.SetState(state);
             
-            ChangeState(data.StateID);
+            ChangeBaseState(data.BaseStateID);
         }
 
         #endregion
@@ -176,7 +180,7 @@ namespace IT.FSM
                 UnconstrainedTimer = state.unconstrainedTimer,
                 HitGround = state.hitGround,
                 IsWalkable = state.isWalkable,
-                StateID = _currentStateID,
+                BaseStateID = _currentBaseStateID,
                 AdditionalMovementMultiplier = _movementStatsModule.AdditionalSpeedModifiers,
             };
         }
@@ -189,46 +193,30 @@ namespace IT.FSM
             Quaternion rotation = Quaternion.LookRotation(hit.point - transform.position);
             float yRotation = rotation.eulerAngles.y;
             
-            if(yRotation == 0 || _input.MovementInput == default)
+            if(yRotation == 0 && _input.MovementInput == default && !_input.IsJumpPressed)
                 return;
 
             input.YRotation = yRotation;
             input.MovementInput = _input.MovementInput;
             input.IsWalkingPressed = _input.IsWalkingPressed;
+            input.isJumpPressed = _input.IsJumpPressed;
         }
 
         #region Interfaces
-        public void ChangeState(PlayerStateID stateID)
+        public void ChangeBaseState(PlayerBaseStateID baseStateID)
         {
-            _currentStateID = stateID;
-            _currentState?.Exit();
+            _currentBaseStateID = baseStateID;
+            _currentBaseState?.Exit();
 
-            if (!_states.ContainsKey(stateID))
+            if (!_baseStates.ContainsKey(baseStateID))
             {
                 Debug.LogError("Could not find given state!");
                 return;
             }
             
-            _currentState = _states[_currentStateID];
-            _currentState?.Enter();
+            _currentBaseState = _baseStates[_currentBaseStateID];
+            _currentBaseState?.Enter();
         }
         #endregion
     }
-
-    public class MovementContext
-    {
-        public MovementContext(CharacterMovement characterMovement, MovementStatsModule movementStatsModule, TransformRotator rotator, PlayerAnimations playerAnimations, IRaycaster raycaster)
-        {
-            CharacterMovement = characterMovement;
-            MovementStatsModule = movementStatsModule;
-            Rotator = rotator;
-            PlayerAnimations = playerAnimations;
-        }
-        
-        public CharacterMovement CharacterMovement { get; }
-        public MovementStatsModule MovementStatsModule { get; }
-        public TransformRotator Rotator { get; }
-        public PlayerAnimations PlayerAnimations { get; }
-    }
-    
 }

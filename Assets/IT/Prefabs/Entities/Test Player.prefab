@@ -102,6 +102,9 @@ MonoBehaviour:
     _Asset: {fileID: 11400000, guid: 717abd7fed08b784d87fe28bc1e66257, type: 2}
   _landingAnimation:
     _Asset: {fileID: 11400000, guid: fcc75892e3ff7ad40b8cab665879faa3, type: 2}
+  _jumpingAnimation:
+    _Asset: {fileID: 11400000, guid: 2ca710741dce3cd47ba65d3e01cbfc8c, type: 2}
+  _avatarMask: {fileID: 31900000, guid: 4753f114f325c3f40bc4038f33175a10, type: 2}
   _interpolationSpeed: 1.5
   _sendRate: 2
 --- !u!1 &3066851563343315535
@@ -155,7 +158,7 @@ MonoBehaviour:
   _input: {fileID: 11400000, guid: 057187fa28e15c846a0787d460386507, type: 2}
   _movementStatsModule: {fileID: 2902755330639871743}
   _transformRotator: {fileID: 8540963238160560455}
-  _startingState: 0
+  startingBaseState: 0
   _playerEntityGameObject: {fileID: 7849939560007978409}
   _raycasterGameObject: {fileID: 7849939560007978409}
   _reconcileRate: 5
@@ -320,7 +323,20 @@ MonoBehaviour:
   _componentIndexCache: 3
   _addedNetworkObject: {fileID: 1912049324724089206}
   _networkObjectCache: {fileID: 1912049324724089206}
+  _movementSpeed: 3
   _walkingSpeedModifier: 0.6
+  _additionalSpeedModifiers: 1
+  _jumpForce: 5
+  _acceleration: 5
+  _deceleration: 5
+  _friction: 3
+  _drag: 3
+  _gravity: 9.81
+  _inAirAcceleration: 1
+  _inAirDeceleration: 1
+  _inAirFriction: 1
+  _inAirDrag: 1
+  _inAirControl: 1
 --- !u!114 &5446920144164943184
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -454,7 +470,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7849939560007978409}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a2836e36774ca1c4bbbee976e17b649c, type: 3}
   m_Name: 

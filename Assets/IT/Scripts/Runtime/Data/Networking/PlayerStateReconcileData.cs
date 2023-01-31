@@ -15,7 +15,7 @@ namespace IT.Data.Networking
         public float UnconstrainedTimer;
         public bool HitGround;
         public bool IsWalkable;
-        public PlayerStateID StateID;
+        public PlayerBaseStateID BaseStateID;
         public float AdditionalMovementMultiplier;
 
         #region Default

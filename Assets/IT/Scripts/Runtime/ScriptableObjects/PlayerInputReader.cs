@@ -16,13 +16,14 @@ namespace IT.Input
         public event Action FreeLookRequest;
 
         private MainInput _mainInput;
-        private Vector2 _movementInput = Vector2.zero;
-        private Vector2 _pointerPositionInput = Vector2.zero;
-        private bool _isWalkingPressed;
 
-        public Vector2 MovementInput => _movementInput;
-        public Vector2 PointerPosition => _pointerPositionInput;
-        public bool IsWalkingPressed => _isWalkingPressed;
+        public Vector2 MovementInput { get; private set; } = Vector2.zero;
+
+        public Vector2 PointerPosition { get; private set; } = Vector2.zero;
+
+        public bool IsWalkingPressed { get; private set; }
+
+        public bool IsJumpPressed { get; private set; }
 
         private void OnEnable()
         {
@@ -69,17 +70,22 @@ namespace IT.Input
 
         public void OnMovement(InputAction.CallbackContext context)
         {
-            _movementInput = context.ReadValue<Vector2>();
+            MovementInput = context.ReadValue<Vector2>();
         }
 
         public void OnPointerMovement(InputAction.CallbackContext context)
         {
-            _pointerPositionInput = context.ReadValue<Vector2>();
+            PointerPosition = context.ReadValue<Vector2>();
         }
 
         public void OnWalking(InputAction.CallbackContext context)
         {
-            _isWalkingPressed = context.phase == InputActionPhase.Performed;
+            IsWalkingPressed = context.phase == InputActionPhase.Performed;
+        }
+
+        public void OnJump(InputAction.CallbackContext context)
+        {
+            IsJumpPressed = context.phase == InputActionPhase.Performed;
         }
 
         public void OnCameraMovement(InputAction.CallbackContext context)

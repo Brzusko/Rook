@@ -1,34 +1,29 @@
 ﻿using EasyCharacterMovement;
 using IT.Data.Networking;
-using IT.Input;
-using IT.Interfaces;
 using IT.Interfaces.FSM;
-using IT.Utils;
 using UnityEngine;
 
 namespace IT.FSM.States
 {
-    public class PlayerWalkingState: IState<NetworkInput>
+    public class MovementIdleState: IState<NetworkInput>
     {
-        private readonly IStateMachine<PlayerStateID, MovementContext> _stateMachine;
+        private readonly IStateMachine<PlayerBaseStateID, PlayerStateMachineContext> _stateMachine;
 
-        public PlayerWalkingState(IStateMachine<PlayerStateID, MovementContext> stateMachine)
+        public MovementIdleState(IStateMachine<PlayerBaseStateID, PlayerStateMachineContext> stateMachine)
         {
             _stateMachine = stateMachine;
         }
         public void Tick(NetworkInput input, bool asServer, bool isReplaying, float deltaTime)
         {
-            MovementContext context = _stateMachine.Context;
+            PlayerStateMachineContext context = _stateMachine.Context;
             MovementStatsModule movementStatsModule = context.MovementStatsModule;
             CharacterMovement characterMovement = context.CharacterMovement;
-
+            
             context.Rotator.RotateY(input.YRotation, movementStatsModule.RotationSpeed, deltaTime);
 
-            float maxSpeed = movementStatsModule.MovementSpeed * movementStatsModule.WalkingSpeedModifier;
-
-            Vector3 desiredVelocity = new Vector3(input.MovementInput.x, 0f, input.MovementInput.y) * maxSpeed;
-                                      
-            characterMovement.SimpleMove(desiredVelocity, 
+            float maxSpeed = movementStatsModule.MovementSpeed;
+            
+            characterMovement.SimpleMove(Vector3.zero, 
                 maxSpeed, 
                 movementStatsModule.Acceleration, 
                 movementStatsModule.Deceleration, 
@@ -41,7 +36,7 @@ namespace IT.FSM.States
 
         public void Enter()
         {
-            
+            _stateMachine.Context.PlayerAnimations.PlayAnimation(PlayerAnimationStateID.GROUNDED);
         }
 
         public void Exit()
@@ -52,23 +47,29 @@ namespace IT.FSM.States
         public void CheckStateChange(NetworkInput input)
         {
             CharacterMovement characterMovement = _stateMachine.Context.CharacterMovement;
+
+            if (characterMovement.isGrounded && input.isJumpPressed)
+            {
+                _stateMachine.ChangeBaseState(PlayerBaseStateID.JUMPING);
+                return;
+            }
             
             if (characterMovement.wasGrounded && !characterMovement.isGrounded)
             {
-                _stateMachine.ChangeState(PlayerStateID.FALLING);
+                _stateMachine.ChangeBaseState(PlayerBaseStateID.FALLING);
                 return;
             }
             
-            if (!input.IsWalkingPressed && input.MovementInput.sqrMagnitude > 0f)
+            if (input.MovementInput.sqrMagnitude == 0 && characterMovement.isGrounded)
+                return;
+
+            if (input.IsWalkingPressed)
             {
-                _stateMachine.ChangeState(PlayerStateID.SCUTTER);
+                _stateMachine.ChangeBaseState(PlayerBaseStateID.WALKING);
                 return;
             }
             
-            if (input.MovementInput.sqrMagnitude == 0f)
-            {
-                _stateMachine.ChangeState(PlayerStateID.IDLE);
-            }
+            _stateMachine.ChangeBaseState(PlayerBaseStateID.SCUTTER);
         }
     }
 }

@@ -225,6 +225,9 @@ namespace FishNet.Managing.Timing
         /// MovingAverage instance used to calculate mean ping.
         /// </summary>
         private MovingAverage _pingAverage = new MovingAverage(5);
+
+        private MovingAverage _pingServerAverage = new MovingAverage(5);
+        private uint _lastReceivedTickFromClient;
         /// <summary>
         /// Time elapsed after ticks. This is extra time beyond the simulation rate.
         /// </summary>
@@ -587,6 +590,14 @@ namespace FishNet.Managing.Timing
             if (!conn.IsActive || !conn.Authenticated)
                 return;
 
+            float passedTime = _lastReceivedTickFromClient == default ? 0 : Tick - _lastReceivedTickFromClient;
+            _lastReceivedTickFromClient = Tick;
+            
+            _pingServerAverage.ComputeAverage(passedTime);
+            double avaregeInTime = _pingAverage.Average * TickDelta * 1000f;
+
+            conn.Ping = (long)Math.Round(avaregeInTime);
+            
             using (PooledWriter writer = WriterPool.GetWriter())
             {
                 writer.WriteUInt16((ushort)PacketId.PingPong);

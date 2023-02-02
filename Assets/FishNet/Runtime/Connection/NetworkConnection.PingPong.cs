@@ -11,6 +11,8 @@ namespace FishNet.Connection
     /// </summary>
     public partial class NetworkConnection : IEquatable<NetworkConnection>
     {
+        public long Ping { get; set; }
+        
 #pragma warning disable CS0414
         #region Private.
         /// <summary>
@@ -54,6 +56,7 @@ namespace FishNet.Connection
             _excessivePingCount = 0;
             _lastPingTick = 0;
         }
+        
 
         /// <summary>
         /// Called when a ping is received from this connection. Returns if can respond to ping.

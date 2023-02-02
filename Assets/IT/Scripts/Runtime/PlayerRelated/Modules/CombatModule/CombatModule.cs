@@ -27,7 +27,7 @@ public class CombatModule : NetworkBehaviour
         set => _swingTimeInSeconds = value;
     }
 
-    private void LaunchCharacter(Vector3 hitNormal, uint requestTick)
+    private void LaunchCharacter(Vector3 hitNormal)
     {
         Vector3 hitDirection = -new Vector3(hitNormal.x, 0f, hitNormal.z);
         Vector3 upForce = Vector3.up * _upPushScalar;
@@ -42,7 +42,7 @@ public class CombatModule : NetworkBehaviour
         
         Debug.Log($"Tick {currentTick}, Tick plus swing {tickToComplete}, tick delta {tickDelta}");
         
-        _playerStateMachine.CacheDeltaForce(hitForce, tickDelta);
+        _playerStateMachine.CacheKnockback(hitForce, tickDelta);
     }
     
     public void RequestHit()
@@ -62,10 +62,10 @@ public class CombatModule : NetworkBehaviour
         Debug.Log($"Sec {_swingTimeInSeconds}, Tick time: ${TimeManager.TicksToTime(TimeManager.Tick)}, Tick time plus swing {TimeManager.TicksToTime(TimeManager.Tick) + (_swingTimeInSeconds)},Tick {TimeManager.Tick} , Calc tick {TimeManager.TimeToTicks(TimeManager.TicksToTime(TimeManager.Tick) + (_swingTimeInSeconds))}");
 
         if(Physics.Raycast(t.position, t.forward, out RaycastHit hit, 1f, mask))
-        {
+        { // add block rollback
             if (hit.collider.TryGetComponent(out CombatModule combatModule))
             {
-                combatModule.LaunchCharacter(hit.normal, preciseTick.Tick);
+                combatModule.LaunchCharacter(hit.normal);
             }
         }
         

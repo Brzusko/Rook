@@ -34,8 +34,12 @@ namespace IT.FSM
         [SerializeField] private GameObject _raycasterGameObject;
         [Range(0, 100)]
         [SerializeField] private uint _reconcileRate = 1;
+        [Range(0, 20)]
+        [SerializeField] private uint _tickOffset = 2;
 
+        [SerializeField] private bool _shouldIgnoreReplay;
         [SerializeField] private PlayerAnimations _playerAnimations;
+
 
         private Dictionary<PlayerBaseStateID, IState<NetworkInput>> _baseStates;
         private Dictionary<PlayerCombatStateID, IState<NetworkInput>> _combatStates;
@@ -51,7 +55,9 @@ namespace IT.FSM
 
         private uint _serverTick;
         private uint _clientTick;
-        private uint _lastInputTick;
+
+        private KnockbackCache _clientKnockbackCache;
+        private KnockbackCache _serverKnockbackCache;
 
         private List<System.Tuple<uint, Vector3>> _knockbackCache = new List<System.Tuple<uint, Vector3>>();
 
@@ -182,30 +188,7 @@ namespace IT.FSM
             float deltaTime = (float)TimeManager.TickDelta;
             _playerAnimations.CacheInput(input, _movementStatsModule.Acceleration, _movementStatsModule.Deceleration);
 
-            if (asServer)
-                _lastInputTick = input.SimulationTick;
-
-            // if (isReplaying && !asServer && _knockbackCache.Count > 0)
-            // {
-            //     System.Tuple<uint, Vector3> knockbackToRemove = null;
-            //     
-            //     foreach (System.Tuple<uint, Vector3> knockback in _knockbackCache)
-            //     {
-            //         if (knockback.Item1 == input.SimulationTick)
-            //         {
-            //             knockbackToRemove = knockback;
-            //             break;
-            //         }
-            //     }
-            //
-            //     if (knockbackToRemove != null)
-            //     {
-            //         LaunchCharacter(knockbackToRemove.Item2);
-            //         _knockbackCache.Remove(knockbackToRemove);
-            //     }
-            // }
-            
-            CheckDeltaForce(input, asServer, isReplaying);
+            CheckKnockback(input, asServer, isReplaying);
             
             _currentBaseState.Tick(input, asServer, isReplaying, deltaTime);
             _currentCombatState.Tick(input, asServer, isReplaying, deltaTime);
@@ -219,16 +202,6 @@ namespace IT.FSM
             CharacterMovement.State state = new CharacterMovement.State(data.Position, data.Rotation, data.Velocity,
                 data.IsConstrainedToGround, data.UnconstrainedTimer, data.HitGround, data.IsWalkable,
                 data.GroundNormal);
-
-            // if (!asServer)
-            // {
-            //     Vector3 clientPosition = _characterMovement.GetPosition();
-            //     Vector3 velocity = _characterMovement.velocity;
-            //     bool isGrounded = _characterMovement.isConstrainedToGround;
-            //     
-            //     Debug.Log($"Before recon: {clientPosition}, {velocity}, {isGrounded}");
-            //     Debug.Log($"After recon: {data.Position}, {data.Velocity}, {data.IsConstrainedToGround}");
-            // }
             
             _characterMovement.SetState(state);
 
@@ -270,14 +243,6 @@ namespace IT.FSM
             Quaternion rotation = Quaternion.LookRotation(hit.point - transform.position);
             float yRotation = rotation.eulerAngles.y;
             
-            // if(yRotation == 0 
-            //    && _input.MovementInput == default 
-            //    && !_input.IsJumpPressed
-            //    && !_input.IsMainActionPressed
-            //    && !_input.IsSecondaryActionPressed
-            //    )
-            //     return;
-
             input.YRotation = yRotation;
             input.MovementInput = _input.MovementInput;
             input.IsWalkingPressed = _input.IsWalkingPressed;
@@ -285,57 +250,30 @@ namespace IT.FSM
             input.IsMainActionPressed = _input.IsMainActionPressed;
             input.IsSecondaryActionPressed = _input.IsSecondaryActionPressed;
             input.SimulationTick = TimeManager.LocalTick;
-
-            if (_deltaForce != default)
-            {
-                input.DeltaForce = _deltaForce;
-                _deltaForce = default;
-            }
-
-            if (_clientTick != default)
-            {
-                input.KnockbackTick = _clientTick;
-                _clientTick = default;
-            }
-        }
-
-        public void CacheDeltaForce(Vector3 deltaForce, uint tickDelta)
-        {
-            double tickDeltaMS = TimeManager.TickDelta * 1000d;
-            double ping = Owner.Ping / 2f;
-
-            uint pingAsTicks = (uint)Math.Round(ping / tickDeltaMS);
-            
-            _serverTick = TimeManager.Tick + tickDelta;
-            uint clientTickWithOffset = Owner.LastPacketTick + pingAsTicks + tickDelta;
-            
-            _deltaForce = deltaForce;
-            
-            Debug.Log($"Serv tick {_serverTick}, Cl local tick {Owner.LocalTick}, Cl offset tick {clientTickWithOffset}");
-            TargetCacheDeltaForce(Owner, clientTickWithOffset, deltaForce);
         }
 
         [TargetRpc]
-        private void TargetCacheDeltaForce(NetworkConnection connection, uint tick, Vector3 deltaForce)
+        private void TargetCacheKnockback(NetworkConnection connection, uint tick, Vector3 deltaForce)
         {
-            _deltaForce = deltaForce;
-            _clientTick = tick;
-            
-            Debug.Log($"Local tick {TimeManager.LocalTick}, Received tick {tick}");
+            _clientKnockbackCache = new KnockbackCache
+            {
+                InvokeTime = tick,
+                KnockbackForce = deltaForce
+            };
         }
 
-        private void CheckDeltaForce(NetworkInput input, bool asServer, bool isReplaying)
+        private void CheckKnockback(NetworkInput input, bool asServer, bool isReplaying)
         {
-            if (asServer && TimeManager.Tick == _serverTick)
+            if (isReplaying && _shouldIgnoreReplay) return ;
+            
+            if (asServer && TimeManager.LocalTick == _serverKnockbackCache.InvokeTime)
             {
-                LaunchCharacter(_deltaForce);
-                _deltaForce = default;
+                LaunchCharacter(_serverKnockbackCache.KnockbackForce);
             }
-
-            if (!asServer && input.SimulationTick >= _clientTick)
+            
+            if (!asServer && input.SimulationTick == _clientKnockbackCache.InvokeTime)
             {
-                //_knockbackCache.Add(new System.Tuple<uint, Vector3>(input.SimulationTick, input.DeltaForce));
-                LaunchCharacter(input.DeltaForce * 2);
+                LaunchCharacter(_clientKnockbackCache.KnockbackForce);
             }
         }
 
@@ -379,6 +317,26 @@ namespace IT.FSM
 
             _currentCombatState = _combatStates[_currentCombatStateID];
             _currentCombatState?.Enter(onReconcile, asReplay);
+        }
+        
+        public void CacheKnockback(Vector3 deltaForce, uint tickDelta)
+        {
+            double tickDeltaMS = TimeManager.TickRate;
+            double deduction = (long)(TimeManager.TickDelta * 1000d);
+            double ping = Math.Max(0, Owner.Ping - deduction);
+
+            uint pingAsTicks = (uint)Math.Round(ping / tickDeltaMS) + _tickOffset;
+            
+            uint serverTick = TimeManager.Tick + pingAsTicks + tickDelta;
+            uint clientTickWithOffset = Owner.LastPacketTick + pingAsTicks + tickDelta;
+
+            _serverKnockbackCache = new KnockbackCache
+            {
+                InvokeTime = serverTick,
+                KnockbackForce = deltaForce
+            };
+            
+            TargetCacheKnockback(Owner, clientTickWithOffset, deltaForce);
         }
 
         #endregion

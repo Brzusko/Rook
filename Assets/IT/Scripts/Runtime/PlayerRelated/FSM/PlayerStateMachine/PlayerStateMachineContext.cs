@@ -1,5 +1,6 @@
 using EasyCharacterMovement;
 using IT.Interfaces;
+using UnityEngine;
 
 namespace IT.FSM
 {
@@ -31,5 +32,11 @@ namespace IT.FSM
         public IRaycaster Raycaster { get; }
         public float CurrentPrepareSwingTime = 0f;
         public float CurrentSwingTime = 0f;
+    }
+    
+    public struct KnockbackCache
+    {
+        public uint InvokeTime;
+        public Vector3 KnockbackForce;
     }
 }

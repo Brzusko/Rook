@@ -159,7 +159,7 @@ MonoBehaviour:
   _prepareTimeInSeconds: 0.5
   _swingTimeInSeconds: 0.2
   _forwardPushScalar: 10
-  _upPushScalar: 5
+  _upPushScalar: 2
   _playerStateMachine: {fileID: 1467469930188945514}
 --- !u!136 &7154729622751247455
 CapsuleCollider:
@@ -240,8 +240,9 @@ MonoBehaviour:
   _startCombatState: 0
   _playerEntityGameObject: {fileID: 7849939560007978409}
   _raycasterGameObject: {fileID: 7849939560007978409}
-  _reconcileRate: 1
+  _reconcileRate: 15
   _playerAnimations: {fileID: 6034007255074437676}
+  _tickOffset: 3
   _context:
     CurrentPrepareSwingTime: 0
     CurrentSwingTime: 0

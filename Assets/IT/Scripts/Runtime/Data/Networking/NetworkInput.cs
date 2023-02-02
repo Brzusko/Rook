@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using FishNet.Object.Prediction;
+using IT.FSM;
 using UnityEngine;
 
 namespace IT.Data.Networking
@@ -14,8 +15,6 @@ namespace IT.Data.Networking
         public bool IsMainActionPressed;
         public bool IsSecondaryActionPressed;
         public uint SimulationTick;
-        public Vector3 DeltaForce;
-        public uint KnockbackTick;
         #region Default
 
         private uint _tick;

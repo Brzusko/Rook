@@ -10,8 +10,12 @@ namespace IT.Data.Networking
         public Vector2 MovementInput;
         public float YRotation;
         public bool IsWalkingPressed;
-        public bool isJumpPressed;
-
+        public bool IsJumpPressed;
+        public bool IsMainActionPressed;
+        public bool IsSecondaryActionPressed;
+        public uint SimulationTick;
+        public Vector3 DeltaForce;
+        public uint KnockbackTick;
         #region Default
 
         private uint _tick;

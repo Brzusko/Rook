@@ -16,7 +16,9 @@ namespace IT.Data.Networking
         public bool HitGround;
         public bool IsWalkable;
         public PlayerBaseStateID BaseStateID;
-        public float AdditionalMovementMultiplier;
+        public PlayerCombatStateID CombatStateID;
+        public float CurrentPrepareSwingTime;
+        public float CurrentSwingTime;
 
         #region Default
         private uint _tick;

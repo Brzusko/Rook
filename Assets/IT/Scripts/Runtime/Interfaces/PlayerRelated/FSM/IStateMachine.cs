@@ -4,10 +4,12 @@ using UnityEngine;
 
 namespace IT.Interfaces.FSM
 {
-    public interface IStateMachine<in TID, in TID2, out TContext>
+    public interface IStateMachine<TID, TID2, out TContext>
     {
         public TContext Context { get; }
-        public void ChangeBaseState(TID stateID);
-        public void ChangeSecondaryState(TID2 stateID);
+        public TID BaseStateID { get; }
+        public TID2 SecondaryStateID { get; }
+        public void ChangeBaseState(TID stateID, bool onReconcile, bool asReplay = false);
+        public void ChangeSecondaryState(TID2 stateID, bool onReconcile, bool asReplay = false);
     }
 }

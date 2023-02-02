@@ -29,6 +29,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3628084287093846931}
+  - {fileID: 7113605857710350962}
   m_Father: {fileID: 1283863882254217425}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -91,7 +92,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 196890d00168a0649bd4709036051e2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 6
+  _componentIndexCache: 7
   _addedNetworkObject: {fileID: 1912049324724089206}
   _networkObjectCache: {fileID: 1912049324724089206}
   _animancerComponent: {fileID: 1565092988270009306}
@@ -107,6 +108,82 @@ MonoBehaviour:
   _avatarMask: {fileID: 31900000, guid: 4753f114f325c3f40bc4038f33175a10, type: 2}
   _interpolationSpeed: 1.5
   _sendRate: 2
+--- !u!1 &2532132215569468829
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3971923407695764200}
+  - component: {fileID: 8468677413267268003}
+  - component: {fileID: 7154729622751247455}
+  m_Layer: 6
+  m_Name: Hitbox
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3971923407695764200
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2532132215569468829}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.093, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7113605857710350962}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8468677413267268003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2532132215569468829}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7423195cfaf689d4e97edd1c06fc50c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _componentIndexCache: 9
+  _addedNetworkObject: {fileID: 1912049324724089206}
+  _networkObjectCache: {fileID: 1912049324724089206}
+  _prepareTimeInSeconds: 0.5
+  _swingTimeInSeconds: 0.2
+  _forwardPushScalar: 10
+  _upPushScalar: 5
+  _playerStateMachine: {fileID: 1467469930188945514}
+--- !u!136 &7154729622751247455
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2532132215569468829}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.23
+  m_Height: 1
+  m_Direction: 1
+  m_Center: {x: 0, y: -0.1, z: 0}
 --- !u!1 &3066851563343315535
 GameObject:
   m_ObjectHideFlags: 0
@@ -151,18 +228,55 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1027bc3218e351a4dae3f78c2f4d2397, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 7
+  _componentIndexCache: 8
   _addedNetworkObject: {fileID: 1912049324724089206}
   _networkObjectCache: {fileID: 1912049324724089206}
   _characterMovement: {fileID: 5446920144164943184}
   _input: {fileID: 11400000, guid: 057187fa28e15c846a0787d460386507, type: 2}
   _movementStatsModule: {fileID: 2902755330639871743}
   _transformRotator: {fileID: 8540963238160560455}
-  startingBaseState: 0
+  _combatModule: {fileID: 8468677413267268003}
+  _startingBaseState: 0
+  _startCombatState: 0
   _playerEntityGameObject: {fileID: 7849939560007978409}
   _raycasterGameObject: {fileID: 7849939560007978409}
-  _reconcileRate: 5
+  _reconcileRate: 1
   _playerAnimations: {fileID: 6034007255074437676}
+  _context:
+    CurrentPrepareSwingTime: 0
+    CurrentSwingTime: 0
+--- !u!1 &4517736049811449683
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7113605857710350962}
+  m_Layer: 0
+  m_Name: HitboxParent
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7113605857710350962
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4517736049811449683}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 3971923407695764200}
+  m_Father: {fileID: 2066412421744531934}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4720426297937606841
 GameObject:
   m_ObjectHideFlags: 0
@@ -231,6 +345,7 @@ GameObject:
   - component: {fileID: 1912049324724089206}
   - component: {fileID: 1961820169530306613}
   - component: {fileID: 1246725671637114553}
+  - component: {fileID: 3257737379795547919}
   m_Layer: 0
   m_Name: Test Player
   m_TagString: Player
@@ -337,6 +452,8 @@ MonoBehaviour:
   _inAirFriction: 1
   _inAirDrag: 1
   _inAirControl: 1
+  _prepareSwingModifier: 0.5
+  _blockModifier: 0.8
 --- !u!114 &5446920144164943184
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -350,7 +467,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _planeConstraint: 0
-  _rootTransform: {fileID: 0}
+  _rootTransform: {fileID: 2066412421744531934}
   _rootTransformOffset: {x: 0, y: 0, z: 0}
   _radius: 0.25
   _height: 2
@@ -446,8 +563,10 @@ MonoBehaviour:
   - {fileID: 2902755330639871743}
   - {fileID: 1961820169530306613}
   - {fileID: 1246725671637114553}
+  - {fileID: 3257737379795547919}
   - {fileID: 6034007255074437676}
   - {fileID: 1467469930188945514}
+  - {fileID: 8468677413267268003}
   <ParentNetworkObject>k__BackingField: {fileID: 0}
   <ChildNetworkObjects>k__BackingField: []
   _isNetworked: 1
@@ -536,6 +655,23 @@ MonoBehaviour:
   _resendType: 0
   _resendInterval: 30
   _networkTransform: {fileID: 1961820169530306613}
+--- !u!114 &3257737379795547919
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7849939560007978409}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01a271dd97d875347b0cea860df29a9d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _componentIndexCache: 6
+  _addedNetworkObject: {fileID: 1912049324724089206}
+  _networkObjectCache: {fileID: 1912049324724089206}
+  _colliderParents:
+  - {fileID: 2532132215569468829}
 --- !u!1001 &3564574306295562763
 PrefabInstance:
   m_ObjectHideFlags: 0

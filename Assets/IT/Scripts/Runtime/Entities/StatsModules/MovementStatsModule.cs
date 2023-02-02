@@ -24,6 +24,10 @@ public class MovementStatsModule : NetworkBehaviour
     [SerializeField] private float _inAirDrag = 1f;
     [SerializeField] private float _inAirControl = 1f;
 
+    [Header("Combat Movement Stats")] 
+    [SerializeField] private float _prepareSwingModifier;
+    [SerializeField] private float _blockModifier = 0.5f;
+
     public float MovementSpeed => _movementSpeed * _additionalSpeedModifiers;
     public float RotationSpeed => Constants.MAX_ROTATION;
     public float WalkingSpeedModifier => _walkingSpeedModifier;
@@ -39,6 +43,8 @@ public class MovementStatsModule : NetworkBehaviour
     public float InAirDrag => _inAirDrag;
     public float InAirFriction => _inAirFriction;
     public float InAirControl => _inAirControl;
+    public float PrepareSwingModifier => _prepareSwingModifier;
+    public float BlockModifier => _blockModifier;
 
     public override void OnStartNetwork()
     {

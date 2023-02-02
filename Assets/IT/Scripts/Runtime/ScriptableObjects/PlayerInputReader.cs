@@ -24,6 +24,8 @@ namespace IT.Input
         public bool IsWalkingPressed { get; private set; }
 
         public bool IsJumpPressed { get; private set; }
+        public bool IsMainActionPressed { get; private set; }
+        public bool IsSecondaryActionPressed { get; private set; }
 
         private void OnEnable()
         {
@@ -86,6 +88,16 @@ namespace IT.Input
         public void OnJump(InputAction.CallbackContext context)
         {
             IsJumpPressed = context.phase == InputActionPhase.Performed;
+        }
+
+        public void OnMainAction(InputAction.CallbackContext context)
+        {
+            IsMainActionPressed = context.phase == InputActionPhase.Performed;
+        }
+
+        public void OnSecondaryAction(InputAction.CallbackContext context)
+        {
+            IsSecondaryActionPressed = context.phase == InputActionPhase.Performed;
         }
 
         public void OnCameraMovement(InputAction.CallbackContext context)

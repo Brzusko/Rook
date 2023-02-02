@@ -34,29 +34,29 @@ namespace IT.FSM.States
                 deltaTime);
         }
 
-        public void Enter()
+        public void Enter(bool onReconcile, bool asReplay = false)
         {
             _stateMachine.Context.PlayerAnimations.PlayAnimation(PlayerAnimationStateID.GROUNDED);
         }
 
-        public void Exit()
+        public void Exit(bool onReconcile, bool asReplay = false)
         {
             
         }
 
-        public void CheckStateChange(NetworkInput input)
+        public void CheckStateChange(NetworkInput input, bool onReconcile, bool asReplay = false)
         {
             CharacterMovement characterMovement = _stateMachine.Context.CharacterMovement;
 
-            if (characterMovement.isGrounded && input.isJumpPressed)
+            if (characterMovement.isGrounded && input.IsJumpPressed)
             {
-                _stateMachine.ChangeBaseState(PlayerBaseStateID.JUMPING);
+                _stateMachine.ChangeBaseState(PlayerBaseStateID.JUMPING, onReconcile, asReplay);
                 return;
             }
             
             if (characterMovement.wasGrounded && !characterMovement.isGrounded)
             {
-                _stateMachine.ChangeBaseState(PlayerBaseStateID.FALLING);
+                _stateMachine.ChangeBaseState(PlayerBaseStateID.FALLING, onReconcile, asReplay);
                 return;
             }
             
@@ -65,11 +65,11 @@ namespace IT.FSM.States
 
             if (input.IsWalkingPressed)
             {
-                _stateMachine.ChangeBaseState(PlayerBaseStateID.WALKING);
+                _stateMachine.ChangeBaseState(PlayerBaseStateID.WALKING, onReconcile, asReplay);
                 return;
             }
             
-            _stateMachine.ChangeBaseState(PlayerBaseStateID.SCUTTER);
+            _stateMachine.ChangeBaseState(PlayerBaseStateID.SCUTTER, onReconcile, asReplay);
         }
     }
 }

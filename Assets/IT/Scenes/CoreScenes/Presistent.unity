@@ -311,7 +311,12 @@ PrefabInstance:
     - target: {fileID: 7696058605773559384, guid: 4f920e473cf519b41af8420fdb936402,
         type: 3}
       propertyPath: _tickRate
-      value: 90
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 7696058605773559385, guid: 4f920e473cf519b41af8420fdb936402,
+        type: 3}
+      propertyPath: _latencySimulator._enabled
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7696058605773559388, guid: 4f920e473cf519b41af8420fdb936402,
         type: 3}

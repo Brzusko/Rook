@@ -67,18 +67,18 @@ namespace IT.FSM.States
             _inTheAir += deltaTime;
         }
 
-        public void Enter()
+        public void Enter(bool onReconcile, bool asReplay = false)
         {
             _stateMachine.Context.PlayerAnimations.PlayAnimation(PlayerAnimationStateID.FALLING);
             _inTheAir = 0f;
         }
 
-        public void Exit()
+        public void Exit(bool onReconcile, bool asReplay = false)
         {
             
         }
 
-        public void CheckStateChange(NetworkInput input)
+        public void CheckStateChange(NetworkInput input, bool onReconcile, bool asReplay = false)
         {
             CharacterMovement characterMovement = _stateMachine.Context.CharacterMovement;
 
@@ -87,17 +87,17 @@ namespace IT.FSM.States
 
             if (input.MovementInput.sqrMagnitude == 0)
             {
-                _stateMachine.ChangeBaseState(PlayerBaseStateID.IDLE);
+                _stateMachine.ChangeBaseState(PlayerBaseStateID.IDLE, onReconcile, asReplay);
                 return;
             }
 
             if (input.IsWalkingPressed)
             {
-                _stateMachine.ChangeBaseState(PlayerBaseStateID.WALKING);
+                _stateMachine.ChangeBaseState(PlayerBaseStateID.WALKING, onReconcile, asReplay);
                 return;
             }
             
-            _stateMachine.ChangeBaseState(PlayerBaseStateID.SCUTTER);
+            _stateMachine.ChangeBaseState(PlayerBaseStateID.SCUTTER, onReconcile, asReplay);
         }
     }
 

@@ -64,6 +64,24 @@ namespace IT.Input
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""MainAction"",
+                    ""type"": ""Button"",
+                    ""id"": ""af3a0c1f-e1d4-457f-9ddb-cfc573b4c28b"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""SecondaryAction"",
+                    ""type"": ""Button"",
+                    ""id"": ""c26a4aaf-5921-4eae-99df-59e8f38c39b7"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -154,6 +172,28 @@ namespace IT.Input
                     ""action"": ""Jump"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""60bd5f1c-cb76-4d84-9188-fe92a1e8e427"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MainAction"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""fcd37a46-697d-49bc-a57a-f25be9448426"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SecondaryAction"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -236,6 +276,8 @@ namespace IT.Input
             m_Gameplay_PointerMovement = m_Gameplay.FindAction("PointerMovement", throwIfNotFound: true);
             m_Gameplay_Walking = m_Gameplay.FindAction("Walking", throwIfNotFound: true);
             m_Gameplay_Jump = m_Gameplay.FindAction("Jump", throwIfNotFound: true);
+            m_Gameplay_MainAction = m_Gameplay.FindAction("MainAction", throwIfNotFound: true);
+            m_Gameplay_SecondaryAction = m_Gameplay.FindAction("SecondaryAction", throwIfNotFound: true);
             // Camera
             m_Camera = asset.FindActionMap("Camera", throwIfNotFound: true);
             m_Camera_CameraMovement = m_Camera.FindAction("Camera Movement", throwIfNotFound: true);
@@ -303,6 +345,8 @@ namespace IT.Input
         private readonly InputAction m_Gameplay_PointerMovement;
         private readonly InputAction m_Gameplay_Walking;
         private readonly InputAction m_Gameplay_Jump;
+        private readonly InputAction m_Gameplay_MainAction;
+        private readonly InputAction m_Gameplay_SecondaryAction;
         public struct GameplayActions
         {
             private @MainInput m_Wrapper;
@@ -311,6 +355,8 @@ namespace IT.Input
             public InputAction @PointerMovement => m_Wrapper.m_Gameplay_PointerMovement;
             public InputAction @Walking => m_Wrapper.m_Gameplay_Walking;
             public InputAction @Jump => m_Wrapper.m_Gameplay_Jump;
+            public InputAction @MainAction => m_Wrapper.m_Gameplay_MainAction;
+            public InputAction @SecondaryAction => m_Wrapper.m_Gameplay_SecondaryAction;
             public InputActionMap Get() { return m_Wrapper.m_Gameplay; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
@@ -332,6 +378,12 @@ namespace IT.Input
                     @Jump.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnJump;
                     @Jump.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnJump;
                     @Jump.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnJump;
+                    @MainAction.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnMainAction;
+                    @MainAction.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnMainAction;
+                    @MainAction.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnMainAction;
+                    @SecondaryAction.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnSecondaryAction;
+                    @SecondaryAction.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnSecondaryAction;
+                    @SecondaryAction.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnSecondaryAction;
                 }
                 m_Wrapper.m_GameplayActionsCallbackInterface = instance;
                 if (instance != null)
@@ -348,6 +400,12 @@ namespace IT.Input
                     @Jump.started += instance.OnJump;
                     @Jump.performed += instance.OnJump;
                     @Jump.canceled += instance.OnJump;
+                    @MainAction.started += instance.OnMainAction;
+                    @MainAction.performed += instance.OnMainAction;
+                    @MainAction.canceled += instance.OnMainAction;
+                    @SecondaryAction.started += instance.OnSecondaryAction;
+                    @SecondaryAction.performed += instance.OnSecondaryAction;
+                    @SecondaryAction.canceled += instance.OnSecondaryAction;
                 }
             }
         }
@@ -399,6 +457,8 @@ namespace IT.Input
             void OnPointerMovement(InputAction.CallbackContext context);
             void OnWalking(InputAction.CallbackContext context);
             void OnJump(InputAction.CallbackContext context);
+            void OnMainAction(InputAction.CallbackContext context);
+            void OnSecondaryAction(InputAction.CallbackContext context);
         }
         public interface ICameraActions
         {

@@ -24,7 +24,7 @@ namespace IT.FSM.States
 
             context.Rotator.RotateY(input.YRotation, movementStatsModule.RotationSpeed, deltaTime);
 
-            if (input.isJumpPressed && characterMovement.isGrounded)
+            if (input.IsJumpPressed && characterMovement.isGrounded)
             {
                 characterMovement.PauseGroundConstraint();
                 characterMovement.LaunchCharacter(Vector3.up * movementStatsModule.JumpForce);
@@ -61,31 +61,31 @@ namespace IT.FSM.States
                 deltaTime);
         }
 
-        public void Enter()
+        public void Enter(bool onReconcile, bool asReplay = false)
         {
             PlayerAnimations playerAnimations = _stateMachine.Context.PlayerAnimations;
             playerAnimations.PlayAnimation(PlayerAnimationStateID.JUMPING);
         }
 
-        public void Exit()
+        public void Exit(bool onReconcile, bool asReplay = false)
         {
             
         }
 
-        public void CheckStateChange(NetworkInput input)
+        public void CheckStateChange(NetworkInput input, bool onReconcile, bool asReplay = false)
         {
             CharacterMovement characterMovement = _stateMachine.Context.CharacterMovement;
             Vector3 velocity = characterMovement.velocity;
 
             if (!characterMovement.isGrounded && velocity.y < 0)
             {
-                _stateMachine.ChangeBaseState(PlayerBaseStateID.FALLING);
+                _stateMachine.ChangeBaseState(PlayerBaseStateID.FALLING, onReconcile, asReplay);
                 return;
             }
 
             if (characterMovement.isGrounded && input.MovementInput == default)
             {
-                _stateMachine.ChangeBaseState(PlayerBaseStateID.IDLE);
+                _stateMachine.ChangeBaseState(PlayerBaseStateID.IDLE, onReconcile, asReplay);
                 return;
             }
 
@@ -93,11 +93,11 @@ namespace IT.FSM.States
             
             if (input.IsWalkingPressed)
             {
-                _stateMachine.ChangeBaseState(PlayerBaseStateID.WALKING);
+                _stateMachine.ChangeBaseState(PlayerBaseStateID.WALKING, onReconcile, asReplay);
                 return;
             }
                 
-            _stateMachine.ChangeBaseState(PlayerBaseStateID.SCUTTER);
+            _stateMachine.ChangeBaseState(PlayerBaseStateID.SCUTTER, onReconcile, asReplay);
 
         }
     }

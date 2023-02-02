@@ -21,19 +21,27 @@ namespace IT.FSM.States
             
         }
 
-        public void Enter()
+        public void Enter(bool onReconcile, bool asReplay = false)
         {
-            
+            MovementStatsModule movementStatsModule = _stateMachine.Context.MovementStatsModule;
+            movementStatsModule.SetAdditionalSpeedModifiers(movementStatsModule.BlockModifier);
         }
 
-        public void Exit()
+        public void Exit(bool onReconcile, bool asReplay = false)
         {
-            
+            MovementStatsModule movementStatsModule = _stateMachine.Context.MovementStatsModule;
+            movementStatsModule.ResetAdditionalSpeedModifiers();
         }
 
-        public void CheckStateChange(NetworkInput input)
+        public void CheckStateChange(NetworkInput input, bool onReconcile, bool asReplay = false)
         {
-            
+            PlayerBaseStateID baseStateID = _stateMachine.BaseStateID;
+
+            if (baseStateID is PlayerBaseStateID.JUMPING or PlayerBaseStateID.FALLING || !input.IsSecondaryActionPressed)
+            {
+                _stateMachine.ChangeSecondaryState(PlayerCombatStateID.IDLE, onReconcile, asReplay);
+                return;
+            }
         }
     }
 }

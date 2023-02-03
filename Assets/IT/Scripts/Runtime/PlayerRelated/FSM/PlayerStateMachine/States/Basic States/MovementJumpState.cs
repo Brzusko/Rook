@@ -66,7 +66,7 @@ namespace IT.FSM.States
             if(asReplay)
                 return;
             
-            _stateMachine.Context.PlayerAnimations.PlayAnimation(PlayerMovementAnimID.JUMPING, 0.3f);
+            _stateMachine.Context.PlayerAnimations.PlayAnimation(PlayerMovementAnimID.JUMPING);
         }
 
         public void Exit(bool onReconcile, bool asReplay = false)

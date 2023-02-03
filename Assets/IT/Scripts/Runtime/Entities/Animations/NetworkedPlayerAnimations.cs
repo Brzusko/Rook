@@ -24,7 +24,7 @@ public class NetworkedPlayerAnimations : NetworkBehaviour
     [SerializeField] private uint _sendRate;
 
     private Dictionary<PlayerMovementAnimID, AnimancerState> _animationStates;
-    private PlayerMovementAnimID _currentAnimancerStateID = PlayerMovementAnimID.NONE;
+    private PlayerMovementAnimID _currentAnimancerStateID;
     private bool _areEventsBound;
     private NetworkInput _cachedInput;
     private Vector2 _animationVector = Vector2.zero;

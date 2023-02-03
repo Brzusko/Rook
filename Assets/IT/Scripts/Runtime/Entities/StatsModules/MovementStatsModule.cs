@@ -28,8 +28,11 @@ public class MovementStatsModule : NetworkBehaviour
     [SerializeField] private float _prepareSwingModifier;
     [SerializeField] private float _blockModifier = 0.5f;
 
+    [Header("General Movement Stats")]
+    [SerializeField] private float _rotationSpeed = 100f;
+
     public float MovementSpeed => _movementSpeed * _additionalSpeedModifiers;
-    public float RotationSpeed => Constants.MAX_ROTATION;
+    public float RotationSpeed => _rotationSpeed;
     public float WalkingSpeedModifier => _walkingSpeedModifier;
     public float JumpForce => _jumpForce;
     public float AdditionalSpeedModifiers => _additionalSpeedModifiers;

@@ -8,19 +8,18 @@ namespace IT.Data.Networking
 
     public enum PlayerMovementAnimID : byte
     {
-        NONE,
-        GROUNDED,
-        FALLING,
-        LANDING,
-        JUMPING,
+        GROUNDED = 0,
+        FALLING = 2,
+        LANDING = 3,
+        JUMPING = 1,
     }
 
     public enum PlayerCombatAnimID : byte
     {
-        NONE,
-        PREPARE_SWING,
-        SWING,
-        BLOCK,
+        NONE = 0,
+        PREPARE_SWING = 1,
+        SWING = 2,
+        BLOCK = 3,
     }
     
     public struct PlayerAnimationState

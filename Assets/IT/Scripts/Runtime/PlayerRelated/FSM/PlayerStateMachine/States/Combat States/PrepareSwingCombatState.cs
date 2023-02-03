@@ -30,15 +30,12 @@ namespace IT.FSM.States
             MovementStatsModule movementStatsModule = _stateMachine.Context.MovementStatsModule;
             movementStatsModule.SetAdditionalSpeedModifiers(movementStatsModule.PrepareSwingModifier);
             
+            _stateMachine.Context.PlayerAnimations.PlayAnimation(PlayerCombatAnimID.PREPARE_SWING);
+            
             if(onReconcile)
                 return;
             
             _stateMachine.Context.CurrentPrepareSwingTime = 0f;
-            
-            if(asReplay)
-                return;
-            
-            _stateMachine.Context.PlayerAnimations.PlayAnimation(PlayerCombatAnimID.PREPARE_SWING, 0.2f);
         }
 
         public void Exit(bool onReconcile, bool asReplay = false)

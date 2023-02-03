@@ -23,10 +23,7 @@ namespace IT.FSM.States
 
         public void Enter(bool onReconcile, bool asReplay = false)
         {
-            if(asReplay)
-                return;
-            
-            _stateMachine.Context.PlayerAnimations.PlayAnimation(PlayerCombatAnimID.NONE, 0.2f);
+            _stateMachine.Context.PlayerAnimations.PlayAnimation(PlayerCombatAnimID.NONE);
         }
 
         public void Exit(bool onReconcile, bool asReplay = false)

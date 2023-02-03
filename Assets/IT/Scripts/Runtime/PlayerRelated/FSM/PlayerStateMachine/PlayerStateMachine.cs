@@ -40,8 +40,7 @@ namespace IT.FSM
 
         [SerializeField] private bool _shouldIgnoreReplay;
         [SerializeField] private PlayerAnimations _playerAnimations;
-
-
+        
         private Dictionary<PlayerBaseStateID, IState<NetworkInput>> _baseStates;
         private Dictionary<PlayerCombatStateID, IState<NetworkInput>> _combatStates;
         private IState<NetworkInput> _currentBaseState;
@@ -296,7 +295,7 @@ namespace IT.FSM
             if(_characterMovement.isGrounded)
                 _characterMovement.PauseGroundConstraint();
             
-            _characterMovement.LaunchCharacter(force);
+            _characterMovement.LaunchCharacter(force, true);
         }
 
         private void SaveSnapshot()

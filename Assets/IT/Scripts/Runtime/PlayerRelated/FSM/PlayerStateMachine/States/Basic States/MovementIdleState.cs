@@ -39,7 +39,7 @@ namespace IT.FSM.States
             if(asReplay)
                 return;
             
-            _stateMachine.Context.PlayerAnimations.PlayAnimation(PlayerMovementAnimID.GROUNDED, 0.3f);
+            _stateMachine.Context.PlayerAnimations.PlayAnimation(PlayerMovementAnimID.GROUNDED);
         }
 
         public void Exit(bool onReconcile, bool asReplay = false)

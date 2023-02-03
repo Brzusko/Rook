@@ -29,7 +29,7 @@ namespace IT.FSM.States
             if(asReplay)
                 return;
             
-            _stateMachine.Context.PlayerAnimations.PlayAnimation(PlayerCombatAnimID.BLOCK, 0.1f);
+            _stateMachine.Context.PlayerAnimations.PlayAnimation(PlayerCombatAnimID.BLOCK);
         }
 
         public void Exit(bool onReconcile, bool asReplay = false)

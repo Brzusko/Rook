@@ -33,6 +33,13 @@ namespace IT.FSM
         public float CurrentPrepareSwingTime = 0f;
         public float CurrentSwingTime = 0f;
     }
+
+    public struct PlayerStateMachineSnapshot
+    {
+        public PlayerBaseStateID BaseStateID;
+        public PlayerCombatStateID PlayerCombatStateID;
+        public uint Tick;
+    }
     
     public struct KnockbackCache
     {

@@ -6,13 +6,21 @@ using UnityEngine;
 namespace IT.Data.Networking
 {
 
-    public enum PlayerAnimationStateID : byte
+    public enum PlayerMovementAnimID : byte
     {
         NONE,
         GROUNDED,
         FALLING,
         LANDING,
         JUMPING,
+    }
+
+    public enum PlayerCombatAnimID : byte
+    {
+        NONE,
+        PREPARE_SWING,
+        SWING,
+        BLOCK,
     }
     
     public struct PlayerAnimationState
@@ -21,7 +29,7 @@ namespace IT.Data.Networking
         public uint Tick;
         public float Speed;
         public float Duration;
-        public PlayerAnimationStateID StateID;
+        public PlayerMovementAnimID StateID;
     }
 
     public static class PlayerAnimationStateSerializer
@@ -36,7 +44,7 @@ namespace IT.Data.Networking
             writer.WriteUInt32(value.Tick, AutoPackType.Unpacked);
             writer.WriteByte((byte)value.StateID);
             
-            if(value.StateID != PlayerAnimationStateID.GROUNDED)
+            if(value.StateID != PlayerMovementAnimID.GROUNDED)
                 return;
 
             byte speed = (byte)(value.Speed * 100f);
@@ -52,10 +60,10 @@ namespace IT.Data.Networking
             float yAnimComponent = (reader.ReadInt16() / 100f);
             Vector2 animVector = new Vector2(xAnimComponent, yAnimComponent);
             uint tick = reader.ReadUInt32(AutoPackType.Unpacked);
-            PlayerAnimationStateID stateID = (PlayerAnimationStateID)reader.ReadByte();
+            PlayerMovementAnimID stateID = (PlayerMovementAnimID)reader.ReadByte();
             PlayerAnimationState playerAnimationState = new PlayerAnimationState { AnimationVector = animVector, Tick = tick, StateID = stateID};
 
-            if (stateID == PlayerAnimationStateID.GROUNDED)
+            if (stateID == PlayerMovementAnimID.GROUNDED)
             {
                 float speed = reader.ReadByte() * 10f;
                 float duration = reader.ReadByte() * 10f;
@@ -70,9 +78,9 @@ namespace IT.Data.Networking
 
     public static class PlayerAnimationStateIDUtils
     {
-        public static bool ShouldBeProcessed(this PlayerAnimationStateID stateID)
+        public static bool ShouldBeProcessed(this PlayerMovementAnimID stateID)
         {
-            return stateID == PlayerAnimationStateID.GROUNDED;
+            return stateID == PlayerMovementAnimID.GROUNDED;
         }
     }
 }

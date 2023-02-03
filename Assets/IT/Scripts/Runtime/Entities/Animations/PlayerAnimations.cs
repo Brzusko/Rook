@@ -10,234 +10,74 @@ using IT.Collections;
 using IT.Data.Networking;
 using UnityEditor.Animations;
 
-public class PlayerAnimations : NetworkBehaviour
+namespace IT
 {
-    [Header("Components")]
-    [SerializeField] private AnimancerComponent _animancerComponent;
-    [SerializeField] private Transform _playerMainSpaceTransform;
-    [Header("Animation Assets")]
-    [SerializeField] private MixerTransition2DAsset.UnShared _basicGroundMixer;
-    [SerializeField] private ClipTransitionAsset.UnShared _fallingAnimation;
-    [SerializeField] private ClipTransitionAsset.UnShared _landingAnimation;
-    [SerializeField] private ClipTransitionAsset.UnShared _jumpingAnimation;
-    [SerializeField] private AvatarMask _avatarMask;
-    [Range(0.00f, 100f)]
-    [SerializeField]
-    private float _interpolationSpeed = 0.1f;
-    [Range(1, 1000)]
-    [SerializeField] private uint _sendRate;
-
-    private Dictionary<PlayerAnimationStateID, AnimancerState> _animationStates;
-    private PlayerAnimationStateID _currentAnimancerStateID = PlayerAnimationStateID.NONE;
-    private bool _areEventsBound;
-    private NetworkInput _cachedInput;
-    private Vector2 _animationVector = Vector2.zero;
-    private float _cachedAcceleration;
-    private float _cachedDeceleration;
-    private AnimancerLayer _mainLayer;
-    private AnimancerLayer _weaponLayer;
-    
-    //Puppet/non owner variables 
-    private PlayerAnimationState _currentState;
-    private PlayerAnimationState _lastState;
-    private readonly RingBuffer<PlayerAnimationState> _puppetAnimationStates = new RingBuffer<PlayerAnimationState>(1024);
-    private float _lerpValue;
-
-    private void Awake()
+    public class PlayerAnimations : NetworkBehaviour
     {
-        BuildAnimator();
-    }
+        [SerializeField] private Transform _mainSpaceTransform;
+        [SerializeField] private Animator _animator;
+        private Dictionary<PlayerMovementAnimID, int> _animationMovementHashes;
+        private Dictionary<PlayerCombatAnimID, int> _animationCombatHashes;
 
-    public override void OnStartNetwork()
-    {
-        base.OnStartNetwork();
-        BindEvents();
-    }
+        private PlayerMovementAnimID _currentMovementAnimationID;
+        private PlayerCombatAnimID _currentCombatAnimationID;
 
-    public override void OnStopNetwork()
-    {
-        base.OnStopNetwork();
-        UnbindEvents();
-    }
-
-    private void BuildAnimator()
-    {
-        _mainLayer = _animancerComponent.Layers[0];
-        _weaponLayer = _animancerComponent.Layers[1];
-        
-        _animationStates = new Dictionary<PlayerAnimationStateID, AnimancerState>
+        private void Awake()
         {
-            {
-                PlayerAnimationStateID.GROUNDED, _animancerComponent.States.GetOrCreate(_basicGroundMixer)
-            },
-            {
-                PlayerAnimationStateID.FALLING, _animancerComponent.States.GetOrCreate(_fallingAnimation)
-            },
-            {
-                PlayerAnimationStateID.LANDING, _animancerComponent.States.GetOrCreate(_landingAnimation)
-            },
-            {
-                PlayerAnimationStateID.JUMPING, _animancerComponent.States.GetOrCreate(_jumpingAnimation)
-            }
-        };
-    }
-
-    private void BindEvents()
-    {
-        if(_areEventsBound)
-            return;
-
-        TimeManager.OnUpdate += OnUpdate;
-        TimeManager.OnPreTick += OnPreTick;
-        TimeManager.OnPostTick += OnPostTick;
-        _areEventsBound = true;
-    }
-
-    private void UnbindEvents()
-    {
-        if(!_areEventsBound)
-            return;
-
-        TimeManager.OnUpdate -= OnUpdate;
-        TimeManager.OnPreTick -= OnPreTick;
-        TimeManager.OnPostTick -= OnPostTick;
-        _areEventsBound = true;
-    }
-
-    #region Event Handlers
-
-    private void OnUpdate()
-    {
-        if(PredictionManager.IsReplaying())
-            return;
-        
-        if (!IsOwner && !IsServer)
-        {
-            ProcessAnimationPuppet();
-            return;
-        }
-        
-        ProcessMainAnimation();
-    }
-
-    private void OnPreTick()
-    {
-        if (IsOwner || IsServer || PredictionManager.IsReplaying()) return;
-        
-        FetchAnimationStateFromBuffer();
-    }
-    
-    private void OnPostTick()
-    {
-        if (!IsServer) return;
-        uint currentTick = TimeManager.LocalTick;
-        
-        if((currentTick % _sendRate) != 0)
-            return;
-
-        float speed = _animationStates[_currentAnimancerStateID].Speed;
-        float duration = _animationStates[_currentAnimancerStateID].Duration;
-        
-        Server_SendAnimationState(new PlayerAnimationState{ AnimationVector = _animationVector, Tick = currentTick, Speed = speed, Duration = duration, StateID = _currentAnimancerStateID});
-    }
-
-    #endregion
-
-
-    [ObserversRpc(BufferLast = true, IncludeOwner = false)]
-    private void Server_SendAnimationState(PlayerAnimationState animationState)
-    {
-        if(IsHost)
-            return;
-
-        if (_puppetAnimationStates.Count == 0)
-        {
-            _puppetAnimationStates.Write(animationState);
-            return;
+            InitializeOnce();
         }
 
-        if(_puppetAnimationStates.Peek().Tick > animationState.Tick)
-            return;
-        
-        _puppetAnimationStates.Write(animationState);
-    }
-
-    private void ProcessMainAnimation()
-    {
-        if(_currentAnimancerStateID != PlayerAnimationStateID.GROUNDED)
-            return;
-        
-        Vector3 transformedVelocity =
-            _playerMainSpaceTransform.InverseTransformDirection(new Vector3(_cachedInput.MovementInput.x, 0,
-                _cachedInput.MovementInput.y));
-        
-        float animationScalar = _cachedInput.IsWalkingPressed ? 1f : 1.7f;
-        bool isPlayerMoving = transformedVelocity.sqrMagnitude > 0f;
-        float targetX = isPlayerMoving ? transformedVelocity.x * animationScalar : 0;
-        float targetY = isPlayerMoving ? transformedVelocity.z * animationScalar : 0;
-        float maxDelta = isPlayerMoving
-            ? _cachedAcceleration * Time.deltaTime
-            : _cachedDeceleration * Time.deltaTime;
-
-        float desiredX = Mathf.MoveTowards(_animationVector.x, targetX, maxDelta);
-        float desiredY = Mathf.MoveTowards(_animationVector.y, targetY, maxDelta);
-
-        _animationVector = new Vector2(desiredX, desiredY);
-        ((MixerState<Vector2>)_animationStates[_currentAnimancerStateID]).Parameter = _animationVector;
-    }
-
-    #region Puppet
-
-    //TODO process one-shot animations
-    private void ProcessAnimationPuppet()
-    {
-        if (_currentAnimancerStateID != _currentState.StateID)
+        private void InitializeOnce()
         {
-            PlayAnimation(_currentState.StateID);    
+            _animationMovementHashes = new Dictionary<PlayerMovementAnimID, int>
+            {
+                {
+                    PlayerMovementAnimID.JUMPING, Animator.StringToHash("Jump Start")
+                },
+                {
+                    PlayerMovementAnimID.FALLING, Animator.StringToHash("Jump Mid")
+                },
+                {
+                    PlayerMovementAnimID.LANDING, Animator.StringToHash("Jump Land")
+                },
+                {
+                    PlayerMovementAnimID.GROUNDED, Animator.StringToHash("Grounded Movement")
+                }
+            };
+
+            _animationCombatHashes = new Dictionary<PlayerCombatAnimID, int>
+            {
+                {
+                    PlayerCombatAnimID.NONE, Animator.StringToHash("Combat Idle")
+                },
+                {
+                    PlayerCombatAnimID.PREPARE_SWING, Animator.StringToHash("Prepare Swing")
+                },
+                {
+                    PlayerCombatAnimID.SWING, Animator.StringToHash("Swing")
+                },
+                {
+                    PlayerCombatAnimID.BLOCK, Animator.StringToHash("Block")
+                }
+            };
         }
-        
-        if(_currentAnimancerStateID != PlayerAnimationStateID.GROUNDED)
-            return;
 
-        _lerpValue += Time.deltaTime * _interpolationSpeed;
-        _animationVector = Vector2.Lerp(_animationVector, _currentState.AnimationVector,
-            _lerpValue);
-        
-        ((MixerState<Vector2>)_animationStates[_currentAnimancerStateID]).Parameter = _animationVector;
-    }
-    
-    private void FetchAnimationStateFromBuffer()
-    {
-        while (_puppetAnimationStates.Count > 1)
+        public void PlayAnimation(PlayerMovementAnimID movementAnimID, float transitionTime = 0f)
         {
-            _lastState = _currentState;
-            _currentState = _puppetAnimationStates.Read();
-            _lerpValue = 0;
+            if(!_animationMovementHashes.ContainsKey(movementAnimID) || _currentMovementAnimationID == movementAnimID)
+                return;
+
+            _currentMovementAnimationID = movementAnimID;
+            _animator.CrossFade(_animationMovementHashes[movementAnimID], transitionTime, 0);
+        }
+
+        public void PlayAnimation(PlayerCombatAnimID combatAnimID, float transitionTime = 0f)
+        {
+            if(!_animationCombatHashes.ContainsKey(combatAnimID) || _currentCombatAnimationID == combatAnimID)
+                return;
+
+            _currentCombatAnimationID = combatAnimID;
+            _animator.CrossFade(_animationCombatHashes[combatAnimID], transitionTime);
         }
     }
-
-    #endregion
-
-    #region Interface
-
-    public void CacheInput(NetworkInput input, float acceleration, float deceleration)
-    {
-        _cachedInput = input;
-        _cachedAcceleration = acceleration;
-        _cachedDeceleration = deceleration;
-    }
-
-    public void PlayAnimation(PlayerAnimationStateID animID)
-    {
-        if(_animationStates == null || !_animationStates.ContainsKey(animID))
-            return;
-        
-        if(animID == _currentAnimancerStateID)
-            return;
-        
-        _currentAnimancerStateID = animID;
-        _animancerComponent.Play(_animationStates[animID], 0.25f);
-    }
-
-    #endregion
 }

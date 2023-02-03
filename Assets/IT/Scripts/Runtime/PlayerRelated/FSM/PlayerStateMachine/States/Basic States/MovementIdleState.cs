@@ -36,7 +36,10 @@ namespace IT.FSM.States
 
         public void Enter(bool onReconcile, bool asReplay = false)
         {
-            _stateMachine.Context.PlayerAnimations.PlayAnimation(PlayerAnimationStateID.GROUNDED);
+            if(asReplay)
+                return;
+            
+            _stateMachine.Context.PlayerAnimations.PlayAnimation(PlayerMovementAnimID.GROUNDED, 0.3f);
         }
 
         public void Exit(bool onReconcile, bool asReplay = false)
@@ -54,7 +57,7 @@ namespace IT.FSM.States
                 return;
             }
             
-            if (characterMovement.wasGrounded && !characterMovement.isGrounded)
+            if (!characterMovement.isGrounded)
             {
                 _stateMachine.ChangeBaseState(PlayerBaseStateID.FALLING, onReconcile, asReplay);
                 return;
@@ -63,12 +66,6 @@ namespace IT.FSM.States
             if (input.MovementInput.sqrMagnitude == 0 && characterMovement.isGrounded)
                 return;
 
-            if (input.IsWalkingPressed)
-            {
-                _stateMachine.ChangeBaseState(PlayerBaseStateID.WALKING, onReconcile, asReplay);
-                return;
-            }
-            
             _stateMachine.ChangeBaseState(PlayerBaseStateID.SCUTTER, onReconcile, asReplay);
         }
     }

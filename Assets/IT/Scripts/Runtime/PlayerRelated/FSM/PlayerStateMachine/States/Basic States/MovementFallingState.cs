@@ -49,9 +49,9 @@ namespace IT.FSM.States
             int layerMask = ~0;
 
             if (characterMovement.Raycast(characterMovement.GetFootPosition(), Vector3.down, 1f, layerMask,
-                    out RaycastHit hit, 0.1f) && _inTheAir > 0.1f)
+                    out RaycastHit hit, 0.1f) && _inTheAir > 0.05f && !isReplaying)
             {
-                context.PlayerAnimations.PlayAnimation(PlayerAnimationStateID.LANDING);
+                context.PlayerAnimations.PlayAnimation(PlayerMovementAnimID.LANDING, 0.1f);
             }
             
             characterMovement.SimpleMove(desiredVelocity,
@@ -69,7 +69,10 @@ namespace IT.FSM.States
 
         public void Enter(bool onReconcile, bool asReplay = false)
         {
-            _stateMachine.Context.PlayerAnimations.PlayAnimation(PlayerAnimationStateID.FALLING);
+            if(asReplay)
+                return;
+
+            _stateMachine.Context.PlayerAnimations.PlayAnimation(PlayerMovementAnimID.FALLING, 0.2f);
             _inTheAir = 0f;
         }
 

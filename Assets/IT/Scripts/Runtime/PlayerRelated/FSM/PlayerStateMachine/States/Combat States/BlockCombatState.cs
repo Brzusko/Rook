@@ -25,6 +25,11 @@ namespace IT.FSM.States
         {
             MovementStatsModule movementStatsModule = _stateMachine.Context.MovementStatsModule;
             movementStatsModule.SetAdditionalSpeedModifiers(movementStatsModule.BlockModifier);
+            
+            if(asReplay)
+                return;
+            
+            _stateMachine.Context.PlayerAnimations.PlayAnimation(PlayerCombatAnimID.BLOCK, 0.1f);
         }
 
         public void Exit(bool onReconcile, bool asReplay = false)

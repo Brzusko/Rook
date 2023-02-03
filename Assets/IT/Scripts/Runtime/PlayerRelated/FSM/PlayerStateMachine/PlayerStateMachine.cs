@@ -36,6 +36,7 @@ namespace IT.FSM
         [SerializeField] private uint _reconcileRate = 1;
         [Range(0, 20)]
         [SerializeField] private uint _tickOffset = 2;
+        [SerializeField] private int _snapshotsBufferLength = 1024;
 
         [SerializeField] private bool _shouldIgnoreReplay;
         [SerializeField] private PlayerAnimations _playerAnimations;
@@ -52,16 +53,11 @@ namespace IT.FSM
 
         private IEntityToPossess _playerEntity;
         private IRaycaster _raycaster;
-
-        private uint _serverTick;
-        private uint _clientTick;
-
+        
         private KnockbackCache _clientKnockbackCache;
         private KnockbackCache _serverKnockbackCache;
-
-        private List<System.Tuple<uint, Vector3>> _knockbackCache = new List<System.Tuple<uint, Vector3>>();
-
-        private Vector3 _deltaForce;
+        private PlayerStateMachineSnapshot[] _snapshotsBuffer;
+        
         public PlayerStateMachineContext Context => _context;
         public PlayerBaseStateID BaseStateID => _currentBaseStateID;
         public PlayerCombatStateID SecondaryStateID => _currentCombatStateID;
@@ -90,6 +86,13 @@ namespace IT.FSM
         {
             base.OnStartClient();
             CheckMovementComponentState();
+        }
+
+        public override void OnStartServer()
+        {
+            base.OnStartServer();
+
+            _snapshotsBuffer = new PlayerStateMachineSnapshot[_snapshotsBufferLength];
         }
 
         private void InitializeOnce()
@@ -170,6 +173,8 @@ namespace IT.FSM
                 {
                     Reconcile(GenerateReconcileData(), true);
                 }
+                
+                SaveSnapshot();
             }
         }
 
@@ -186,7 +191,6 @@ namespace IT.FSM
         private void Simulation(NetworkInput input, bool asServer, Channel channel = Channel.Unreliable, bool isReplaying = false)
         {
             float deltaTime = (float)TimeManager.TickDelta;
-            _playerAnimations.CacheInput(input, _movementStatsModule.Acceleration, _movementStatsModule.Deceleration);
 
             CheckKnockback(input, asServer, isReplaying);
             
@@ -265,6 +269,13 @@ namespace IT.FSM
         private void CheckKnockback(NetworkInput input, bool asServer, bool isReplaying)
         {
             if (isReplaying && _shouldIgnoreReplay) return ;
+
+            if (IsHost && TimeManager.LocalTick >= _serverKnockbackCache.InvokeTime && IsHost && IsOwner)
+            {
+                LaunchCharacter(_serverKnockbackCache.KnockbackForce);
+                _serverKnockbackCache = default;
+                return;
+            }
             
             if (asServer && TimeManager.LocalTick == _serverKnockbackCache.InvokeTime)
             {
@@ -286,6 +297,21 @@ namespace IT.FSM
                 _characterMovement.PauseGroundConstraint();
             
             _characterMovement.LaunchCharacter(force);
+        }
+
+        private void SaveSnapshot()
+        {
+            uint tick = TimeManager.LocalTick;
+            int index = (int)tick % _snapshotsBufferLength;
+
+            PlayerStateMachineSnapshot recentSnapshot = new PlayerStateMachineSnapshot
+            {
+                BaseStateID = _currentBaseStateID,
+                PlayerCombatStateID = _currentCombatStateID,
+                Tick = tick
+            };
+
+            _snapshotsBuffer[index] = recentSnapshot;
         }
     
         #region Interfaces
@@ -318,6 +344,13 @@ namespace IT.FSM
             _currentCombatState = _combatStates[_currentCombatStateID];
             _currentCombatState?.Enter(onReconcile, asReplay);
         }
+
+        public bool TryGetSnapshotAtTick(uint tick, out PlayerStateMachineSnapshot snapshot)
+        {
+            int index = (int)tick % _snapshotsBufferLength;
+            snapshot = _snapshotsBuffer[index];
+            return snapshot.Tick.Equals(tick);
+        }
         
         public void CacheKnockback(Vector3 deltaForce, uint tickDelta)
         {
@@ -335,6 +368,9 @@ namespace IT.FSM
                 InvokeTime = serverTick,
                 KnockbackForce = deltaForce
             };
+            
+            if(IsHost && IsOwner)
+                return;
             
             TargetCacheKnockback(Owner, clientTickWithOffset, deltaForce);
         }

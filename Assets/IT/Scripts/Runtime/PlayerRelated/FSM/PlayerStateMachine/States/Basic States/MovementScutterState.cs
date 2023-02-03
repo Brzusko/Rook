@@ -42,7 +42,10 @@ namespace IT.FSM.States
 
         public void Enter(bool onReconcile, bool asReplay = false)
         {
-            _stateMachine.Context.PlayerAnimations.PlayAnimation(PlayerAnimationStateID.GROUNDED);
+            if(asReplay)
+                return;
+            
+            _stateMachine.Context.PlayerAnimations.PlayAnimation(PlayerMovementAnimID.GROUNDED, 0.3f);
         }
 
         public void Exit(bool onReconcile, bool asReplay = false)

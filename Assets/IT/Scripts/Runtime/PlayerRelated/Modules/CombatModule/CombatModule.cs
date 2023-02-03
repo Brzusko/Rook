@@ -27,11 +27,19 @@ public class CombatModule : NetworkBehaviour
         set => _swingTimeInSeconds = value;
     }
 
-    private void LaunchCharacter(Vector3 hitNormal)
+    private void LaunchCharacter(Vector3 hitNormal, uint requestTick)
     {
+        float negateForceScalar = 1f;
+        
+        if (_playerStateMachine.TryGetSnapshotAtTick(requestTick, out PlayerStateMachineSnapshot snapshot))
+        {
+            negateForceScalar = snapshot.PlayerCombatStateID == PlayerCombatStateID.BLOCK ? 0.6f : 1f;
+        }
+        
         Vector3 hitDirection = -new Vector3(hitNormal.x, 0f, hitNormal.z);
         Vector3 upForce = Vector3.up * _upPushScalar;
         Vector3 forwardForce = hitDirection * _forwardPushScalar;
+        forwardForce = forwardForce * negateForceScalar;
         Vector3 hitForce = forwardForce + upForce;
 
         uint currentTick = TimeManager.Tick;
@@ -58,14 +66,18 @@ public class CombatModule : NetworkBehaviour
         int mask = 1 << LayerMask.NameToLayer("HitBox");
 
         Transform t = transform;
+        Vector3 tPosition = t.position;
         
         Debug.Log($"Sec {_swingTimeInSeconds}, Tick time: ${TimeManager.TicksToTime(TimeManager.Tick)}, Tick time plus swing {TimeManager.TicksToTime(TimeManager.Tick) + (_swingTimeInSeconds)},Tick {TimeManager.Tick} , Calc tick {TimeManager.TimeToTicks(TimeManager.TicksToTime(TimeManager.Tick) + (_swingTimeInSeconds))}");
 
-        if(Physics.Raycast(t.position, t.forward, out RaycastHit hit, 1f, mask))
+        if(Physics.Raycast(tPosition, t.forward, out RaycastHit hit, 1f, mask))
         { // add block rollback
             if (hit.collider.TryGetComponent(out CombatModule combatModule))
             {
-                combatModule.LaunchCharacter(hit.normal);
+                Transform targetTransform = combatModule.transform;
+                Vector3 targetPosition = targetTransform.position;
+                
+                combatModule.LaunchCharacter((tPosition - targetPosition).normalized, preciseTick.Tick);
             }
         }
         

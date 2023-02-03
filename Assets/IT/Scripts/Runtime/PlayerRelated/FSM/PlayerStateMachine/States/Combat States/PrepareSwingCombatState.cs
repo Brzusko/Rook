@@ -34,6 +34,11 @@ namespace IT.FSM.States
                 return;
             
             _stateMachine.Context.CurrentPrepareSwingTime = 0f;
+            
+            if(asReplay)
+                return;
+            
+            _stateMachine.Context.PlayerAnimations.PlayAnimation(PlayerCombatAnimID.PREPARE_SWING, 0.2f);
         }
 
         public void Exit(bool onReconcile, bool asReplay = false)

@@ -23,11 +23,6 @@ namespace IT.FSM.States
 
             context.CurrentSwingTime = Mathf.MoveTowards(context.CurrentSwingTime,
                 combatModule.SwingTimeInSeconds, deltaTime);
-
-            if (context.CurrentSwingTime >= combatModule.SwingTimeInSeconds && !isReplaying && !asServer)
-            {
-                
-            }
         }
 
         public void Enter(bool onReconcile, bool asReplay = false)
@@ -37,11 +32,13 @@ namespace IT.FSM.States
             MovementStatsModule movementStatsModule = _stateMachine.Context.MovementStatsModule;
             movementStatsModule.SetAdditionalSpeedModifiers(movementStatsModule.PrepareSwingModifier);
             
-            if(onReconcile)
+            if(onReconcile || asReplay)
                 return;
             
             combatModule.RequestHit();
             context.CurrentSwingTime = 0f;
+            
+            _stateMachine.Context.PlayerAnimations.PlayAnimation(PlayerCombatAnimID.SWING);
         }
 
         public void Exit(bool onReconcile, bool asReplay = false)

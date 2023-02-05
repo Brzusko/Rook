@@ -14,7 +14,7 @@ namespace IT.Data.Networking
         public bool IsJumpPressed;
         public bool IsMainActionPressed;
         public bool IsSecondaryActionPressed;
-        public uint SimulationTick;
+        public uint Tick;
         #region Default
 
         private uint _tick;

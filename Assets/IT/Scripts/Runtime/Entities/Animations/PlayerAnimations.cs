@@ -1,15 +1,9 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using FishNet.Object;
 using UnityEngine;
-using Animancer;
 using EasyCharacterMovement;
-using FishNet.Managing.Timing;
-using IT.Collections;
 using IT.Data.Networking;
 using IT.FSM;
-using UnityEditor.Animations;
 
 namespace IT
 {

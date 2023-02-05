@@ -19,6 +19,7 @@ namespace IT.Data.Networking
         public PlayerCombatStateID CombatStateID;
         public float CurrentPrepareSwingTime;
         public float CurrentSwingTime;
+        public Vector3 KnockbackForce;
 
         #region Default
         private uint _tick;

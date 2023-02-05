@@ -50,7 +50,7 @@ public class CombatModule : NetworkBehaviour
         
         Debug.Log($"Tick {currentTick}, Tick plus swing {tickToComplete}, tick delta {tickDelta}");
         
-        _playerStateMachine.CacheKnockback(hitForce, tickDelta);
+        _playerStateMachine.RequestKnockback(hitForce, tickDelta);
     }
     
     public void RequestHit()

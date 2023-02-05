@@ -41,6 +41,7 @@ namespace IT.FSM
         public uint Tick;
     }
     
+    [System.Serializable]
     public struct KnockbackCache
     {
         public uint InvokeTime;

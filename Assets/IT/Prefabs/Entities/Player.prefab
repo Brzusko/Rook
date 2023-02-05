@@ -136,10 +136,10 @@ MonoBehaviour:
   _componentIndexCache: 9
   _addedNetworkObject: {fileID: 1912049324724089206}
   _networkObjectCache: {fileID: 1912049324724089206}
-  _prepareTimeInSeconds: 0.5
-  _swingTimeInSeconds: 1
-  _forwardPushScalar: 10
-  _upPushScalar: 2
+  _prepareTimeInSeconds: 0.3
+  _swingTimeInSeconds: 0.1
+  _forwardPushScalar: 5
+  _upPushScalar: 3
   _playerStateMachine: {fileID: 1467469930188945514}
 --- !u!136 &7154729622751247455
 CapsuleCollider:
@@ -220,10 +220,9 @@ MonoBehaviour:
   _startCombatState: 0
   _playerEntityGameObject: {fileID: 7849939560007978409}
   _raycasterGameObject: {fileID: 7849939560007978409}
-  _reconcileRate: 15
-  _tickOffset: 3
+  _reconcileRate: 1
+  _tickOffset: 2
   _snapshotsBufferLength: 1024
-  _shouldIgnoreReplay: 1
   _playerAnimations: {fileID: 6034007255074437676}
   _context:
     CurrentPrepareSwingTime: 0
@@ -587,8 +586,8 @@ MonoBehaviour:
     Position: 1
     Rotation: 1
     Scale: 0
-  _interpolation: 1
-  _extrapolation: 2
+  _interpolation: 2
+  _extrapolation: 1
   _enableTeleport: 0
   _teleportThreshold: 1
   _clientAuthoritative: 0

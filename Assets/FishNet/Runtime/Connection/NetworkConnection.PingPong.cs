@@ -11,8 +11,7 @@ namespace FishNet.Connection
     /// </summary>
     public partial class NetworkConnection : IEquatable<NetworkConnection>
     {
-        public long Ping { get; set; }
-        
+        public float Ping { get; set; }
 #pragma warning disable CS0414
         #region Private.
         /// <summary>
@@ -56,7 +55,6 @@ namespace FishNet.Connection
             _excessivePingCount = 0;
             _lastPingTick = 0;
         }
-        
 
         /// <summary>
         /// Called when a ping is received from this connection. Returns if can respond to ping.
@@ -95,7 +93,7 @@ namespace FishNet.Connection
             //Ping isnt too fast.
             else
             {
-                _excessivePingCount = Mathf.Max(0f, _excessivePingCount - 0.5f);
+                _excessivePingCount = UnityEngine.Mathf.Max(0f, _excessivePingCount - 0.5f);
                 return true;
             }
 #endif

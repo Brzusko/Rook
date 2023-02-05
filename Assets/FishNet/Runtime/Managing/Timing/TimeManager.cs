@@ -225,11 +225,8 @@ namespace FishNet.Managing.Timing
         /// MovingAverage instance used to calculate mean ping.
         /// </summary>
         private MovingAverage _pingAverage = new MovingAverage(5);
-
-        private MovingAverage _pingServerAverage = new MovingAverage(5);
-        private uint _lastReceivedTickFromClient;
         /// <summary>
-        /// Time elapsed after ticks. This is extra time beyond the simulation rate.
+        /// Accumulating frame time to determine when to increase tick.
         /// </summary>
         private double _elapsedTickTime;
         /// <summary>
@@ -257,13 +254,13 @@ namespace FishNet.Managing.Timing
         /// </summary>
         private float _lastMultipleTicksTime;
         /// <summary>
-        /// Number of times ticks would have increased last frame.
-        /// </summary>
-        private int _lastTicksCount;
-        /// <summary>
         /// Number of TimeManagers open which are using manual physics.
         /// </summary>
         private static uint _manualPhysics;
+
+        private MovingAverage _pingServerAverage = new MovingAverage(5);
+        private ulong _lastReceivedTickFromClient;
+
         #endregion
 
         #region Const.
@@ -576,7 +573,7 @@ namespace FishNet.Managing.Timing
             uint tick = (tickOverride == null) ? LocalTick : tickOverride.Value;
             using (PooledWriter writer = WriterPool.GetWriter())
             {
-                writer.WriteUInt16((ushort)PacketId.PingPong);
+                writer.WritePacketId(PacketId.PingPong);
                 writer.WriteUInt32(tick, AutoPackType.Unpacked);
                 _networkManager.TransportManager.SendToServer((byte)Channel.Unreliable, writer.GetArraySegment());
             }
@@ -585,6 +582,7 @@ namespace FishNet.Managing.Timing
         /// <summary>
         /// Sends a pong to a client.
         /// </summary>
+
         internal void SendPong(NetworkConnection conn, uint clientTick)
         {
             if (!conn.IsActive || !conn.Authenticated)
@@ -613,8 +611,10 @@ namespace FishNet.Managing.Timing
         private void IncreaseTick()
         {
             bool isClient = _networkManager.IsClient;
+            bool isServer = _networkManager.IsServer;
 
-            double timePerSimulation = (_networkManager.IsServer) ? TickDelta : _adjustedTickDelta;
+            double tickDelta = TickDelta;
+            double timePerSimulation = (isServer) ? tickDelta : _adjustedTickDelta;
             double time = Time.unscaledDeltaTime;
             _elapsedTickTime += time;
             FrameTicked = (_elapsedTickTime >= timePerSimulation);
@@ -684,12 +684,13 @@ namespace FishNet.Managing.Timing
                     Tick++;
                     LocalTick++;
                 }
-            } while (_elapsedTickTime >= timePerSimulation);
 
+            } while (_elapsedTickTime >= timePerSimulation);
         }
 
 
-        #region TicksToTime.
+
+        #region Tick conversions.
         /// <summary>
         /// Returns the percentage of how far the TimeManager is into the next tick.
         /// </summary>
@@ -784,18 +785,6 @@ namespace FishNet.Managing.Timing
         {
             return (TickDelta * (double)ticks);
         }
-        /// <summary>
-        /// Converts time passed from currentTick to previous. Value will be negative if previousTick is larger than currentTick.
-        /// </summary>
-        /// <param name="currentTick">The current tick.</param>
-        /// <param name="previousTick">The previous tick.</param>
-        /// <returns></returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [Obsolete("Use TimePassed(uint, uint).")] //remove 2023/01/01.
-        public double TicksToTime(uint currentTick, uint previousTick)
-        {
-            return TimePassed(currentTick, previousTick);
-        }
 
         /// <summary>
         /// Gets time passed from currentTick to previousTick.
@@ -878,14 +867,13 @@ namespace FishNet.Managing.Timing
                 }
             }
         }
-        #endregion
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         /// <summary>
         /// Converts time to ticks.
         /// </summary>
         /// <param name="time">Time to convert.</param>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public uint TimeToTicks(double time, TickRounding rounding = TickRounding.RoundNearest)
         {
             double result = (time / TickDelta);
@@ -897,6 +885,54 @@ namespace FishNet.Managing.Timing
             else
                 return (uint)Math.Ceiling(result);
         }
+
+        /// <summary>
+        /// Estimatedly converts a synchronized tick to what it would be for the local tick.
+        /// </summary>
+        /// <param name="tick">Synchronized tick to convert.</param>
+        /// <returns></returns>
+        public uint TickToLocalTick(uint tick)
+        {
+            //Server will always have local and tick aligned.
+            if (_networkManager.IsServer)
+                return tick;
+
+            long difference = (Tick - tick);
+            //If no ticks have passed then return current local tick.
+            if (difference <= 0)
+                return LocalTick;
+
+            long result = (LocalTick - difference);
+            if (result <= 0)
+                result = 0;
+
+            return (uint)result;
+        }
+        /// <summary>
+        /// Estimatedly converts a local tick to what it would be for the synchronized tick.
+        /// </summary>
+        /// <param name="localTick">Local tick to convert.</param>
+        /// <returns></returns>
+        public uint LocalTickToTick(uint localTick)
+        {
+            //Server will always have local and tick aligned.
+            if (_networkManager.IsServer)
+                return localTick;
+
+            long difference = (LocalTick - localTick);
+            //If no ticks have passed then return current local tick.
+            if (difference <= 0)
+                return Tick;
+
+            long result = (Tick - difference);
+            if (result <= 0)
+                result = 0;
+
+            return (uint)result;
+
+        }
+        #endregion
+
 
         /// <summary>
         /// Tries to iterate incoming or outgoing data.
@@ -962,7 +998,6 @@ namespace FishNet.Managing.Timing
             //Add half of rtt onto tick.
             uint rttTicks = TimeToTicks((RoundTripTime / 2) / 1000f);
             Tick = LastPacketTick + rttTicks;
-
             uint expected = (uint)(TickRate * _timingInterval);
             long difference;
             //If ticking too fast.

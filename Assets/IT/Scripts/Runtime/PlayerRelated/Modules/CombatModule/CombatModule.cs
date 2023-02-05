@@ -14,6 +14,7 @@ public class CombatModule : NetworkBehaviour
     [SerializeField] private float _forwardPushScalar;
     [SerializeField] private float _upPushScalar;
     [SerializeField] private PlayerStateMachine _playerStateMachine;
+    [SerializeField] private Hurtbox _hurtbox;
 
     public float PrepareTimeInSeconds
     {
@@ -63,22 +64,17 @@ public class CombatModule : NetworkBehaviour
     private void ServerHit(PreciseTick preciseTick)
     {
         RollbackManager.Rollback(preciseTick, RollbackManager.PhysicsType.ThreeDimensional, IsOwner);
-        int mask = 1 << LayerMask.NameToLayer("HitBox");
-
-        Transform t = transform;
-        Vector3 tPosition = t.position;
-        
         Debug.Log($"Sec {_swingTimeInSeconds}, Tick time: ${TimeManager.TicksToTime(TimeManager.Tick)}, Tick time plus swing {TimeManager.TicksToTime(TimeManager.Tick) + (_swingTimeInSeconds)},Tick {TimeManager.Tick} , Calc tick {TimeManager.TimeToTicks(TimeManager.TicksToTime(TimeManager.Tick) + (_swingTimeInSeconds))}");
-
-        if(Physics.Raycast(tPosition, t.forward, out RaycastHit hit, 1f, mask))
-        { // add block rollback
-            if (hit.collider.TryGetComponent(out CombatModule combatModule))
-            {
-                Transform targetTransform = combatModule.transform;
-                Vector3 targetPosition = targetTransform.position;
+        
+        if (_hurtbox.DetectHitbox(out CombatModule combatModule))
+        {
+            Transform t = transform;
+            Vector3 tPosition = t.position;
+            
+            Transform targetTransform = combatModule.transform;
+            Vector3 targetPosition = targetTransform.position;
                 
-                combatModule.LaunchCharacter((tPosition - targetPosition).normalized, preciseTick.Tick);
-            }
+            combatModule.LaunchCharacter((tPosition - targetPosition).normalized, preciseTick.Tick);
         }
         
         RollbackManager.Return();

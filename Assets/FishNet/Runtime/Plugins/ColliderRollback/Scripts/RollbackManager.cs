@@ -33,20 +33,6 @@ namespace FishNet.Component.ColliderRollback
         /// Called when a rollback should occur.
         /// </summary>
         public event Action<float> OnRollback;
-        /// <summary>
-        /// Returns the current PreciseTick.
-        /// </summary>
-        [Obsolete("Use TimeManager.GetPreciseTick(TickType.LastPacketTick) instead.")]
-        public PreciseTick PreciseTick
-        {
-            get
-            {
-                if (_networkManager == null)
-                    return default;
-
-                return _networkManager.TimeManager.GetPreciseTick(TickType.LastPacketTick);
-            }
-        }
 
         #endregion
         //PROEND

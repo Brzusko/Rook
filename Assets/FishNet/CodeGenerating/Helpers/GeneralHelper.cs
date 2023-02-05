@@ -22,6 +22,7 @@ namespace FishNet.CodeGenerating.Helping
         #region Reflection references.
         public string CodegenExcludeAttribute_FullName;
         public string CodegenIncludeAttribute_FullName;
+        public MethodReference Extension_Attribute_Ctor_MethodRef;
         public MethodReference Queue_Enqueue_MethodRef;
         public MethodReference Queue_get_Count_MethodRef;
         public MethodReference Queue_Dequeue_MethodRef;
@@ -58,6 +59,11 @@ namespace FishNet.CodeGenerating.Helping
         public TypeDefinition GeneratedComparer_ClassTypeDef;
         public MethodDefinition GeneratedComparer_OnLoadMethodDef;
         public TypeReference IEquatable_TypeRef;
+        //Actions.
+        public TypeReference ActionT2TypeRef;
+        public TypeReference ActionT3TypeRef;
+        public MethodReference ActionT2ConstructorMethodRef;
+        public MethodReference ActionT3ConstructorMethodRef;
 
         private Dictionary<Type, TypeReference> _importedTypeReferences = new Dictionary<Type, TypeReference>();
         private Dictionary<FieldDefinition, FieldReference> _importedFieldReferences = new Dictionary<FieldDefinition, FieldReference>();
@@ -73,11 +79,17 @@ namespace FishNet.CodeGenerating.Helping
         public override bool ImportReferences()
         {
             Type tmpType;
+            TypeReference tmpTr;
             SR.MethodInfo tmpMi;
             SR.PropertyInfo tmpPi;
 
             NonSerialized_Attribute_FullName = typeof(NonSerializedAttribute).FullName;
             Single_FullName = typeof(float).FullName;
+
+            ActionT2TypeRef = base.ImportReference(typeof(Action<,>));
+            ActionT3TypeRef = base.ImportReference(typeof(Action<,,>));
+            ActionT2ConstructorMethodRef = base.ImportReference(typeof(Action<,>).GetConstructors()[0]);
+            ActionT3ConstructorMethodRef = base.ImportReference(typeof(Action<,,>).GetConstructors()[0]);
 
             CodegenExcludeAttribute_FullName = typeof(CodegenExcludeAttribute).FullName;
             CodegenIncludeAttribute_FullName = typeof(CodegenIncludeAttribute).FullName;
@@ -88,7 +100,6 @@ namespace FishNet.CodeGenerating.Helping
             Queue_get_Count_MethodRef = base.ImportReference(tmpMi);
             foreach (SR.MethodInfo mi in tmpType.GetMethods())
             {
-
                 if (mi.Name == nameof(Queue<int>.Enqueue))
                     Queue_Enqueue_MethodRef = base.ImportReference(mi);
                 else if (mi.Name == nameof(Queue<int>.Dequeue))
@@ -97,11 +108,16 @@ namespace FishNet.CodeGenerating.Helping
                     Queue_Clear_MethodRef = base.ImportReference(mi);
             }
 
-            //Misc.
+            /* MISC */
+            //
             tmpType = typeof(UnityEngine.Application);
             tmpPi = tmpType.GetProperty(nameof(UnityEngine.Application.isPlaying));
             if (tmpPi != null)
                 Application_IsPlaying_MethodRef = base.ImportReference(tmpPi.GetMethod);
+            //
+            tmpType = typeof(System.Runtime.CompilerServices.ExtensionAttribute);
+            tmpTr = base.ImportReference(tmpType);
+            Extension_Attribute_Ctor_MethodRef = base.ImportReference(tmpTr.GetConstructor(base.Session));
 
             //Networkbehaviour.
             Type networkBehaviourType = typeof(NetworkBehaviour);
@@ -177,14 +193,15 @@ namespace FishNet.CodeGenerating.Helping
             FunctionT2ConstructorMethodRef = base.ImportReference(typeof(Func<,>).GetConstructors()[0]);
             FunctionT3ConstructorMethodRef = base.ImportReference(typeof(Func<,,>).GetConstructors()[0]);
 
-            DoGeneratedComparers();
+            GeneratedComparers();
 
-            void DoGeneratedComparers()
+            //Sets up for generated comparers.
+            void GeneratedComparers()
             {
                 GeneralHelper gh = base.GetClass<GeneralHelper>();
-                GeneratedComparer_ClassTypeDef = gh.GetOrCreateClass(out _, WriterGenerator.GENERATED_TYPE_ATTRIBUTES, "GeneratedComparers___Internal", null, GenericWriterHelper.GENERATED_WRITER_NAMESPACE);
+                GeneratedComparer_ClassTypeDef = gh.GetOrCreateClass(out _, WriterProcessor.GENERATED_TYPE_ATTRIBUTES, "GeneratedComparers___Internal", null, WriterProcessor.GENERATED_WRITER_NAMESPACE);
                 bool created;
-                GeneratedComparer_OnLoadMethodDef = gh.GetOrCreateMethod(GeneratedComparer_ClassTypeDef, out created, GenericWriterHelper.INITIALIZEONCE_METHOD_ATTRIBUTES, GenericWriterHelper.INITIALIZEONCE_METHOD_NAME, base.Module.TypeSystem.Void);
+                GeneratedComparer_OnLoadMethodDef = gh.GetOrCreateMethod(GeneratedComparer_ClassTypeDef, out created, WriterProcessor.INITIALIZEONCE_METHOD_ATTRIBUTES, WriterProcessor.INITIALIZEONCE_METHOD_NAME, base.Module.TypeSystem.Void);
                 if (created)
                 {
                     gh.CreateRuntimeInitializeOnLoadMethodAttribute(GeneratedComparer_OnLoadMethodDef);
@@ -294,21 +311,48 @@ namespace FishNet.CodeGenerating.Helping
 
 
         /// <summary>
-        /// This is a stupid hack to remove generic brackets for string matching. Need to make this not stupid. //todo
+        /// Makes a method an extension method.
         /// </summary>
-        /// <param name="str"></param>
-        public string RemoveGenericBrackets(string str)
+        public void MakeExtensionMethod(MethodDefinition md)
         {
-            int startIndex = str.IndexOf("<");
-            int endIndex = str.IndexOf(">");
-            if (startIndex > 0 && endIndex > startIndex)
+            if (md.Parameters.Count == 0)
             {
-                string a = str.Substring(0, startIndex);
-                string b = str.Substring(endIndex + 1);
-                str = a + b;
+                base.LogError($"Method {md.FullName} cannot be made an extension method because it has no parameters.");
+                return;
             }
 
-            return str;
+            md.Attributes |= (MethodAttributes.Public | MethodAttributes.Static | MethodAttributes.HideBySig);
+            CustomAttribute ca = new CustomAttribute(Extension_Attribute_Ctor_MethodRef);
+            md.CustomAttributes.Add(ca);
+        }
+
+        /// <summary>
+        /// Removes characters which would create invalid comparisons when trying to compare generics.
+        /// </summary>
+        public string RemoveGenericBrackets(string str)
+        {
+            /* Fix example...
+             * List`1<T> converts to...
+             *  List`1.
+             * System.Nullable`1<System.Int> converts to...
+             *  System.Nullable`1System.Int */
+            if (str.Contains(typeof(System.Nullable).FullName))
+                return str;
+
+            //Find bracket areas to remove.
+            int startIndex = str.IndexOf("<");
+            int endIndex = str.IndexOf(">");
+            //If found.
+            if (startIndex >= 0 && endIndex >= 0)
+            {
+                string result = str.Substring(0, startIndex);
+                result += str.Substring(endIndex + 1);
+                return result;
+            }
+            else
+            {
+                return str;
+            }
         }
 
         /// <summary>
@@ -412,23 +456,8 @@ namespace FishNet.CodeGenerating.Helping
             return false;
         }
 
-        /// <summary>
-        /// Returns an OpCode for loading a parameter.
-        /// </summary>
-        public OpCode GetLoadParameterOpCode(ParameterDefinition pd)
-        {
-            return (pd.ParameterType.IsValueType) ? OpCodes.Ldarga : OpCodes.Ldarg;
-        }
 
-        /// <summary>
-        /// Returns an instruction for loading a parameter.s
-        /// </summary>
-        public Instruction GetLoadParameterInstruction(MethodDefinition md, ParameterDefinition pd)
-        {
-            ILProcessor processor = md.Body.GetILProcessor();
-            OpCode oc = GetLoadParameterOpCode(pd);
-            return processor.Create(oc, pd);
-        }
+
 
         /// <summary>
         /// Calls copiedMd with the assumption md shares the same parameters.
@@ -465,7 +494,7 @@ namespace FishNet.CodeGenerating.Helping
             insts.Add(processor.Create(OpCodes.Ldfld, dataFd));
             insts.Add(processor.Create(OpCodes.Ldc_I4_0));
             insts.Add(processor.Create(OpCodes.Ldloc, countVd));
-            insts.Add(processor.Create(OpCodes.Callvirt, lstDataRemoveRangeMr));
+            insts.Add(processor.Create(lstDataRemoveRangeMr.GetCallOpCode(base.Session), lstDataRemoveRangeMr));
 
             return insts;
         }
@@ -591,7 +620,7 @@ namespace FishNet.CodeGenerating.Helping
         /// </summary>
         /// <param name="moduleDef"></param>
         /// <returns></returns>
-        public TypeDefinition GetOrCreateClass(out bool created, TypeAttributes typeAttr, string className, TypeReference baseTypeRef, string namespaceName = GenericWriterHelper.GENERATED_WRITER_NAMESPACE)
+        public TypeDefinition GetOrCreateClass(out bool created, TypeAttributes typeAttr, string className, TypeReference baseTypeRef, string namespaceName = WriterProcessor.GENERATED_WRITER_NAMESPACE)
         {
             if (namespaceName.Length == 0)
                 namespaceName = FishNetILPP.RUNTIME_ASSEMBLY_NAME;
@@ -891,6 +920,22 @@ namespace FishNet.CodeGenerating.Helping
             TypeReference typeRef = methodDef.Module.ImportReference(parameterTypeDef);
             return CreateParameter(methodDef, typeRef, name, attributes, index);
         }
+
+        /// <summary>
+        /// Creates a parameter within methodDef as the next index, with the same data as passed in parameter definition.
+        /// </summary>
+        public ParameterDefinition CreateParameter(MethodDefinition methodDef, ParameterDefinition parameterTypeDef)
+        {
+            base.ImportReference(parameterTypeDef.ParameterType);
+
+            int currentCount = methodDef.Parameters.Count;
+            string name = (parameterTypeDef.Name + currentCount);
+            ParameterDefinition parameterDef = new ParameterDefinition(name, parameterTypeDef.Attributes, parameterTypeDef.ParameterType);
+                methodDef.Parameters.Add(parameterDef);
+
+            return parameterDef;
+        }
+
         /// <summary>
         /// Creates a parameter within methodDef and returns it's ParameterDefinition.
         /// </summary>
@@ -1037,8 +1082,8 @@ namespace FishNet.CodeGenerating.Helping
             //Make sure it's imported into current module.
             typeRef = base.ImportReference(typeRef);
             //Can be serialized/deserialized.
-            bool hasWriter = base.GetClass<WriterHelper>().HasSerializer(typeRef, create);
-            bool hasReader = base.GetClass<ReaderHelper>().HasDeserializer(typeRef, create);
+            bool hasWriter = base.GetClass<WriterProcessor>().HasSerializer(typeRef, create);
+            bool hasReader = base.GetClass<ReaderProcessor>().HasDeserializer(typeRef, create);
 
             return (hasWriter && hasReader);
         }
@@ -1077,7 +1122,7 @@ namespace FishNet.CodeGenerating.Helping
         public MethodDefinition CreateEqualityComparer(TypeReference dataTr)
         {
             GeneralHelper gh = base.GetClass<GeneralHelper>();
-            MethodDefinition comparerMd = gh.GetOrCreateMethod(GeneratedComparer_ClassTypeDef, out bool created, GenericWriterHelper.GENERATED_METHOD_ATTRIBUTES,
+            MethodDefinition comparerMd = gh.GetOrCreateMethod(GeneratedComparer_ClassTypeDef, out bool created, WriterProcessor.GENERATED_METHOD_ATTRIBUTES,
                 $"Comparer___{dataTr.FullName}", base.Module.TypeSystem.Boolean);
             //Already done. This can happen if the same replicate data is used in multiple places.
             if (created)
@@ -1103,8 +1148,8 @@ namespace FishNet.CodeGenerating.Helping
 
                 //Fields.
                 foreach (FieldDefinition fieldDef in dataTr.FindAllSerializableFields(base.Session
-                    , null, WriterHelper.EXCLUDED_ASSEMBLY_PREFIXES))
-                {
+                    , null, WriterProcessor.EXCLUDED_ASSEMBLY_PREFIXES))
+                { 
                     base.ImportReference(fieldDef);
                     processor.Append(GetLoadParameterInstruction(comparerMd, v0Pd));
                     processor.Emit(OpCodes.Ldfld, fieldDef);
@@ -1116,7 +1161,7 @@ namespace FishNet.CodeGenerating.Helping
 
                 //Properties.
                 foreach (PropertyDefinition propertyDef in dataTr.FindAllSerializableProperties(base.Session
-                    , null, WriterHelper.EXCLUDED_ASSEMBLY_PREFIXES))
+                    , null, WriterProcessor.EXCLUDED_ASSEMBLY_PREFIXES))
                 {
                     MethodReference getMr = base.Module.ImportReference(propertyDef.GetMethod);
                     processor.Append(GetLoadParameterInstruction(comparerMd, v0Pd));
@@ -1199,6 +1244,23 @@ namespace FishNet.CodeGenerating.Helping
 
         }
 
+        /// <summary>
+        /// Returns an OpCode for loading a parameter.
+        /// </summary>
+        public OpCode GetLoadParameterOpCode(ParameterDefinition pd)
+        {
+            return (pd.ParameterType.IsValueType) ? OpCodes.Ldarga : OpCodes.Ldarg;
+        }
+
+        /// <summary>
+        /// Returns an instruction for loading a parameter.s
+        /// </summary>
+        public Instruction GetLoadParameterInstruction(MethodDefinition md, ParameterDefinition pd)
+        {
+            ILProcessor processor = md.Body.GetILProcessor();
+            OpCode oc = GetLoadParameterOpCode(pd);
+            return processor.Create(oc, pd);
+        }
 
         /// <summary>
         /// Creates an IsDefault comparer for dataTr.
@@ -1207,7 +1269,7 @@ namespace FishNet.CodeGenerating.Helping
         {
             GeneralHelper gh = base.GetClass<GeneralHelper>();
 
-            MethodDefinition isDefaultMd = gh.GetOrCreateMethod(GeneratedComparer_ClassTypeDef, out bool created, GenericWriterHelper.GENERATED_METHOD_ATTRIBUTES,
+            MethodDefinition isDefaultMd = gh.GetOrCreateMethod(GeneratedComparer_ClassTypeDef, out bool created, WriterProcessor.GENERATED_METHOD_ATTRIBUTES,
                 $"IsDefault___{dataTr.FullName}", base.Module.TypeSystem.Boolean);
             //Already done. This can happen if the same replicate data is used in multiple places.
             if (!created)

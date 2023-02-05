@@ -84,6 +84,10 @@ public class CameraRaycaster : NetworkBehaviour, IRaycaster
         Camera currentCamera = brain.OutputCamera;
         Ray screenPointToRay = currentCamera.ScreenPointToRay(_playerInputReader.PointerPosition);
         _foundRaycastHitThisTick = Physics.Raycast(screenPointToRay, out RaycastHit hit);
+        
+        if(!_foundRaycastHitThisTick)
+            return;
+        
         _recentRaycastHit = hit;
     }
 

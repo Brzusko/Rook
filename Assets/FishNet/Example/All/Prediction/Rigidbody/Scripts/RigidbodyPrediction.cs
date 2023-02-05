@@ -21,14 +21,12 @@ namespace FishNet.Example.Prediction.Rigidbodies
             public bool Jump;
             public float Horizontal;
             public float Vertical;
-            public bool TriggerEnter;
-            public MoveData(bool jump, float horizontal, float vertical, bool triggerEnter)
+            public MoveData(bool jump, float horizontal, float vertical)
             {
                 Jump = jump;
                 Horizontal = horizontal;
                 Vertical = vertical;
                 _tick = 0;
-                TriggerEnter = triggerEnter;
             }
 
             private uint _tick;
@@ -42,15 +40,13 @@ namespace FishNet.Example.Prediction.Rigidbodies
             public Quaternion Rotation;
             public Vector3 Velocity;
             public Vector3 AngularVelocity;
-            public float AdditionalForce;
-            public ReconcileData(Vector3 position, Quaternion rotation, Vector3 velocity, Vector3 angularVelocity, float additionalForce)
+            public ReconcileData(Vector3 position, Quaternion rotation, Vector3 velocity, Vector3 angularVelocity)
             {
                 Position = position;
                 Rotation = rotation;
                 Velocity = velocity;
                 AngularVelocity = angularVelocity;
                 _tick = 0;
-                AdditionalForce = additionalForce;
             }
 
             private uint _tick;
@@ -82,9 +78,9 @@ namespace FishNet.Example.Prediction.Rigidbodies
         private bool _jump;
         #endregion
 
-        public bool LaunchUP;
-        public bool TriggerEnter;
-        public float AdditionalUPForce;
+        public NetworkObject BulletPrefab;
+        private bool _spawnBullet;
+        private NetworkObject _lastSpawnedBullet;
 
         private void Awake()
         {
@@ -112,6 +108,12 @@ namespace FishNet.Example.Prediction.Rigidbodies
                     _nextJumpTime = Time.time + 1f;
                     _jump = true;
                 }
+                else if (Input.GetKeyDown(KeyCode.LeftShift))
+                    _spawnBullet = true;
+                else if (Input.GetKeyDown(KeyCode.LeftAlt))
+                {
+                    _lastSpawnedBullet?.Despawn();
+                }
             }
         }
 
@@ -122,6 +124,20 @@ namespace FishNet.Example.Prediction.Rigidbodies
                 Reconciliation(default, false);
                 CheckInput(out MoveData md);
                 Move(md, false);
+
+                if (_spawnBullet)
+                {
+                    _spawnBullet = false;
+                    NetworkObject nob = Instantiate(BulletPrefab, transform.position + (transform.forward * 0.5f), transform.rotation);
+                    _lastSpawnedBullet = nob;
+                    base.Spawn(nob);
+                    //If not server add speed for client side.
+                    if (!base.IsServer)
+                    {
+                        BulletTest bt = nob.GetComponent<BulletTest>();
+                        bt.SendSpeed();
+                    }
+                }
             }
             if (base.IsServer)
             {
@@ -134,11 +150,9 @@ namespace FishNet.Example.Prediction.Rigidbodies
         {
             if (base.IsServer)
             {
-                ReconcileData rd = new ReconcileData(transform.position, transform.rotation, _rigidbody.velocity, _rigidbody.angularVelocity, AdditionalUPForce);
+                ReconcileData rd = new ReconcileData(transform.position, transform.rotation, _rigidbody.velocity, _rigidbody.angularVelocity);
                 Reconciliation(rd, true);
             }
-
-            LaunchUP = false;
         }
 
         private void CheckInput(out MoveData md)
@@ -148,10 +162,10 @@ namespace FishNet.Example.Prediction.Rigidbodies
             float horizontal = Input.GetAxisRaw("Horizontal");
             float vertical = Input.GetAxisRaw("Vertical");
 
-            if (horizontal == 0f && vertical == 0f && !_jump && !TriggerEnter)
+            if (horizontal == 0f && vertical == 0f && !_jump)
                 return;
 
-            md = new MoveData(_jump, horizontal, vertical, TriggerEnter);
+            md = new MoveData(_jump, horizontal, vertical);
             _jump = false;
         }
 
@@ -162,22 +176,6 @@ namespace FishNet.Example.Prediction.Rigidbodies
             Vector3 forces = new Vector3(md.Horizontal, Physics.gravity.y, md.Vertical) * _moveRate;
             _rigidbody.AddForce(forces);
 
-            float deltaTime = (float)base.TimeManager.TickDelta;
-
-            if (asServer)
-            {
-                AdditionalUPForce = Mathf.MoveTowards(AdditionalUPForce, TriggerEnter ? 160f : 0f, 100f * deltaTime);
-            }
-            else
-            {
-                AdditionalUPForce = Mathf.MoveTowards(AdditionalUPForce, md.TriggerEnter ? 160f : 0f, 100f * deltaTime);
-            }
-
-            if (AdditionalUPForce > 0)
-            {
-                _rigidbody.AddForce(Vector3.up * AdditionalUPForce);
-            }
-            
             if (md.Jump)
                 _rigidbody.AddForce(new Vector3(0f, _jumpForce, 0f), ForceMode.Impulse);
         }
@@ -189,7 +187,6 @@ namespace FishNet.Example.Prediction.Rigidbodies
             transform.rotation = rd.Rotation;
             _rigidbody.velocity = rd.Velocity;
             _rigidbody.angularVelocity = rd.AngularVelocity;
-            AdditionalUPForce = rd.AdditionalForce;
         }
 
 

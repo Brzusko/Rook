@@ -222,15 +222,6 @@ namespace FishNet.Component.ColliderRollback
         private bool _initialized = false;
         #endregion
 
-
-        public override void OnStartClient()
-        {
-            base.OnStartClient();
-            //If not acting as a client host then destroy script.
-            if (base.IsClientOnly)
-                DestroyImmediate(this);
-        }
-
         public override void OnStartServer()
         {
             base.OnStartServer();

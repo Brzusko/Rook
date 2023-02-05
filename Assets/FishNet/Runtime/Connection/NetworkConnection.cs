@@ -12,7 +12,7 @@ namespace FishNet.Connection
     /// <summary>
     /// A container for a connected client used to perform actions on and gather information for the declared client.
     /// </summary>
-    public partial class NetworkConnection : IEquatable<NetworkConnection>, IComparable<NetworkConnection>
+    public partial class NetworkConnection : IEquatable<NetworkConnection>
     {
 
         #region Public.
@@ -54,6 +54,10 @@ namespace FishNet.Connection
         /// True if loaded start scenes as client.
         /// </summary>
         private bool _loadedStartScenesAsClient;
+        /// <summary>
+        /// ObjectIds to use for predicted spawning.
+        /// </summary>
+        internal Queue<int> PredictedObjectIds = new Queue<int>();
         /// <summary>
         /// True if this connection is authenticated. Only available to server.
         /// </summary>
@@ -155,13 +159,14 @@ namespace FishNet.Connection
         }
         #endregion
 
+        #region Const.
+        /// <summary>
+        /// Value used when ClientId has not been set.
+        /// </summary>
+        public const int UNSET_CLIENTID_VALUE = -1;
+        #endregion
+
         #region Comparers.
-
-        public int CompareTo(NetworkConnection other)
-        {
-            return ClientId.CompareTo(other.ClientId);
-        }
-
         public override bool Equals(object obj)
         {
             if (obj is NetworkConnection nc)
@@ -174,7 +179,7 @@ namespace FishNet.Connection
             if (nc is null)
                 return false;
             //If either is -1 Id.
-            if (this.ClientId == -1 || nc.ClientId == -1)
+            if (this.ClientId == NetworkConnection.UNSET_CLIENTID_VALUE || nc.ClientId == NetworkConnection.UNSET_CLIENTID_VALUE)
                 return false;
             //Same object.
             if (System.Object.ReferenceEquals(this, nc))
@@ -249,6 +254,7 @@ namespace FishNet.Connection
             _loadedStartScenesAsServer = false;
             SetDisconnecting(false);
             Scenes.Clear();
+            PredictedObjectIds.Clear();
             ResetPingPong();
         }
 

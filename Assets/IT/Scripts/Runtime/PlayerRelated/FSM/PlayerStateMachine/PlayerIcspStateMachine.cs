@@ -19,7 +19,7 @@ using UnityEngine.InputSystem;
 
 namespace IT.FSM
 {
-    public class PlayerStateMachine : NetworkBehaviour, IStateMachine<PlayerBaseStateID, PlayerCombatStateID, PlayerStateMachineContext>
+    public class PlayerIcspStateMachine : NetworkBehaviour, ICSPStateMachine<PlayerBaseStateID, PlayerCombatStateID, PlayerStateMachineContext>
     {
         [Header("General")]
         [SerializeField] private CharacterMovement _characterMovement;
@@ -39,10 +39,10 @@ namespace IT.FSM
         [SerializeField] private int _snapshotsBufferLength = 1024;
         [SerializeField] private PlayerAnimations _playerAnimations;
         
-        private Dictionary<PlayerBaseStateID, IState<NetworkInput>> _baseStates;
-        private Dictionary<PlayerCombatStateID, IState<NetworkInput>> _combatStates;
-        private IState<NetworkInput> _currentBaseState;
-        private IState<NetworkInput> _currentCombatState;
+        private Dictionary<PlayerBaseStateID, ICSPState<NetworkInput>> _baseStates;
+        private Dictionary<PlayerCombatStateID, ICSPState<NetworkInput>> _combatStates;
+        private ICSPState<NetworkInput> _currentBaseIcspState;
+        private ICSPState<NetworkInput> _currentCombatIcspState;
         private PlayerBaseStateID _currentBaseStateID;
         private PlayerCombatStateID _currentCombatStateID;
         [SerializeField]
@@ -111,43 +111,43 @@ namespace IT.FSM
         {
             _context = new PlayerStateMachineContext(_characterMovement, _movementStatsModule, _transformRotator, _playerAnimations, _raycaster, _combatModule);
                 
-            _baseStates = new Dictionary<PlayerBaseStateID, IState<NetworkInput>>
+            _baseStates = new Dictionary<PlayerBaseStateID, ICSPState<NetworkInput>>
             {
                 { 
                     PlayerBaseStateID.IDLE, 
-                    new MovementIdleState(this)
+                    new MovementIdleIcspState(this)
                 },
                 {
                     PlayerBaseStateID.SCUTTER,
-                    new MovementScutterState(this)
+                    new MovementScutterIcspState(this)
                 },
                 {
                     PlayerBaseStateID.FALLING,
-                    new MovementFallingState(this)
+                    new MovementFallingIcspState(this)
                 },
                 {
                     PlayerBaseStateID.JUMPING,
-                    new MovementJumpState(this)
+                    new MovementJumpIcspState(this)
                 }
             };
 
-            _combatStates = new Dictionary<PlayerCombatStateID, IState<NetworkInput>>
+            _combatStates = new Dictionary<PlayerCombatStateID, ICSPState<NetworkInput>>
             {
                 {
                     PlayerCombatStateID.IDLE,
-                    new IdleCombatState(this)
+                    new IdleCombatIcspState(this)
                 },
                 {
                     PlayerCombatStateID.SWING,
-                    new SwingCombatState(this)
+                    new SwingCombatIcspState(this)
                 },
                 {
                     PlayerCombatStateID.PREPARE_SWING,
-                    new PrepareSwingCombatState(this)
+                    new PrepareSwingCombatIcspState(this)
                 },
                 {
                     PlayerCombatStateID.BLOCK,
-                    new BlockCombatState(this)
+                    new BlockCombatIcspState(this)
                 }
             };
         }
@@ -199,10 +199,10 @@ namespace IT.FSM
             
             CheckKnockback(input, asServer);
             
-            _currentBaseState.Tick(input, asServer, isReplaying, deltaTime);
-            _currentCombatState.Tick(input, asServer, isReplaying, deltaTime);
-            _currentBaseState.CheckStateChange(input, false, isReplaying);
-            _currentCombatState.CheckStateChange(input, false, isReplaying);
+            _currentBaseIcspState.Tick(input, asServer, isReplaying, deltaTime);
+            _currentCombatIcspState.Tick(input, asServer, isReplaying, deltaTime);
+            _currentBaseIcspState.CheckStateChange(input, false, isReplaying);
+            _currentCombatIcspState.CheckStateChange(input, false, isReplaying);
         }
         
         [Reconcile]
@@ -379,7 +379,7 @@ namespace IT.FSM
         public void ChangeBaseState(PlayerBaseStateID baseStateID, bool onReconcile, bool asReplay = false)
         {
             _currentBaseStateID = baseStateID;
-            _currentBaseState?.Exit(onReconcile, asReplay);
+            _currentBaseIcspState?.Exit(onReconcile, asReplay);
 
             if (!_baseStates.ContainsKey(baseStateID))
             {
@@ -387,14 +387,14 @@ namespace IT.FSM
                 return;
             }
             
-            _currentBaseState = _baseStates[_currentBaseStateID];
-            _currentBaseState?.Enter(onReconcile, asReplay);
+            _currentBaseIcspState = _baseStates[_currentBaseStateID];
+            _currentBaseIcspState?.Enter(onReconcile, asReplay);
         }
 
         public void ChangeSecondaryState(PlayerCombatStateID stateID, bool onReconcile, bool asReplay = false)
         {
             _currentCombatStateID = stateID;
-            _currentCombatState?.Exit(onReconcile, asReplay);
+            _currentCombatIcspState?.Exit(onReconcile, asReplay);
 
             if (!_combatStates.ContainsKey(stateID))
             {
@@ -402,8 +402,8 @@ namespace IT.FSM
                 return;
             }
 
-            _currentCombatState = _combatStates[_currentCombatStateID];
-            _currentCombatState?.Enter(onReconcile, asReplay);
+            _currentCombatIcspState = _combatStates[_currentCombatStateID];
+            _currentCombatIcspState?.Enter(onReconcile, asReplay);
         }
 
         public bool TryGetSnapshotAtTick(uint tick, out PlayerStateMachineSnapshot snapshot)

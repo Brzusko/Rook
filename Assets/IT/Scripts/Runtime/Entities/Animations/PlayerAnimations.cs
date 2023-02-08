@@ -4,6 +4,7 @@ using UnityEngine;
 using EasyCharacterMovement;
 using IT.Data.Networking;
 using IT.FSM;
+using UnityEngine.Serialization;
 
 namespace IT
 {
@@ -12,7 +13,7 @@ namespace IT
         [SerializeField] private Transform _mainSpaceTransform;
         [SerializeField] private Animator _animator;
         [SerializeField] private CharacterMovement _characterMovement;
-        [SerializeField] private PlayerStateMachine _stateMachine;
+        [FormerlySerializedAs("_stateMachine")] [SerializeField] private PlayerIcspStateMachine icspStateMachine;
         [SerializeField] private MovementStatsModule _movementStatsModule;
 
         [Header("Animation Rates")] 
@@ -61,7 +62,7 @@ namespace IT
             Vector3 transformedVelocity = _mainSpaceTransform.InverseTransformDirection(characterVelocity);
             Vector2 verticalVelocity = new Vector2(transformedVelocity.x, transformedVelocity.z);
 
-            PlayerCombatStateID combatStateID = _stateMachine.SecondaryStateID;
+            PlayerCombatStateID combatStateID = icspStateMachine.SecondaryStateID;
             
             float baseMaxValue = _baseMaxValue;
             baseMaxValue = combatStateID == PlayerCombatStateID.BLOCK ? _blockValue : baseMaxValue;

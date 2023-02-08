@@ -13,7 +13,7 @@ public class CombatModule : NetworkBehaviour
     [SerializeField] private float _swingTimeInSeconds = 1f;
     [SerializeField] private float _forwardPushScalar;
     [SerializeField] private float _upPushScalar;
-    [SerializeField] private PlayerStateMachine _playerStateMachine;
+    [SerializeField] private PlayerIcspStateMachine playerIcspStateMachine;
     [SerializeField] private Hurtbox _hurtbox;
 
     public float PrepareTimeInSeconds
@@ -32,7 +32,7 @@ public class CombatModule : NetworkBehaviour
     {
         float negateForceScalar = 1f;
         
-        if (_playerStateMachine.TryGetSnapshotAtTick(requestTick, out PlayerStateMachineSnapshot snapshot))
+        if (playerIcspStateMachine.TryGetSnapshotAtTick(requestTick, out PlayerStateMachineSnapshot snapshot))
         {
             negateForceScalar = snapshot.PlayerCombatStateID == PlayerCombatStateID.BLOCK ? 0.6f : 1f;
         }
@@ -51,7 +51,7 @@ public class CombatModule : NetworkBehaviour
         
         Debug.Log($"Tick {currentTick}, Tick plus swing {tickToComplete}, tick delta {tickDelta}");
         
-        _playerStateMachine.RequestKnockback(hitForce, tickDelta);
+        playerIcspStateMachine.RequestKnockback(hitForce, tickDelta);
     }
     
     public void RequestHit()

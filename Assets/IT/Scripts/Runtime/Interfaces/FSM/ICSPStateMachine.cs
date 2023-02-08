@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace IT.Interfaces.FSM
 {
-    public interface IStateMachine<TID, TID2, out TContext>
+    public interface ICSPStateMachine<TID, TID2, out TContext>
     {
         public TContext Context { get; }
         public TID BaseStateID { get; }

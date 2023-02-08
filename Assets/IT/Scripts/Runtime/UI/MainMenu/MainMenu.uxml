@@ -1,0 +1,10 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/IT/Scripts/Runtime/UI/MainMenu/MainMenu.uss?fileID=7433441132597879392&amp;guid=f6d6381ecd2bedc4c9e0995b89cfc08e&amp;type=3#MainMenu" />
+    <ui:VisualElement name="MainMenuContainer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0.65); width: 250px; height: 100%; margin-left: 15%;">
+        <ui:Label tabindex="-1" text="Main Menu" display-tooltip-when-elided="true" name="Title" class="mainTextColor" style="margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; font-size: 35px; align-self: center; padding-top: 30px;" />
+        <ui:VisualElement name="Buttons" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); justify-content: flex-end; padding-bottom: 30px; padding-left: 15px; padding-right: 15px;">
+            <ui:Button text="Play" display-tooltip-when-elided="true" name="Play" class="button" />
+            <ui:Button text="Exit" display-tooltip-when-elided="true" name="Exit" class="button" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

@@ -8,18 +8,18 @@ using IT.Data.Networking;
 
 namespace IT.FSM.States
 {
-    public class MovementScutterState : IState<NetworkInput>
+    public class MovementScutterIcspState : ICSPState<NetworkInput>
     {
-        private readonly IStateMachine<PlayerBaseStateID, PlayerCombatStateID, PlayerStateMachineContext> _stateMachine;
+        private readonly ICSPStateMachine<PlayerBaseStateID, PlayerCombatStateID, PlayerStateMachineContext> _icspStateMachine;
 
-        public MovementScutterState(IStateMachine<PlayerBaseStateID, PlayerCombatStateID, PlayerStateMachineContext> stateMachine)
+        public MovementScutterIcspState(ICSPStateMachine<PlayerBaseStateID, PlayerCombatStateID, PlayerStateMachineContext> icspStateMachine)
         {
-            _stateMachine = stateMachine;
+            _icspStateMachine = icspStateMachine;
         }
 
         public void Tick(NetworkInput input, bool asServer, bool isReplaying, float deltaTime)
         {
-            PlayerStateMachineContext context = _stateMachine.Context;
+            PlayerStateMachineContext context = _icspStateMachine.Context;
             MovementStatsModule movementStatsModule = context.MovementStatsModule;
             CharacterMovement characterMovement = context.CharacterMovement;
 
@@ -45,7 +45,7 @@ namespace IT.FSM.States
             if(asReplay)
                 return;
             
-            _stateMachine.Context.PlayerAnimations.PlayAnimation(PlayerMovementAnimID.GROUNDED);
+            _icspStateMachine.Context.PlayerAnimations.PlayAnimation(PlayerMovementAnimID.GROUNDED);
         }
 
         public void Exit(bool onReconcile, bool asReplay = false)
@@ -55,29 +55,29 @@ namespace IT.FSM.States
 
         public void CheckStateChange(NetworkInput input, bool onReconcile, bool asReplay = false)
         {
-            CharacterMovement characterMovement = _stateMachine.Context.CharacterMovement;
+            CharacterMovement characterMovement = _icspStateMachine.Context.CharacterMovement;
             
             if (characterMovement.isGrounded && input.IsJumpPressed)
             {
-                _stateMachine.ChangeBaseState(PlayerBaseStateID.JUMPING, onReconcile, asReplay);
+                _icspStateMachine.ChangeBaseState(PlayerBaseStateID.JUMPING, onReconcile, asReplay);
                 return;
             }
             
             if (characterMovement.wasGrounded && !characterMovement.isGrounded)
             {
-                _stateMachine.ChangeBaseState(PlayerBaseStateID.FALLING, onReconcile, asReplay);
+                _icspStateMachine.ChangeBaseState(PlayerBaseStateID.FALLING, onReconcile, asReplay);
                 return;
             }
 
             if (input.IsWalkingPressed && input.MovementInput.sqrMagnitude > 0f)
             {
-                _stateMachine.ChangeBaseState(PlayerBaseStateID.WALKING, onReconcile, asReplay);
+                _icspStateMachine.ChangeBaseState(PlayerBaseStateID.WALKING, onReconcile, asReplay);
                 return;
             }
 
             if (input.MovementInput.sqrMagnitude == 0f)
             {
-                _stateMachine.ChangeBaseState(PlayerBaseStateID.IDLE, onReconcile, asReplay);
+                _icspStateMachine.ChangeBaseState(PlayerBaseStateID.IDLE, onReconcile, asReplay);
             }
         }
     }

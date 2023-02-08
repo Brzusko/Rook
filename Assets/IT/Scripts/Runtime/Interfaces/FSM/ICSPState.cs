@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace IT.Interfaces.FSM
 {
-    public interface IState<TInput>
+    public interface ICSPState<TInput>
     {
         public void Tick(TInput input, bool asServer, bool isReplaying, float deltaTime);
         public void Enter(bool onReconcile, bool asReplay = false);

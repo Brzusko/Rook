@@ -6,14 +6,14 @@ using UnityEngine;
 
 namespace IT.FSM.States
 {
-    public class IdleCombatState : IState<NetworkInput>
+    public class IdleCombatIcspState : ICSPState<NetworkInput>
     {
-        private readonly IStateMachine<PlayerBaseStateID, PlayerCombatStateID, PlayerStateMachineContext> _stateMachine;
+        private readonly ICSPStateMachine<PlayerBaseStateID, PlayerCombatStateID, PlayerStateMachineContext> _icspStateMachine;
 
-        public IdleCombatState(
-            IStateMachine<PlayerBaseStateID, PlayerCombatStateID, PlayerStateMachineContext> stateMachine)
+        public IdleCombatIcspState(
+            ICSPStateMachine<PlayerBaseStateID, PlayerCombatStateID, PlayerStateMachineContext> icspStateMachine)
         {
-            _stateMachine = stateMachine;
+            _icspStateMachine = icspStateMachine;
         }
         
         public void Tick(NetworkInput input, bool asServer, bool isReplaying, float deltaTime)
@@ -23,7 +23,7 @@ namespace IT.FSM.States
 
         public void Enter(bool onReconcile, bool asReplay = false)
         {
-            _stateMachine.Context.PlayerAnimations.PlayAnimation(PlayerCombatAnimID.NONE);
+            _icspStateMachine.Context.PlayerAnimations.PlayAnimation(PlayerCombatAnimID.NONE);
         }
 
         public void Exit(bool onReconcile, bool asReplay = false)
@@ -33,21 +33,21 @@ namespace IT.FSM.States
 
         public void CheckStateChange(NetworkInput input, bool onReconcile, bool asReplay = false)
         {
-            PlayerBaseStateID baseStateID = _stateMachine.BaseStateID;
+            PlayerBaseStateID baseStateID = _icspStateMachine.BaseStateID;
             
             if(baseStateID is PlayerBaseStateID.JUMPING or PlayerBaseStateID.FALLING)
                 return;
 
             if (input.IsSecondaryActionPressed)
             {
-                _stateMachine.ChangeSecondaryState(PlayerCombatStateID.BLOCK, onReconcile, asReplay);
+                _icspStateMachine.ChangeSecondaryState(PlayerCombatStateID.BLOCK, onReconcile, asReplay);
                 return;
             }
             
             if(!input.IsMainActionPressed)
                 return;
             
-            _stateMachine.ChangeSecondaryState(PlayerCombatStateID.PREPARE_SWING, onReconcile, asReplay);
+            _icspStateMachine.ChangeSecondaryState(PlayerCombatStateID.PREPARE_SWING, onReconcile, asReplay);
         }
     }
 }

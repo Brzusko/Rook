@@ -159,5 +159,11 @@ namespace IT.Gameplay
 
             _currentContestPlayer = _contestAreaPlayersData[0].PointCounter;
         }
+
+        public void ResetTimer()
+        {
+            _contestAreaPlayersData.Clear();
+            _currentContestTime = 0;
+        }
     }
 }

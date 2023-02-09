@@ -25,7 +25,6 @@ namespace IT
             ReloadNetworkSettings();
         }
 
-
         public string Address
         {
             get => _transport.GetClientAddress();
@@ -69,12 +68,7 @@ namespace IT
             _transport = _transportManager.Transport;
             RegisterToContainer();
         }
-
-        private void OnDestroy()
-        {
-            UnregisterFromContainer();
-        }
-
+        
         public void StartServer()
         {
             if(IsServerCreated)
@@ -117,15 +111,7 @@ namespace IT
             _clientManager.OnClientConnectionState += ClientInternalState;
             _isRegistered = true;
         }
-
-        private void UnregisterFromContainer()
-        {
-            if(!_isRegistered)
-                return;
-            
-            ServiceContainer.UnregisterService<INetworkBridge>();
-        }
-
+        
         private void ReloadNetworkSettings()
         {
             if(IsServerCreated || IsClientCreated)

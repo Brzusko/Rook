@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using IT.ScriptableObjects.UI;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -8,18 +9,27 @@ namespace IT.UI
 {
     public class MainMenuController : Controller
     {
-        private void OnPlayClicked()
+        [SerializeField] private MainMenuBinding _mainMenuBinding;
+        public override ControllerIDs ControllerID => ControllerIDs.MAIN_MENU;
+
+        protected override void BindUI()
         {
-            
+            VisualElement root = _uiDocument.rootVisualElement;
+            Button playButton = root.Q<Button>("Play");
+            Button exitButton = root.Q<Button>("Exit");
+
+            playButton.clicked += _mainMenuBinding.InvokePlayButton;
+            exitButton.clicked += _mainMenuBinding.InvokeExitButton;
         }
 
-        private void OnExitClicked()
+        protected override void UnbindUI()
         {
-#if UNITY_EDITOR
-            UnityEditor.EditorApplication.isPlaying = false;
-#else
-            Application.Quit();
-#endif
+            VisualElement root = _uiDocument.rootVisualElement;
+            Button playButton = root.Q<Button>("Play");
+            Button exitButton = root.Q<Button>("Exit");
+            
+            playButton.clicked -= _mainMenuBinding.InvokePlayButton;
+            exitButton.clicked -= _mainMenuBinding.InvokeExitButton;
         }
     }
 }

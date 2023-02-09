@@ -30,7 +30,7 @@ namespace IT.Lobby
             
             _readyConnectionsDictionary.Clear();
         }
-
+ 
         private void BindEvents()
         {
             if(_areEventsBound)

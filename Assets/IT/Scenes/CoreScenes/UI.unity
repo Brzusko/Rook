@@ -811,4 +811,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: faf43e52b0dd33c4c8a2419c37e22f06, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _mainMenuDocument: {fileID: 2144388652}
+  _uiDocument: {fileID: 2144388652}
+  _mainMenuBinding: {fileID: 11400000, guid: 833135d9f21000344a2c538f39a65a92, type: 2}

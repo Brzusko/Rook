@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace IT.ScriptableObjects
 {
@@ -8,9 +9,11 @@ namespace IT.ScriptableObjects
     public class ScenesCollection : ScriptableObject
     {
         [SerializeField] private string[] _coreScenes;
-        [SerializeField] private string[] _gameplayScenes;
+        [SerializeField] private string _offlineSceneID;
+        [SerializeField] private string _onlineSceneID;
 
         public IEnumerable<string> CoreScenes => _coreScenes;
-        public IEnumerable<string> GameplayScenes => _gameplayScenes;
+        public string OfflineScene => _offlineSceneID;
+        public string OnlineScene => _onlineSceneID;
     }
 }

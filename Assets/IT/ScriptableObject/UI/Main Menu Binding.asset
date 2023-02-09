@@ -9,11 +9,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ea86278304d1f6e439f9f331f1172365, type: 3}
-  m_Name: ScenesCollection
+  m_Script: {fileID: 11500000, guid: 99f4f07a51bc4e24d99c97be81ffa2e0, type: 3}
+  m_Name: Main Menu Binding
   m_EditorClassIdentifier: 
-  _coreScenes:
-  - Presistent
-  - UI
-  _offlineSceneID: MainMenu
-  _onlineSceneID: TestGameplayScene

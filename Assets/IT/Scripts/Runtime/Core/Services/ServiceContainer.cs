@@ -57,7 +57,8 @@ namespace IT
         private void UnloadServices()
         {
             foreach (var service in _services)
-                Destroy(service.Value.GameObject);
+                if(!service.Value.GameObject)
+                    Destroy(service.Value.GameObject);
 
             _services.Clear();
         }

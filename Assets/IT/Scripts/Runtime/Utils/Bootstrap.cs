@@ -27,6 +27,7 @@ namespace IT.Utils
 #if UNITY_STANDALONE_LINUX
             ServiceContainer.Get<INetworkBridge>().StartServer();
 #endif
+            await LoadMainMenu();
             await UnloadSceneBySceneRef(_bootstrapSceneRef);
         }
 
@@ -61,6 +62,17 @@ namespace IT.Utils
         {
             while (!asyncOperation.isDone)
                 await Task.Yield();
+        }
+
+        private async Task LoadMainMenu()
+        {
+            AsyncOperation loadOperation = SceneManager.LoadSceneAsync(_scenesToLoad.OfflineScene, LoadSceneMode.Additive);
+        
+            while (!loadOperation.isDone)
+                await Task.Yield();
+
+            Scene loadedScene = SceneManager.GetSceneByName(_scenesToLoad.OfflineScene);
+            SceneManager.SetActiveScene(loadedScene);
         }
         
         private void QuitOnError(Exception ex = null)

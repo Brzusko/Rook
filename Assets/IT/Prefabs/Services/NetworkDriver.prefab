@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 7696058605773559385}
   - component: {fileID: 7696058605773559390}
   - component: {fileID: 2086750880}
+  - component: {fileID: 6730386757192038130}
   m_Layer: 0
   m_Name: NetworkDriver
   m_TagString: Untagged
@@ -72,7 +73,7 @@ MonoBehaviour:
   _objectPool: {fileID: 0}
   _persistence: 0
   _logging: {fileID: 0}
-  _spawnablePrefabs: {fileID: 11400000, guid: ec64eb18c93ab344892891f33edbf82a, type: 2}
+  _spawnablePrefabs: {fileID: 11400000, guid: 1489b1f17f6552f43a7a7b7b4a6da1aa, type: 2}
 --- !u!114 &7696058605773559386
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -85,7 +86,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68828c85278210948b9d50a8db3aab74, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _authenticator: {fileID: 0}
+  _authenticator: {fileID: 6730386757192038130}
   SpawnPacking:
     Position: 0
     Rotation: 2
@@ -95,7 +96,6 @@ MonoBehaviour:
   _shareIds: 1
   _startOnHeadless: 1
   _limitClientMTU: 1
-  _allowPredictedSpawning: 1
 --- !u!114 &7696058605773559387
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -144,7 +144,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Transport: {fileID: 7696058605773559390}
   _latencySimulator:
-    _enabled: 1
+    _enabled: 0
     _simulateHost: 1
     _latency: 100
     _outOfOrder: 0
@@ -184,3 +184,15 @@ MonoBehaviour:
     _updateInteval: 1
     _updateClient: 1
     _updateServer: 1
+--- !u!114 &6730386757192038130
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7696058605773559388}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81697bb67e0cd284eb0a900a9832ed2b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

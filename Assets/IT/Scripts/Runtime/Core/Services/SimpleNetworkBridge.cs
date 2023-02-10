@@ -18,7 +18,7 @@ namespace IT
         
         private Transport _transport;
         private bool _isRegistered;
-        
+
         public override Type Type => typeof(INetworkBridge);
         public void FetchDependency()
         {
@@ -62,6 +62,14 @@ namespace IT
         }
         public bool IsClientCreated => _clientManager.Started;
         public bool IsServerCreated => _serverManager.Started;
+
+        public bool ShouldAcceptConnections
+        {
+            get;
+            set;
+        }
+
+        public int ConnectedClients => _serverManager.Clients.Count;
 
         private void Start()
         {

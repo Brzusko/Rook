@@ -54,7 +54,7 @@ namespace IT.Gameplay
             ObserverChangeState(stateID);
         }
         
-        [ObserversRpc]
+        [ObserversRpc(BufferLast = true)]
         private void ObserverChangeState(MatchStatesID stateID)
         {
             ChangeState(stateID, false);

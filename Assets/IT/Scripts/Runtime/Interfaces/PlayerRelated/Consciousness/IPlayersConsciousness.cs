@@ -7,5 +7,7 @@ namespace IT.Interfaces
 {
     public interface IPlayersConsciousness
     {
+        public void PossessAll();
+        public void UnpossessAll();
     }
 }

@@ -6,35 +6,26 @@ using UnityEngine;
 
 public class PlayerConsciousness : NetworkBehaviour, IPlayerConsciousness
 {
-    private IPlayersConsciousness _playersConsciousness;
-    private IEntityToPossess _currentPossession;
-    public bool HasPossession => _currentPossession != null;
-    
-    [Server]
-    public void Initialize(IPlayersConsciousness playersConsciousness)
+    private IEntityToPossess _boundPossession;
+    public bool HasPossession => _boundPossession is { CanBePossessed: false };
+    public void BindEntity(IEntityToPossess entityToPossess)
     {
-        _playersConsciousness = playersConsciousness;
+        _boundPossession = entityToPossess;
     }
-    
-    [Server]
-    public void Possess(IEntityToPossess entityToPossess)
-    {
-        if(!entityToPossess.CanBePossessed || _currentPossession != null)
-            return;
-        
-        if(entityToPossess.PossessBy(this))
-            _currentPossession = entityToPossess;
-    }
-    
-    [Server]
-    public void RevokeCurrentPossession(bool clearCache = false)
-    {
-        if(_currentPossession == null)
-            return;
-        
-        _currentPossession.RevokePossession();
 
-        if (clearCache)
-            _currentPossession = null;
+    public void Possess()
+    {
+        if(_boundPossession is not { CanBePossessed: true })
+            return;
+
+        _boundPossession.PossessBy(this);
+    }
+
+    public void Unpossess()
+    {
+        if(_boundPossession is not { CanBePossessed: false })
+            return;
+        
+        _boundPossession.RevokePossession();
     }
 }

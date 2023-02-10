@@ -12,6 +12,8 @@ namespace IT.Interfaces
         public bool IsClientCreated { get; }
         public bool IsServerCreated { get; }
         public int MaxClients { get; set; }
+        public bool ShouldAcceptConnections { get; set; }
+        public int ConnectedClients { get; }
 
         public void StartServer();
         public void StartClient();

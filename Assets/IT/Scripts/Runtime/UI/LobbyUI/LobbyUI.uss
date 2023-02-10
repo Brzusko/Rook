@@ -1,0 +1,32 @@
+.title {
+    font-size: 35px;
+    color: rgb(255, 255, 255);
+    padding-left: 0;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    -unity-text-align: upper-center;
+}
+
+.text {
+    color: rgb(255, 255, 255);
+}
+
+.unity-button {
+    padding-left: 1px;
+    padding-right: 1px;
+    padding-top: 1px;
+    padding-bottom: 1px;
+}
+
+.buttons {
+    padding-left: 15px;
+    padding-right: 15px;
+    border-left-color: rgb(255, 255, 255);
+    border-right-color: rgb(255, 255, 255);
+    border-top-color: rgb(255, 255, 255);
+    border-bottom-color: rgb(255, 255, 255);
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.unity-text-element {
+}

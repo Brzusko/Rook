@@ -91,8 +91,6 @@ namespace IT.Spawners
             
             _serverManager.Spawn(playerConsciousness.NetworkObject, conn);
             _serverManager.Spawn(playerEntityInstance, conn);
-            
-            playerConsciousness.Possess(playerEntity);
         }
     }
 }

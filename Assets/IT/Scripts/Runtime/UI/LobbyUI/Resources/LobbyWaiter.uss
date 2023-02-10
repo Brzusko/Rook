@@ -1,0 +1,19 @@
+.lobby_waiter_container {
+    flex-grow: 0;
+    flex-direction: row;
+    color: white;
+    margin-top: 15px;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.lobby_waiter_info_container {
+    flex-grow: 0;
+    flex-direction: row;
+    margin-right: 15px;
+}
+
+.lobby_waiter_player_color {
+    padding: 15px 15px 15px 15px;
+    margin-right: 15px;
+}

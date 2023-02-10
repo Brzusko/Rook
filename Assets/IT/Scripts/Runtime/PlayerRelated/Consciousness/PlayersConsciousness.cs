@@ -7,6 +7,7 @@ using FishNet.Managing.Server;
 using FishNet.Object;
 using FishNet.Transporting;
 using IT.Interfaces;
+using Sirenix.Utilities;
 using UnityEngine;
 
 namespace IT
@@ -98,7 +99,6 @@ namespace IT
             if (playerConsciousness != null)
             {
                 _playerConsciousnesses.Add(connection, playerConsciousness);
-                playerConsciousness.Initialize(this);
                 return playerConsciousness;
             }
 
@@ -107,8 +107,24 @@ namespace IT
             
             return null;
         }
+        
+        public void PossessAll()
+        {
+            if(_playerConsciousnesses == null)
+                return;
+
+            _playerConsciousnesses.Values.ForEach(playerConsciousness => playerConsciousness.Possess());
+        }
+
+        public void UnpossessAll()
+        {
+            if(_playerConsciousnesses == null)
+                return;
+            
+            _playerConsciousnesses.Values.ForEach(playerConsciousness => playerConsciousness.Unpossess());
+        }
 
         #endregion
-
+        
     }
 }

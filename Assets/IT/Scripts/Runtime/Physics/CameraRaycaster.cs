@@ -99,6 +99,6 @@ public class CameraRaycaster : NetworkBehaviour, IRaycaster
             return;
         }
         
-        UnbindEntityEvents();
+        UnbindTickEvents();
     }
 }

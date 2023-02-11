@@ -34,7 +34,7 @@ namespace IT.FSM.States
                 deltaTime);
         }
 
-        public void Enter(bool onReconcile, bool asReplay = false)
+        public void Enter(bool onReconcile, bool asServer, bool asReplay = false)
         {
             if(asReplay)
                 return;
@@ -47,26 +47,26 @@ namespace IT.FSM.States
             
         }
 
-        public void CheckStateChange(NetworkInput input, bool onReconcile, bool asReplay = false)
+        public void CheckStateChange(NetworkInput input, bool onReconcile, bool asServer, bool asReplay = false)
         {
             CharacterMovement characterMovement = _icspStateMachine.Context.CharacterMovement;
 
             if (characterMovement.isGrounded && input.IsJumpPressed)
             {
-                _icspStateMachine.ChangeBaseState(PlayerBaseStateID.JUMPING, onReconcile, asReplay);
+                _icspStateMachine.ChangeBaseState(PlayerBaseStateID.JUMPING,  onReconcile, asServer, asReplay);
                 return;
             }
             
             if (!characterMovement.isGrounded)
             {
-                _icspStateMachine.ChangeBaseState(PlayerBaseStateID.FALLING, onReconcile, asReplay);
+                _icspStateMachine.ChangeBaseState(PlayerBaseStateID.FALLING,  onReconcile, asServer, asReplay);
                 return;
             }
             
             if (input.MovementInput.sqrMagnitude == 0 && characterMovement.isGrounded)
                 return;
 
-            _icspStateMachine.ChangeBaseState(PlayerBaseStateID.SCUTTER, onReconcile, asReplay);
+            _icspStateMachine.ChangeBaseState(PlayerBaseStateID.SCUTTER,  onReconcile, asServer, asReplay);
         }
     }
 }

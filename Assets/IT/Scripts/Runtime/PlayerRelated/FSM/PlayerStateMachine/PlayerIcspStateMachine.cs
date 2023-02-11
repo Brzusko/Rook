@@ -67,8 +67,8 @@ namespace IT.FSM
         {
             InitializeOnce();
             InitializeStateMachine();
-            ChangeBaseState(_startingBaseState, false);
-            ChangeSecondaryState(_startCombatState, false);
+            ChangeBaseState(_startingBaseState, false, false);
+            ChangeSecondaryState(_startCombatState, false, false);
         }
 
         private void Start()
@@ -201,8 +201,8 @@ namespace IT.FSM
             
             _currentBaseIcspState.Tick(input, asServer, isReplaying, deltaTime);
             _currentCombatIcspState.Tick(input, asServer, isReplaying, deltaTime);
-            _currentBaseIcspState.CheckStateChange(input, false, isReplaying);
-            _currentCombatIcspState.CheckStateChange(input, false, isReplaying);
+            _currentBaseIcspState.CheckStateChange(input, false, asServer, isReplaying);
+            _currentCombatIcspState.CheckStateChange(input, false, asServer, isReplaying);
         }
         
         [Reconcile]
@@ -218,8 +218,8 @@ namespace IT.FSM
             _context.CurrentPrepareSwingTime = data.CurrentPrepareSwingTime;
             _context.CurrentSwingTime = data.CurrentSwingTime;
             
-            ChangeBaseState(data.BaseStateID, true);
-            ChangeSecondaryState(data.CombatStateID, true);
+            ChangeBaseState(data.BaseStateID, true, asServer);
+            ChangeSecondaryState(data.CombatStateID, true, asServer);
         }
 
         #endregion
@@ -376,7 +376,7 @@ namespace IT.FSM
         }
     
         #region Interfaces
-        public void ChangeBaseState(PlayerBaseStateID baseStateID, bool onReconcile, bool asReplay = false)
+        public void ChangeBaseState(PlayerBaseStateID baseStateID, bool onReconcile, bool asServer, bool asReplay = false)
         {
             _currentBaseStateID = baseStateID;
             _currentBaseIcspState?.Exit(onReconcile, asReplay);
@@ -388,10 +388,10 @@ namespace IT.FSM
             }
             
             _currentBaseIcspState = _baseStates[_currentBaseStateID];
-            _currentBaseIcspState?.Enter(onReconcile, asReplay);
+            _currentBaseIcspState?.Enter(onReconcile, asServer, asReplay);
         }
 
-        public void ChangeSecondaryState(PlayerCombatStateID stateID, bool onReconcile, bool asReplay = false)
+        public void ChangeSecondaryState(PlayerCombatStateID stateID, bool onReconcile, bool asServer, bool asReplay = false)
         {
             _currentCombatStateID = stateID;
             _currentCombatIcspState?.Exit(onReconcile, asReplay);
@@ -403,7 +403,7 @@ namespace IT.FSM
             }
 
             _currentCombatIcspState = _combatStates[_currentCombatStateID];
-            _currentCombatIcspState?.Enter(onReconcile, asReplay);
+            _currentCombatIcspState?.Enter(onReconcile, asServer, asReplay);
         }
 
         public bool TryGetSnapshotAtTick(uint tick, out PlayerStateMachineSnapshot snapshot)

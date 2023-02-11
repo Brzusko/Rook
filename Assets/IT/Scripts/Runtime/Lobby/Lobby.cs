@@ -111,9 +111,7 @@ namespace IT.Lobby
 
             _readyConnectionsDictionary[caller].IsReady = newState;
 
-            int readyWaiters = _readyConnectionsDictionary.Values.Count(pred => pred.IsReady);
-            
-            WaitersStateChange?.Invoke(_readyConnectionsDictionary.Count, readyWaiters);
+            InvokeWaitersStateChangeEvent();
             
             SendLobbyData();
         }
@@ -155,6 +153,8 @@ namespace IT.Lobby
                 return;
             
             _readyConnectionsDictionary.Add(connection, CreateWaiter(connection));
+            InvokeWaitersStateChangeEvent();
+            
             SendLobbyData();
         }
 
@@ -167,6 +167,8 @@ namespace IT.Lobby
                 return;
 
             _readyConnectionsDictionary.Remove(connection);
+            InvokeWaitersStateChangeEvent();
+            
             SendLobbyData();
         }
 
@@ -215,6 +217,12 @@ namespace IT.Lobby
             };
         }
 
+        private void InvokeWaitersStateChangeEvent()
+        {
+            int readyWaiters = _readyConnectionsDictionary.Values.Count(pred => pred.IsReady);
+            WaitersStateChange?.Invoke(_readyConnectionsDictionary.Count, readyWaiters);
+        }
+
         #endregion
 
         #region Interface
@@ -233,6 +241,9 @@ namespace IT.Lobby
     
             foreach (NetworkConnection conn in ServerManager.Clients.Values)
             {
+                if(conn.Disconnecting)
+                    continue;
+                
                 _readyConnectionsDictionary.Add(conn, CreateWaiter(conn));
             }
 

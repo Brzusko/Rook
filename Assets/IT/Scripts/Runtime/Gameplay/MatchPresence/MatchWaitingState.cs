@@ -14,9 +14,11 @@ namespace IT.Gameplay
     {
         [SerializeField] private GameObject _stateMachineGameObject;
         [SerializeField] private GameObject _lobbyGameObject;
+        [SerializeField] private GameObject _spawnerGameObject;
         
         private IStateMachine<MatchStatesID> _stateMachine;
         private ILobby<LobbyWaiter> _lobby;
+        private IPlayerSpawner<LobbyWaiter> _spawner;
 
         private bool _areEventsBound;
         
@@ -36,6 +38,7 @@ namespace IT.Gameplay
         {
             _lobby = _lobbyGameObject.GetComponent<ILobby<LobbyWaiter>>();
             _stateMachine = _stateMachineGameObject.GetComponent<IStateMachine<MatchStatesID>>();
+            _spawner = _spawnerGameObject.GetComponent<IPlayerSpawner<LobbyWaiter>>();
         }
 
         private void BindEvents()
@@ -66,13 +69,26 @@ namespace IT.Gameplay
         
         public void Enter(bool asServer)
         {
+            bool shouldSendRequest = true;
+            
             if (asServer)
             {
                 _lobby.OpenLobby();
                 BindEvents();
+
+                if (IsHost)
+                {
+                    shouldSendRequest = false;
+                    ServiceContainer.Get<IUI>().ShowUI(ControllerIDs.LOBBY, true);
+                    _lobby.RequestData();
+                }
+                
                 return;
             }
             
+            if(!shouldSendRequest)
+                return;
+
             ServiceContainer.Get<IUI>().ShowUI(ControllerIDs.LOBBY, true);
             _lobby.RequestData();
         }
@@ -81,12 +97,20 @@ namespace IT.Gameplay
         {
             if (asServer)
             {
-                //fetch waiters connection
-                //close lobby
-                //unbind events
-                //spawn players
+                IEnumerable<LobbyWaiter> _waiters = _lobby.FetchWaiters();
+                _spawner.SpawnPlayers(_waiters);
+                _lobby.CloseLobby();
+                UnbindEvents();
+
+                if (IsHost)
+                {
+                    ServiceContainer.Get<IUI>().HideUI(ControllerIDs.LOBBY);
+                }
+                
                 return;
             }
+            
+            ServiceContainer.Get<IUI>().HideUI(ControllerIDs.LOBBY);
         }
     }
 }

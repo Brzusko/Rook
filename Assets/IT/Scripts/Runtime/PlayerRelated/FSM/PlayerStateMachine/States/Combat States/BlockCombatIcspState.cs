@@ -21,7 +21,7 @@ namespace IT.FSM.States
             
         }
 
-        public void Enter(bool onReconcile, bool asReplay = false)
+        public void Enter(bool onReconcile, bool asServer, bool asReplay = false)
         {
             MovementStatsModule movementStatsModule = _icspStateMachine.Context.MovementStatsModule;
             movementStatsModule.SetAdditionalSpeedModifiers(movementStatsModule.BlockModifier);
@@ -38,13 +38,13 @@ namespace IT.FSM.States
             movementStatsModule.ResetAdditionalSpeedModifiers();
         }
 
-        public void CheckStateChange(NetworkInput input, bool onReconcile, bool asReplay = false)
+        public void CheckStateChange(NetworkInput input, bool onReconcile, bool asServer, bool asReplay = false)
         {
             PlayerBaseStateID baseStateID = _icspStateMachine.BaseStateID;
 
             if (baseStateID is PlayerBaseStateID.JUMPING or PlayerBaseStateID.FALLING || !input.IsSecondaryActionPressed)
             {
-                _icspStateMachine.ChangeSecondaryState(PlayerCombatStateID.IDLE, onReconcile, asReplay);
+                _icspStateMachine.ChangeSecondaryState(PlayerCombatStateID.IDLE,  onReconcile, asServer, asReplay);
                 return;
             }
         }

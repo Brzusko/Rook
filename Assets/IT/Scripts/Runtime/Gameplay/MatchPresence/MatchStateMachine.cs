@@ -14,6 +14,9 @@ namespace IT.Gameplay
         
         private Dictionary<MatchStatesID, IState<MatchStatesID>> _states;
         private IState<MatchStatesID> _currentState;
+        
+        [SerializeField]
+        private MatchStatesID _currentID;
 
         private void Awake() => InitializeOnce();
 
@@ -46,6 +49,7 @@ namespace IT.Gameplay
             
             _currentState?.Exit(asServer);
             _currentState = _states[stateID];
+            _currentID = stateID;
             _currentState?.Enter(asServer);
             
             if(!asServer)

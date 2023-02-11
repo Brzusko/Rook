@@ -11,23 +11,16 @@ public class PlayerEntity : NetworkBehaviour, IEntityToPossess
     public event Action<bool> ServerPossessChanged;
     public event Action<bool> ClientPossessChanged;
     public bool CanBePossessed => OwnerId == -1;
-
-    [Server]
-    private void GiveOwnershipInternal(NetworkConnection connection)
-    {
-        if(Owner == connection)
-            return;
-        
-        GiveOwnership(connection);
-    }
     
     [Server]
     public bool PossessBy(IPlayerConsciousness playerConsciousness)
     {
         if(!CanBePossessed || playerConsciousness.HasPossession)
             return false;
-
-        GiveOwnershipInternal(playerConsciousness.NetworkObject.Owner);
+        
+        Debug.Log(playerConsciousness.NetworkObject.Owner.ClientId);
+        NetworkObject.GiveOwnership(playerConsciousness.NetworkObject.Owner);
+        
         ServerPossessChanged?.Invoke(true);
         return true;
     }
@@ -45,6 +38,7 @@ public class PlayerEntity : NetworkBehaviour, IEntityToPossess
     public override void OnOwnershipClient(NetworkConnection prevOwner)
     {
         base.OnOwnershipClient(prevOwner);
+        
         ClientPossessChanged?.Invoke(IsOwner);
     }
 }

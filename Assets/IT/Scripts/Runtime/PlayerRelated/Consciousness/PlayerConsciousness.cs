@@ -8,6 +8,17 @@ public class PlayerConsciousness : NetworkBehaviour, IPlayerConsciousness
 {
     private IEntityToPossess _boundPossession;
     public bool HasPossession => _boundPossession is { CanBePossessed: false };
+
+    public override void OnStopServer()
+    {
+        base.OnStopServer();
+        
+        if(_boundPossession == null)
+            return;
+        
+        ServerManager.Despawn(_boundPossession.NetworkObject);
+    }
+
     public void BindEntity(IEntityToPossess entityToPossess)
     {
         _boundPossession = entityToPossess;
@@ -17,7 +28,7 @@ public class PlayerConsciousness : NetworkBehaviour, IPlayerConsciousness
     {
         if(_boundPossession is not { CanBePossessed: true })
             return;
-
+        
         _boundPossession.PossessBy(this);
     }
 

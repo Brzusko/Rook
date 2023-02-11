@@ -9,7 +9,7 @@ namespace IT.Interfaces.FSM
         public TContext Context { get; }
         public TID BaseStateID { get; }
         public TID2 SecondaryStateID { get; }
-        public void ChangeBaseState(TID stateID, bool onReconcile, bool asReplay = false);
-        public void ChangeSecondaryState(TID2 stateID, bool onReconcile, bool asReplay = false);
+        public void ChangeBaseState(TID stateID, bool onReconcile, bool asServer, bool asReplay = false);
+        public void ChangeSecondaryState(TID2 stateID, bool onReconcile, bool asServer, bool asReplay = false);
     }
 }

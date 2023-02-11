@@ -61,7 +61,7 @@ namespace IT.FSM.States
                 deltaTime);
         }
 
-        public void Enter(bool onReconcile, bool asReplay = false)
+        public void Enter(bool onReconcile, bool asServer, bool asReplay = false)
         {
             if(asReplay)
                 return;
@@ -74,20 +74,20 @@ namespace IT.FSM.States
             
         }
 
-        public void CheckStateChange(NetworkInput input, bool onReconcile, bool asReplay = false)
+        public void CheckStateChange(NetworkInput input, bool onReconcile, bool asServer, bool asReplay = false)
         {
             CharacterMovement characterMovement = _icspStateMachine.Context.CharacterMovement;
             Vector3 velocity = characterMovement.velocity;
 
             if (!characterMovement.isGrounded && velocity.y < 0)
             {
-                _icspStateMachine.ChangeBaseState(PlayerBaseStateID.FALLING, onReconcile, asReplay);
+                _icspStateMachine.ChangeBaseState(PlayerBaseStateID.FALLING,  onReconcile, asServer, asReplay);
                 return;
             }
 
             if (characterMovement.isGrounded && input.MovementInput == default)
             {
-                _icspStateMachine.ChangeBaseState(PlayerBaseStateID.IDLE, onReconcile, asReplay);
+                _icspStateMachine.ChangeBaseState(PlayerBaseStateID.IDLE,  onReconcile, asServer, asReplay);
                 return;
             }
 
@@ -95,11 +95,11 @@ namespace IT.FSM.States
             
             if (input.IsWalkingPressed)
             {
-                _icspStateMachine.ChangeBaseState(PlayerBaseStateID.WALKING, onReconcile, asReplay);
+                _icspStateMachine.ChangeBaseState(PlayerBaseStateID.WALKING,  onReconcile, asServer, asReplay);
                 return;
             }
                 
-            _icspStateMachine.ChangeBaseState(PlayerBaseStateID.SCUTTER, onReconcile, asReplay);
+            _icspStateMachine.ChangeBaseState(PlayerBaseStateID.SCUTTER,  onReconcile, asServer, asReplay);
 
         }
     }

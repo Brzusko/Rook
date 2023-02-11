@@ -23,9 +23,10 @@ namespace IT.FSM.States
 
             context.CurrentPrepareSwingTime = Mathf.MoveTowards(context.CurrentPrepareSwingTime,
                 combatModule.PrepareTimeInSeconds, deltaTime);
+            
         }
 
-        public void Enter(bool onReconcile, bool asReplay = false)
+        public void Enter(bool onReconcile, bool asServer, bool asReplay = false)
         {
             MovementStatsModule movementStatsModule = _icspStateMachine.Context.MovementStatsModule;
             movementStatsModule.SetAdditionalSpeedModifiers(movementStatsModule.PrepareSwingModifier);
@@ -44,13 +45,13 @@ namespace IT.FSM.States
             movementStatsModule.ResetAdditionalSpeedModifiers();
         }
 
-        public void CheckStateChange(NetworkInput input, bool onReconcile, bool asReplay = false)
+        public void CheckStateChange(NetworkInput input, bool onReconcile, bool asServer, bool asReplay = false)
         {
             PlayerBaseStateID baseStateID = _icspStateMachine.BaseStateID;
             
             if (baseStateID is PlayerBaseStateID.JUMPING or PlayerBaseStateID.FALLING)
             {
-                _icspStateMachine.ChangeSecondaryState(PlayerCombatStateID.IDLE, onReconcile, asReplay);
+                _icspStateMachine.ChangeSecondaryState(PlayerCombatStateID.IDLE, onReconcile, asServer, asReplay);
                 return;
             }
 
@@ -61,11 +62,11 @@ namespace IT.FSM.States
 
             if (context.CurrentPrepareSwingTime < context.CombatModule.PrepareTimeInSeconds)
             {
-                _icspStateMachine.ChangeSecondaryState(PlayerCombatStateID.IDLE, onReconcile, asReplay);
+                _icspStateMachine.ChangeSecondaryState(PlayerCombatStateID.IDLE, onReconcile, asServer, asReplay);
                 return;
             }
             
-            _icspStateMachine.ChangeSecondaryState(PlayerCombatStateID.SWING, onReconcile, asReplay);
+            _icspStateMachine.ChangeSecondaryState(PlayerCombatStateID.SWING, onReconcile, asServer, asReplay);
         }
     }
 }

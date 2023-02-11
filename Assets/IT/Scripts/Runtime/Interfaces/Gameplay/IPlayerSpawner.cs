@@ -5,9 +5,9 @@ using UnityEngine;
 
 namespace IT.Interfaces
 {
-    public interface IPlayerSpawner
+    public interface IPlayerSpawner<T>
     {
-        public void SpawnPlayers(IEnumerable<NetworkConnection> connections);
+        public void SpawnPlayers(IEnumerable<T> connections);
         public void UnclaimSpawnpoints();
     }
 }

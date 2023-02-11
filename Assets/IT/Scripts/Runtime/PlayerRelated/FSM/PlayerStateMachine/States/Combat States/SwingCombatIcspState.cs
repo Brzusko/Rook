@@ -25,14 +25,14 @@ namespace IT.FSM.States
                 combatModule.SwingTimeInSeconds, deltaTime);
         }
 
-        public void Enter(bool onReconcile, bool asReplay = false)
+        public void Enter(bool onReconcile, bool asServer, bool asReplay = false)
         {
             PlayerStateMachineContext context = _icspStateMachine.Context;
             CombatModule combatModule = context.CombatModule;
             MovementStatsModule movementStatsModule = _icspStateMachine.Context.MovementStatsModule;
             movementStatsModule.SetAdditionalSpeedModifiers(movementStatsModule.PrepareSwingModifier);
             
-            if(onReconcile || asReplay)
+            if(onReconcile || asReplay || asServer)
                 return;
             
             combatModule.RequestHit();
@@ -47,18 +47,18 @@ namespace IT.FSM.States
             movementStatsModule.ResetAdditionalSpeedModifiers();
         }
 
-        public void CheckStateChange(NetworkInput input, bool onReconcile, bool asReplay = false)
+        public void CheckStateChange(NetworkInput input, bool onReconcile, bool asServer, bool asReplay = false)
         {
             PlayerBaseStateID baseStateID = _icspStateMachine.BaseStateID;
             
             if (baseStateID is PlayerBaseStateID.JUMPING or PlayerBaseStateID.FALLING || _icspStateMachine.Context.CurrentSwingTime >= _icspStateMachine.Context.CombatModule.SwingTimeInSeconds)
             {
-                _icspStateMachine.ChangeSecondaryState(PlayerCombatStateID.IDLE, onReconcile, asReplay);
+                _icspStateMachine.ChangeSecondaryState(PlayerCombatStateID.IDLE, onReconcile, asServer, asReplay);
                 return;
             }
 
             if (!input.IsSecondaryActionPressed) return;
-            _icspStateMachine.ChangeSecondaryState(PlayerCombatStateID.BLOCK, onReconcile, asReplay);
+            _icspStateMachine.ChangeSecondaryState(PlayerCombatStateID.BLOCK, onReconcile, asServer, asReplay);
         }
     }
 }

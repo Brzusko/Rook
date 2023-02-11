@@ -628,6 +628,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 341351447}
+  - component: {fileID: 341351448}
   m_Layer: 0
   m_Name: Preparing
   m_TagString: Untagged
@@ -650,6 +651,23 @@ Transform:
   m_Father: {fileID: 1722237382}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &341351448
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 341351446}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d84ae4ea48ddb7d4da9654aaa8e29c0e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _componentIndexCache: 3
+  _addedNetworkObject: {fileID: 1553435440}
+  _networkObjectCache: {fileID: 1553435440}
+  _stateMachineGameObject: {fileID: 1722237381}
+  _playersConsciousnessGameObject: {fileID: 1218216419}
 --- !u!850595691 &429990066
 LightingSettings:
   m_ObjectHideFlags: 0
@@ -3094,6 +3112,7 @@ MonoBehaviour:
   - {fileID: 243824493}
   - {fileID: 1722237383}
   - {fileID: 2065025593}
+  - {fileID: 341351448}
   <ParentNetworkObject>k__BackingField: {fileID: 0}
   <ChildNetworkObjects>k__BackingField: []
   _isNetworked: 1
@@ -3109,7 +3128,6 @@ MonoBehaviour:
   _sceneNetworkObjects:
   - {fileID: 1218216421}
   - {fileID: 1553435440}
-  - {fileID: 0}
   - {fileID: 2028483790}
 --- !u!4 &1553435441
 Transform:
@@ -6053,7 +6071,6 @@ MonoBehaviour:
   _sceneNetworkObjects:
   - {fileID: 1218216421}
   - {fileID: 1553435440}
-  - {fileID: 0}
   - {fileID: 2028483790}
 --- !u!114 &2028483791
 MonoBehaviour:
@@ -6286,6 +6303,7 @@ MonoBehaviour:
   _networkObjectCache: {fileID: 1553435440}
   _stateMachineGameObject: {fileID: 1722237381}
   _lobbyGameObject: {fileID: 243824492}
+  _spawnerGameObject: {fileID: 2069980491}
 --- !u!1 &2069980491
 GameObject:
   m_ObjectHideFlags: 0

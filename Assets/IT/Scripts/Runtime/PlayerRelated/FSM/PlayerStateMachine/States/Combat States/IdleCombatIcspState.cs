@@ -21,7 +21,7 @@ namespace IT.FSM.States
             
         }
 
-        public void Enter(bool onReconcile, bool asReplay = false)
+        public void Enter(bool onReconcile, bool asServer, bool asReplay = false)
         {
             _icspStateMachine.Context.PlayerAnimations.PlayAnimation(PlayerCombatAnimID.NONE);
         }
@@ -31,7 +31,7 @@ namespace IT.FSM.States
             
         }
 
-        public void CheckStateChange(NetworkInput input, bool onReconcile, bool asReplay = false)
+        public void CheckStateChange(NetworkInput input, bool onReconcile, bool asServer, bool asReplay = false)
         {
             PlayerBaseStateID baseStateID = _icspStateMachine.BaseStateID;
             
@@ -40,14 +40,14 @@ namespace IT.FSM.States
 
             if (input.IsSecondaryActionPressed)
             {
-                _icspStateMachine.ChangeSecondaryState(PlayerCombatStateID.BLOCK, onReconcile, asReplay);
+                _icspStateMachine.ChangeSecondaryState(PlayerCombatStateID.BLOCK, onReconcile, asServer, asReplay);
                 return;
             }
             
             if(!input.IsMainActionPressed)
                 return;
             
-            _icspStateMachine.ChangeSecondaryState(PlayerCombatStateID.PREPARE_SWING, onReconcile, asReplay);
+            _icspStateMachine.ChangeSecondaryState(PlayerCombatStateID.PREPARE_SWING, onReconcile, asServer, asReplay);
         }
     }
 }

@@ -39,7 +39,7 @@ namespace IT.FSM.States
                 deltaTime);
         }
 
-        public void Enter(bool onReconcile, bool asReplay = false)
+        public void Enter(bool onReconcile, bool asServer, bool asReplay = false)
         {
             
         }
@@ -49,31 +49,31 @@ namespace IT.FSM.States
             
         }
 
-        public void CheckStateChange(NetworkInput input, bool onReconcile, bool asReplay = false)
+        public void CheckStateChange(NetworkInput input, bool onReconcile, bool asServer, bool asReplay = false)
         {
             CharacterMovement characterMovement = _icspStateMachine.Context.CharacterMovement;
             
             if (characterMovement.isGrounded && input.IsJumpPressed)
             {
-                _icspStateMachine.ChangeBaseState(PlayerBaseStateID.JUMPING, onReconcile, asReplay);
+                _icspStateMachine.ChangeBaseState(PlayerBaseStateID.JUMPING, onReconcile, asServer, asReplay);
                 return;
             }
             
             if (characterMovement.wasGrounded && !characterMovement.isGrounded)
             {
-                _icspStateMachine.ChangeBaseState(PlayerBaseStateID.FALLING, onReconcile, asReplay);
+                _icspStateMachine.ChangeBaseState(PlayerBaseStateID.FALLING, onReconcile, asServer, asReplay);
                 return;
             }
             
             if (!input.IsWalkingPressed && input.MovementInput.sqrMagnitude > 0f)
             {
-                _icspStateMachine.ChangeBaseState(PlayerBaseStateID.SCUTTER, onReconcile, asReplay);
+                _icspStateMachine.ChangeBaseState(PlayerBaseStateID.SCUTTER, onReconcile, asServer, asReplay);
                 return;
             }
             
             if (input.MovementInput.sqrMagnitude == 0f)
             {
-                _icspStateMachine.ChangeBaseState(PlayerBaseStateID.IDLE, onReconcile, asReplay);
+                _icspStateMachine.ChangeBaseState(PlayerBaseStateID.IDLE, onReconcile, asServer, asReplay);
             }
         }
     }

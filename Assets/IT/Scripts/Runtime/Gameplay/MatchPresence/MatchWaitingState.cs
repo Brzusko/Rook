@@ -4,8 +4,9 @@ using System.Collections.Generic;
 using FishNet.Object;
 using IT.Interfaces;
 using IT.Interfaces.FSM;
-using IT.Lobby;
+using IT.UI;
 using UnityEngine;
+using LobbyWaiter = IT.Lobby.LobbyWaiter;
 
 namespace IT.Gameplay
 {
@@ -71,6 +72,9 @@ namespace IT.Gameplay
                 BindEvents();
                 return;
             }
+            
+            ServiceContainer.Get<IUI>().ShowUI(ControllerIDs.LOBBY, true);
+            _lobby.RequestData();
         }
 
         public void Exit(bool asServer)

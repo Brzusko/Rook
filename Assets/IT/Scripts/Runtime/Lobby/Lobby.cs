@@ -7,6 +7,7 @@ using FishNet.Managing.Server;
 using FishNet.Object;
 using FishNet.Transporting;
 using IT.Interfaces;
+using IT.ScriptableObjects.UI;
 using Sirenix.Utilities;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -17,43 +18,92 @@ namespace IT.Lobby
     {
         public event Action<int, int> WaitersStateChange;
 
+        [SerializeField] private LobbyBinding _lobbyBinding;
+        
         private Dictionary<NetworkConnection, LobbyWaiter> _readyConnectionsDictionary;
-        private bool _areEventsBound;
+        private bool _areServerEventsBound;
+        private bool _areClientEventsBound;
+        private bool _isOpen;
+
+        private bool _isReady;
+
+        #region Initialization
+
+        public override void OnStartClient()
+        {
+            base.OnStartClient();
+            
+            BindClientEvents();
+        }
+
+        public override void OnStopClient()
+        {
+            base.OnStopClient();
+            
+            UnbindClientEvents();
+        }
 
         public override void OnStopServer()
         {
             base.OnStopServer();
-            UnbindEvents();
+            UnbindServerEvents();
             
             _readyConnectionsDictionary.Clear();
         }
  
-        private void BindEvents()
+        private void BindServerEvents()
         {
-            if(_areEventsBound)
+            if(_areServerEventsBound)
                 return;
 
-            ServerManager.GetAuthenticator().OnAuthenticationResult += OnAuthenticationResult;
+            SceneManager.OnClientLoadedStartScenes += OnClientLoadedStartScenes;
             ServerManager.OnRemoteConnectionState += OnRemoteConnectionState;
-            _areEventsBound = true;
+            _areServerEventsBound = true;
         }
         
-        private void UnbindEvents()
+
+        private void UnbindServerEvents()
         {
-            if(!_areEventsBound)
+            if(!_areServerEventsBound)
                 return;
             
-            ServerManager.GetAuthenticator().OnAuthenticationResult -= OnAuthenticationResult;
+            SceneManager.OnClientLoadedStartScenes -= OnClientLoadedStartScenes;
             ServerManager.OnRemoteConnectionState -= OnRemoteConnectionState;
-            _areEventsBound = false;
+            _areServerEventsBound = false;
         }
+
+        private void BindClientEvents()
+        {
+            if(_areClientEventsBound)
+                return;
+
+
+            _lobbyBinding.ReadyClicked += OnReadyClicked;
+            _lobbyBinding.ExitClicked += OnExitClicked;
+            
+            _areClientEventsBound = true;
+        }
+
+        private void UnbindClientEvents()
+        {
+            if(!_areClientEventsBound)
+                return;
+
+
+            _lobbyBinding.ReadyClicked -= OnReadyClicked;
+            _lobbyBinding.ExitClicked -= OnExitClicked;
+            
+            _areClientEventsBound = false;
+        }
+
+        #endregion
 
         #region Networking
 
         [ServerRpc(RequireOwnership = false)]
-        private void Server_ChangeWaiterState(NetworkConnection caller, bool newState)
+        private void Server_ChangeWaiterState(bool newState, NetworkConnection caller = null)
         {
-            if (!_readyConnectionsDictionary.ContainsKey(caller))
+            if (!_readyConnectionsDictionary.ContainsKey(caller) || !_isOpen)
             {
                 caller.Kick(KickReason.ExploitAttempt);
                 return;
@@ -69,22 +119,33 @@ namespace IT.Lobby
         }
         
         [ServerRpc(RequireOwnership = false)]
-        private void Server_RequestLobbyData()
+        private void Server_RequestLobbyData(NetworkConnection caller = null)
         {
+            if (!_readyConnectionsDictionary.ContainsKey(caller) || !_isOpen)
+            {
+                caller.Kick(KickReason.ExploitAttempt);
+                return;
+            }
+            
             SendLobbyData();
         }
         
         [ObserversRpc]
         private void Observers_ReceiveLobbyData(LobbyWaiterSendData[] waiterSendData)
         {
-            // propagate to UI
+            _lobbyBinding.FireLobbyWaitersPropagation(waiterSendData);
         }
 
         #endregion
+
+        #region Events
         
-        private void OnAuthenticationResult(NetworkConnection connection, bool result)
+        private void OnClientLoadedStartScenes(NetworkConnection connection, bool asServer)
         {
-            if (!result)
+            if(!asServer)
+                return;
+            
+            if (!connection.Authenticated)
             {
                 connection.Kick(KickReason.Unset);
                 return;
@@ -96,7 +157,7 @@ namespace IT.Lobby
             _readyConnectionsDictionary.Add(connection, CreateWaiter(connection));
             SendLobbyData();
         }
-        
+
         private void OnRemoteConnectionState(NetworkConnection connection, RemoteConnectionStateArgs connectionStateArgs)
         {
             if(connectionStateArgs.ConnectionState != RemoteConnectionState.Stopped)
@@ -108,6 +169,29 @@ namespace IT.Lobby
             _readyConnectionsDictionary.Remove(connection);
             SendLobbyData();
         }
+
+        private void OnReadyClicked()
+        {
+            _isReady = !_isReady;
+            Server_ChangeWaiterState(_isReady);
+        }
+
+        private void OnExitClicked()
+        {
+            INetworkBridge networkBridge = ServiceContainer.Get<INetworkBridge>();
+
+            if (IsHost)
+            {
+                networkBridge.StopServer();
+                return;
+            }
+            
+            networkBridge.StopClient();
+        }
+
+        #endregion
+
+        #region Private
 
         private void SendLobbyData()
         {
@@ -131,8 +215,15 @@ namespace IT.Lobby
             };
         }
 
+        #endregion
+
+        #region Interface
+
         public void OpenLobby()
         {
+            if (_isOpen)
+                return;
+
             INetworkBridge networkBridge = ServiceContainer.Get<INetworkBridge>();
 
             networkBridge.ShouldAcceptConnections = true;
@@ -144,20 +235,25 @@ namespace IT.Lobby
             {
                 _readyConnectionsDictionary.Add(conn, CreateWaiter(conn));
             }
-            
-            BindEvents();
+
+            _isOpen = true;
+            BindServerEvents();
         }
 
         public void CloseLobby()
         {
+            if(!_isOpen)
+                return;
+            
             INetworkBridge networkBridge = ServiceContainer.Get<INetworkBridge>();
 
             networkBridge.ShouldAcceptConnections = false;
             networkBridge.MaxClients = ServerManager.Clients.Count;
 
             _readyConnectionsDictionary.Clear();
-            
-            UnbindEvents();
+
+            _isOpen = false;
+            UnbindServerEvents();
         }
 
         public IEnumerable<LobbyWaiter> FetchWaiters()
@@ -170,5 +266,8 @@ namespace IT.Lobby
         {
             Server_RequestLobbyData();
         }
+
+        #endregion
+
     }
 }

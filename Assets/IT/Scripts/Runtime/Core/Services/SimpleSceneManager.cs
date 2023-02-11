@@ -137,11 +137,12 @@ namespace IT
         private async Task LoadMainScene(string sceneToLoad, string sceneNameToCompare)
         {
             Scene activeScene = SceneManager.GetActiveScene();
+            Scene toLoad = SceneManager.GetSceneByName(sceneToLoad);
             
-            if(activeScene.name == sceneToLoad)
+            if(activeScene.name == sceneToLoad || toLoad.isLoaded)
                 return;
             
-            AsyncOperation loadOperation = SceneManager.LoadSceneAsync(_scenesCollection.OfflineScene, LoadSceneMode.Additive);
+            AsyncOperation loadOperation = SceneManager.LoadSceneAsync(sceneToLoad, LoadSceneMode.Additive);
             
             while (!loadOperation.isDone)
                 await Task.Yield();

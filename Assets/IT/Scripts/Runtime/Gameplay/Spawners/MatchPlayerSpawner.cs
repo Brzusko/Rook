@@ -56,6 +56,7 @@ namespace IT.Gameplay
                 
                 spawnPoint.Claim();
                 point = spawnPoint.SpawnPoint;
+                break;
             }
 
             return point;

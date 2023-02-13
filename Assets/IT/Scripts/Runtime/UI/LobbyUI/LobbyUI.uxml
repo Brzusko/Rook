@@ -5,8 +5,8 @@
         <ui:VisualElement name="MainContainer" style="flex-grow: 0; background-color: rgba(0, 0, 0, 0.57); width: 350px; height: 550px; min-height: 550px; max-height: 550px;">
             <ui:Label tabindex="-1" text="Lobby" display-tooltip-when-elided="true" name="Title" class="title" />
             <ui:VisualElement name="WaiterList" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);" />
-            <ui:VisualElement name="MessageContainer" style="flex-grow: 0; background-color: rgba(0, 0, 0, 0); align-items: center; flex-wrap: wrap; min-height: 50px; display: none;">
-                <ui:Label tabindex="-1" text="Sample message" display-tooltip-when-elided="true" name="Message" style="flex-wrap: wrap; flex-grow: 1; white-space: normal;" />
+            <ui:VisualElement name="MessageContainer" style="flex-grow: 0; background-color: rgba(0, 0, 0, 0); align-items: center; flex-wrap: wrap; min-height: 50px; display: flex;">
+                <ui:Label tabindex="-1" text="Waiting for players to be ready." display-tooltip-when-elided="true" name="Message" style="flex-wrap: wrap; flex-grow: 1; white-space: normal;" />
             </ui:VisualElement>
             <ui:VisualElement name="ButtonsContainer" style="flex-grow: 0; background-color: rgba(0, 0, 0, 0); flex-direction: row; justify-content: center; padding-top: 15px; padding-bottom: 15px;">
                 <ui:Button text="Ready" display-tooltip-when-elided="true" name="Ready" class="buttons unity-text-element" />

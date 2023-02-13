@@ -6,7 +6,7 @@ namespace IT.Interfaces
 {
     public interface ILobby<T>
     {
-        public event Action<int, int> WaitersStateChange; 
+        public event Action EveryoneReady;
         
         public void OpenLobby();
         public void CloseLobby();

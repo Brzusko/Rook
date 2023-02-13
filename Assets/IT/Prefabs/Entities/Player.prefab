@@ -102,9 +102,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8cac635f24954048aad3a6ff9110beb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 255
+  _componentIndexCache: 9
   _addedNetworkObject: {fileID: 1912049324724089206}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 1912049324724089206}
   IgnoredParameters: []
   _animator: {fileID: 3468797211559734355}
   _smoothFloats: 1
@@ -156,14 +156,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7423195cfaf689d4e97edd1c06fc50c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 10
+  _componentIndexCache: 11
   _addedNetworkObject: {fileID: 1912049324724089206}
   _networkObjectCache: {fileID: 1912049324724089206}
   _prepareTimeInSeconds: 0.3
-  _swingTimeInSeconds: 0.1
+  _swingTimeInSeconds: 0.03
   _forwardPushScalar: 5
   _upPushScalar: 3
-  playerIcspStateMachine: {fileID: 0}
+  playerIcspStateMachine: {fileID: 1467469930188945514}
   _hurtbox: {fileID: 7742024010053569367}
 --- !u!136 &7154729622751247455
 CapsuleCollider:
@@ -232,7 +232,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1027bc3218e351a4dae3f78c2f4d2397, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 9
+  _componentIndexCache: 10
   _addedNetworkObject: {fileID: 1912049324724089206}
   _networkObjectCache: {fileID: 1912049324724089206}
   _characterMovement: {fileID: 5446920144164943184}
@@ -245,7 +245,7 @@ MonoBehaviour:
   _playerEntityGameObject: {fileID: 7849939560007978409}
   _raycasterGameObject: {fileID: 7849939560007978409}
   _reconcileRate: 1
-  _tickOffset: 2
+  _tickOffset: 1
   _snapshotsBufferLength: 1024
   _playerAnimations: {fileID: 6034007255074437676}
   _context:
@@ -659,11 +659,11 @@ MonoBehaviour:
   - {fileID: 1246725671637114553}
   - {fileID: 3257737379795547919}
   - {fileID: 6034007255074437676}
+  - {fileID: 6712665501531748635}
   - {fileID: 1467469930188945514}
   - {fileID: 8468677413267268003}
   <ParentNetworkObject>k__BackingField: {fileID: 0}
-  <ChildNetworkObjects>k__BackingField:
-  - {fileID: 0}
+  <ChildNetworkObjects>k__BackingField: []
   _isNetworked: 1
   _isGlobal: 0
   _initializeOrder: 0

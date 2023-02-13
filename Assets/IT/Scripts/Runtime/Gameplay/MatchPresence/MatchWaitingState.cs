@@ -46,7 +46,7 @@ namespace IT.Gameplay
             if(_areEventsBound)
                 return;
 
-            _lobby.WaitersStateChange += OnWaiterReady;
+            _lobby.EveryoneReady += OnWaitersReady;
             _areEventsBound = true;
         }
 
@@ -55,15 +55,12 @@ namespace IT.Gameplay
             if(!_areEventsBound)
                 return;
             
-            _lobby.WaitersStateChange -= OnWaiterReady;
+            _lobby.EveryoneReady -= OnWaitersReady;
             _areEventsBound = false;
         }
 
-        private void OnWaiterReady(int totalCount, int readyCount)
+        private void OnWaitersReady()
         {
-            if(totalCount != readyCount)
-                return;
-            
             _stateMachine.ChangeState(MatchStatesID.PREPARING, true);
         }
         

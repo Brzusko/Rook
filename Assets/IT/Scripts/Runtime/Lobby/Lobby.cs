@@ -5,6 +5,7 @@ using System.Linq;
 using FishNet.Connection;
 using FishNet.Managing.Server;
 using FishNet.Object;
+using FishNet.Object.Synchronizing;
 using FishNet.Transporting;
 using IT.Interfaces;
 using IT.ScriptableObjects.UI;
@@ -16,18 +17,62 @@ namespace IT.Lobby
 {
     public class Lobby : NetworkBehaviour, ILobby<LobbyWaiter>
     {
-        public event Action<int, int> WaitersStateChange;
+        public event Action EveryoneReady;
 
         [SerializeField] private LobbyBinding _lobbyBinding;
+        [SerializeField] private float _timerStartValue = 10f;
         
+        //Server Vars
         private Dictionary<NetworkConnection, LobbyWaiter> _readyConnectionsDictionary;
         private bool _areServerEventsBound;
-        private bool _areClientEventsBound;
         private bool _isOpen;
-
+        
+        //Client Vars
+        private bool _areClientEventsBound;
         private bool _isReady;
+        
+        //shared
+        private int _timeLeftCache = -1;
+        private bool _updateTimer = false;
+        
+        //Networked Vars
+        [SyncObject] private readonly SyncTimer _lobbyTimer = new SyncTimer();
 
         #region Initialization
+
+        private void Awake()
+        {
+            _lobbyTimer.OnChange += LobbyTimerOnChange;
+        }
+        
+        private void OnDestroy()
+        {
+            _lobbyTimer.OnChange -= LobbyTimerOnChange;
+        }
+        
+        private void Update()
+        {
+            _lobbyTimer.Update(Time.deltaTime); 
+           
+            if(!IsClient || !_updateTimer)
+                return;
+           
+            if(_lobbyTimer.Paused)
+                return;
+           
+            int timeLeft = (int)_lobbyTimer.Remaining;
+           
+            if (timeLeft == _timeLeftCache)
+            {
+                return;
+            }
+           
+            _timeLeftCache = timeLeft;
+           
+            string message = $"Game starts in {timeLeft.ToString()}.";
+           
+            _lobbyBinding.FireLobbyMessage(message);
+        }
 
         public override void OnStartClient()
         {
@@ -58,6 +103,7 @@ namespace IT.Lobby
 
             SceneManager.OnClientLoadedStartScenes += OnClientLoadedStartScenes;
             ServerManager.OnRemoteConnectionState += OnRemoteConnectionState;
+
             _areServerEventsBound = true;
         }
         
@@ -69,6 +115,7 @@ namespace IT.Lobby
             
             SceneManager.OnClientLoadedStartScenes -= OnClientLoadedStartScenes;
             ServerManager.OnRemoteConnectionState -= OnRemoteConnectionState;
+
             _areServerEventsBound = false;
         }
 
@@ -110,8 +157,7 @@ namespace IT.Lobby
             }
 
             _readyConnectionsDictionary[caller].IsReady = newState;
-
-            InvokeWaitersStateChangeEvent();
+            CheckTimer();
             
             SendLobbyData();
         }
@@ -137,6 +183,33 @@ namespace IT.Lobby
         #endregion
 
         #region Events
+
+        private void LobbyTimerOnChange(SyncTimerOperation op, float prev, float next, bool asServer)
+        {
+            if (op == SyncTimerOperation.Start && !asServer)
+            {
+                _updateTimer = true;
+                return;
+            }
+
+            if (op == SyncTimerOperation.Finished)
+            {
+                if (asServer)
+                {
+                    EveryoneReady?.Invoke();
+                    return;
+                }
+                
+                _lobbyBinding.FireLobbyMessage("Waiting for game to start.");
+                return;
+            }
+
+            if ((op == SyncTimerOperation.Stop || op == SyncTimerOperation.StopUpdated || op == SyncTimerOperation.Pause) && !asServer)
+            {
+                _lobbyBinding.FireLobbyMessage("Waiting for players to be ready.");
+                _updateTimer = false;
+            }
+        }
         
         private void OnClientLoadedStartScenes(NetworkConnection connection, bool asServer)
         {
@@ -153,8 +226,7 @@ namespace IT.Lobby
                 return;
             
             _readyConnectionsDictionary.Add(connection, CreateWaiter(connection));
-            InvokeWaitersStateChangeEvent();
-            
+
             SendLobbyData();
         }
 
@@ -167,8 +239,7 @@ namespace IT.Lobby
                 return;
 
             _readyConnectionsDictionary.Remove(connection);
-            InvokeWaitersStateChangeEvent();
-            
+
             SendLobbyData();
         }
 
@@ -217,12 +288,19 @@ namespace IT.Lobby
             };
         }
 
-        private void InvokeWaitersStateChangeEvent()
+        private void CheckTimer()
         {
-            int readyWaiters = _readyConnectionsDictionary.Values.Count(pred => pred.IsReady);
-            WaitersStateChange?.Invoke(_readyConnectionsDictionary.Count, readyWaiters);
-        }
+            bool areWaitersReady = _readyConnectionsDictionary.Values.All(waiter => waiter.IsReady);
 
+            if (areWaitersReady)
+            {
+                _lobbyTimer.StartTimer(_timerStartValue);
+                return;
+            }
+            
+            _lobbyTimer.StopTimer();
+        }
+        
         #endregion
 
         #region Interface

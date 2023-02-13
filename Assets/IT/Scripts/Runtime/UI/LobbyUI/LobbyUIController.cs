@@ -38,6 +38,7 @@ namespace IT.UI
             _lobbyBinding.LobbyWaitersPropagation += OnLobbyWaitersPropagation;
             readyButton.clicked += _lobbyBinding.FireReadyClicked;
             exitButton.clicked += _lobbyBinding.FireExitClicked;
+            _lobbyBinding.LobbyMessage += OnMessage;
         }
 
         protected override void UnbindUI()
@@ -49,6 +50,7 @@ namespace IT.UI
             _lobbyBinding.LobbyWaitersPropagation -= OnLobbyWaitersPropagation;
             readyButton.clicked -= _lobbyBinding.FireReadyClicked;
             exitButton.clicked -= _lobbyBinding.FireExitClicked;
+            _lobbyBinding.LobbyMessage -= OnMessage;
         }
 
         private void OnLobbyWaitersPropagation(IEnumerable<LobbyWaiterSendData> waitersSendData)
@@ -85,6 +87,14 @@ namespace IT.UI
             CreateNewWaiters(waitersToCreate, waiterList);
 
             _waitersCache = lobbyWaiterSendData;
+        }
+
+        private void OnMessage(string message)
+        {
+            VisualElement root = _uiDocument.rootVisualElement;
+            Label messageLabel = root.Q<Label>(_messageLabelName);
+
+            messageLabel.text = message;
         }
 
         private void RemoveMissings(IEnumerable<LobbyWaiterSendData> missings, VisualElement waiterList)

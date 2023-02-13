@@ -18,8 +18,11 @@ namespace IT.ScriptableObjects.UI
         
         // UI Listen to
         public event Action<IEnumerable<LobbyWaiterSendData>> LobbyWaitersPropagation;
+        public event Action<string> LobbyMessage;
 
         public void FireLobbyWaitersPropagation(IEnumerable<LobbyWaiterSendData> lobbyWaiterSendData) =>
             LobbyWaitersPropagation?.Invoke(lobbyWaiterSendData);
+
+        public void FireLobbyMessage(string message) => LobbyMessage?.Invoke(message);
     }
 }

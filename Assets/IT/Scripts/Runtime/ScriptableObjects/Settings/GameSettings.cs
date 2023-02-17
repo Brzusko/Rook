@@ -8,12 +8,14 @@ namespace IT.ScriptableObjects
     public class GameSettings : ScriptableObject
     {
         [SerializeField] private int _readyPlayersToStart;
-        [SerializeField] private float _pointsGainPerTick;
-        [SerializeField] private float _pointsToWin;
+        [SerializeField] private int _pointsGainPerTick;
+        [SerializeField] private int _pointsToWin;
+        [SerializeField] private int _minimumPlayersToPlay;
 
         public int ReadyPlayersToStart => _readyPlayersToStart;
-        public float PointsGainPerTick => _pointsGainPerTick;
-        public float PointsToWin => _pointsToWin;
+        public int PointsGainPerTick => _pointsGainPerTick;
+        public int PointsToWin => _pointsToWin;
+        public int MinimunPlayersToPlay => _minimumPlayersToPlay;
     }
 
 }

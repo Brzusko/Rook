@@ -6,8 +6,7 @@ namespace IT.Interfaces
 {
     public interface IPointCounter : INetworkObject
     {
-        public uint CurrentPoints { get; }
+        public int CurrentPoints { get; }
         public void GainPoints();
-        public void ResetCounter();
     }
 }

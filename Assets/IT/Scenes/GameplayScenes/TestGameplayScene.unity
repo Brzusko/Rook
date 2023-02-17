@@ -274,6 +274,7 @@ MonoBehaviour:
   _addedNetworkObject: {fileID: 1553435440}
   _networkObjectCache: {fileID: 1553435440}
   _lobbyBinding: {fileID: 11400000, guid: 27dcc1e44fc180549a1ea20c8562fa5a, type: 2}
+  _timerStartValue: 10
 --- !u!4 &243824494
 Transform:
   m_ObjectHideFlags: 0
@@ -1102,6 +1103,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 705815080}
+  - component: {fileID: 705815081}
   m_Layer: 0
   m_Name: Gameplay
   m_TagString: Untagged
@@ -1124,6 +1126,21 @@ Transform:
   m_Father: {fileID: 1722237382}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &705815081
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 705815079}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 605797bc1d970a843bfa5a42a4e348ec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: 1553435440}
+  _networkObjectCache: {fileID: 0}
 --- !u!1001 &720550260
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3624,6 +3641,7 @@ MonoBehaviour:
   - {fileID: 705815079}
   - {fileID: 520593507}
   _startState: 1
+  _currentID: 0
 --- !u!43 &1737838289
 Mesh:
   m_ObjectHideFlags: 0
@@ -6089,6 +6107,7 @@ MonoBehaviour:
   _networkObjectCache: {fileID: 2028483790}
   _timeToContest: 100
   _currentContestTime: 0
+  _gameSettings: {fileID: 0}
 --- !u!43 &2046741423
 Mesh:
   m_ObjectHideFlags: 0

@@ -26,11 +26,7 @@ namespace IT.Gameplay
         {
             InitializeOnce();
         }
-
-        private void OnDestroy()
-        {
-            UnbindEvents();
-        }
+        
 
         private void InitializeOnce()
         {
@@ -38,44 +34,12 @@ namespace IT.Gameplay
             _playersConsciousness = _playersConsciousnessGameObject.GetComponent<IPlayersConsciousness>();
         }
 
-        private void BindEvents()
-        {
-            if(_areEventsBound)
-                return;
-            
-            ServerManager.OnRemoteConnectionState += OnRemoteConnectionState;
-            
-            _areEventsBound = true;
-        }
-
-        private void UnbindEvents()
-        {
-            if(!_areEventsBound)
-                return;
-            
-            ServerManager.OnRemoteConnectionState -= OnRemoteConnectionState;
-            _areEventsBound = false;
-        }
-        
-        private void OnRemoteConnectionState(NetworkConnection connection, RemoteConnectionStateArgs connectionStateArgs)
-        {
-            if(connectionStateArgs.ConnectionState != RemoteConnectionState.Stopped)
-                return;
-            
-            Debug.Log(ServerManager.Clients.Count);
-            
-            if(ServerManager.Clients.Count > 1)
-                return;
-            
-            _stateMachine.ChangeState(MatchStatesID.WAITING, true);
-        }
-
         public void Enter(bool asServer)
         {
             if (asServer)
             {
                 _playersConsciousness.PossessAll();
-                BindEvents();
+                _stateMachine.ChangeState(MatchStatesID.GAMEPLAY, asServer);
             }
         }
 
@@ -83,7 +47,7 @@ namespace IT.Gameplay
         {
             if (asServer)
             {
-                UnbindEvents();   
+                //TODO setup UIs
             }
         }
     }

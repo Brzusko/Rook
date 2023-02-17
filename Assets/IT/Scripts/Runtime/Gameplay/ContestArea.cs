@@ -5,16 +5,21 @@ using System.Linq;
 using FishNet.Object;
 using IT.Data.Gameplay;
 using IT.Interfaces;
+using IT.ScriptableObjects;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace IT.Gameplay
 {
-    public class ContestArea : NetworkBehaviour
+    public class ContestArea : NetworkBehaviour, IContestArea
     {
-        [SerializeField] private float _timeToContest;
+        public event Action<IPointCounter> PointCounterGainAllPoints;
+        public event Action<IPointCounter> PointCounterStartContesting;
         
+        [SerializeField] private float _timeToContest;
         [SerializeField, ReadOnly] private float _currentContestTime;
+        [SerializeField] private GameSettings _gameSettings;
+        
         private List<ContestAreaPlayerData> _contestAreaPlayersData;
         private IPointCounter _currentContestPlayer;
         public override void OnStartServer()
@@ -119,6 +124,9 @@ namespace IT.Gameplay
                 return;
             
             _currentContestPlayer.GainPoints();
+            
+            if(_currentContestPlayer.CurrentPoints >= _gameSettings.PointsToWin)
+                PointCounterGainAllPoints?.Invoke(_currentContestPlayer);
         }
 
         private void TryToIncrement()
@@ -131,6 +139,9 @@ namespace IT.Gameplay
             
             if(_currentContestTime >= _timeToContest)
                 return;
+            
+            if(_currentContestTime == 0)
+                PointCounterStartContesting?.Invoke(_currentContestPlayer);
 
             _currentContestTime = Mathf.MoveTowards(_currentContestTime, _timeToContest, (float)TimeManager.TickDelta);
         }
@@ -160,10 +171,11 @@ namespace IT.Gameplay
             _currentContestPlayer = _contestAreaPlayersData[0].PointCounter;
         }
 
-        public void ResetTimer()
+        public void Restart()
         {
+            _currentContestTime = 0f;
             _contestAreaPlayersData.Clear();
-            _currentContestTime = 0;
+            _currentContestPlayer = null;
         }
     }
 }

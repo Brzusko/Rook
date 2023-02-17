@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using FishNet.Object;
+using FishNet.Object.Synchronizing;
 using IT.Interfaces;
 using IT.ScriptableObjects;
 using UnityEngine;
@@ -12,7 +13,7 @@ namespace IT.Gameplay
     public class PointCounter : NetworkBehaviour, IPointCounter
     {
         [SerializeField] private GameSettings _gameSettings;
-        [SerializeField, Sirenix.OdinInspector.ReadOnly] private int _currentPoints;
+        [SerializeField, Sirenix.OdinInspector.ReadOnly, SyncVar] private int _currentPoints;
         
         public int CurrentPoints => _currentPoints;
 

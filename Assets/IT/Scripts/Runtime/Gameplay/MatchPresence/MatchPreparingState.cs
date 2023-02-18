@@ -6,6 +6,7 @@ using FishNet.Object;
 using FishNet.Transporting;
 using IT.Interfaces;
 using IT.Interfaces.FSM;
+using IT.Utils;
 using UnityEngine;
 
 namespace IT.Gameplay
@@ -17,8 +18,9 @@ namespace IT.Gameplay
         
         private IStateMachine<MatchStatesID> _stateMachine;
         private IPlayersConsciousness _playersConsciousness;
+        private SimpleTimer _timer = new();
 
-        private bool _areEventsBound;
+        private bool _areTickEventsBound;
         
         public MatchStatesID StateID => MatchStatesID.PREPARING;
 
@@ -26,7 +28,11 @@ namespace IT.Gameplay
         {
             InitializeOnce();
         }
-        
+
+        private void OnDestroy()
+        {
+            UnbindTickEvents();
+        }
 
         private void InitializeOnce()
         {
@@ -34,12 +40,47 @@ namespace IT.Gameplay
             _playersConsciousness = _playersConsciousnessGameObject.GetComponent<IPlayersConsciousness>();
         }
 
+        private void BindTickEvents()
+        {
+            if(_areTickEventsBound)
+                return;
+
+            TimeManager.OnTick += OnTick;
+            _timer.Complete += OnTimerComplete;
+            
+            _areTickEventsBound = true;
+        }
+
+        private void UnbindTickEvents()
+        {
+            if(!_areTickEventsBound)
+                return;
+
+            TimeManager.OnTick -= OnTick;
+            _timer.Complete -= OnTimerComplete;
+            
+            _areTickEventsBound = false;
+        }
+
+        private void OnTick()
+        {
+            float deltaTime = (float)TimeManager.TickDelta;
+            _timer.Update(deltaTime);
+        }
+
+        private void OnTimerComplete()
+        {
+            _stateMachine.ChangeState(MatchStatesID.GAMEPLAY, true);
+        }
+
         public void Enter(bool asServer)
         {
             if (asServer)
             {
                 _playersConsciousness.PossessAll();
-                _stateMachine.ChangeState(MatchStatesID.GAMEPLAY, asServer);
+                _timer.Start(1f);
+                
+                BindTickEvents();
             }
         }
 
@@ -47,7 +88,7 @@ namespace IT.Gameplay
         {
             if (asServer)
             {
-                //TODO setup UIs
+                UnbindTickEvents();
             }
         }
     }

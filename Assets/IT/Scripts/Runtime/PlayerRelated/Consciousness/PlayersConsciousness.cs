@@ -27,13 +27,7 @@ namespace IT
             int maxClients = ServiceContainer.Get<INetworkBridge>().MaxClients;
             _playerConsciousnesses = new SortedList<NetworkConnection, IPlayerConsciousness>(maxClients);
         }
-
-        private void Clear()
-        {
-            _playerConsciousnesses.Clear();
-            _playerConsciousnesses = null;
-        }
-
+        
         private void BindEvents()
         {
             if(_areEventsBound)
@@ -123,7 +117,16 @@ namespace IT
             
             _playerConsciousnesses.Values.ForEach(playerConsciousness => playerConsciousness.Unpossess());
         }
-
+        
+        public void Clear()
+        {
+            if(_playerConsciousnesses == null || _playerConsciousnesses.Count == 0)
+                return;
+            
+            _playerConsciousnesses.Values.ForEach(pred => pred.Clear());
+            _playerConsciousnesses.Clear();
+        }
+        
         #endregion
         
     }

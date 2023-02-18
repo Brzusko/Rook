@@ -15,10 +15,12 @@ namespace IT.Gameplay
         [SerializeField] private GameObject _stateMachineGameObject;
         [SerializeField] private GameObject _lobbyGameObject;
         [SerializeField] private GameObject _spawnerGameObject;
+        [SerializeField] private GameObject _playersConsciousnessGameObject;
         
         private IStateMachine<MatchStatesID> _stateMachine;
         private ILobby<LobbyWaiter> _lobby;
         private IPlayerSpawner<LobbyWaiter> _spawner;
+        private IPlayersConsciousness _playersConsciousness;
 
         private bool _areEventsBound;
         
@@ -39,6 +41,7 @@ namespace IT.Gameplay
             _lobby = _lobbyGameObject.GetComponent<ILobby<LobbyWaiter>>();
             _stateMachine = _stateMachineGameObject.GetComponent<IStateMachine<MatchStatesID>>();
             _spawner = _spawnerGameObject.GetComponent<IPlayerSpawner<LobbyWaiter>>();
+            _playersConsciousness = _playersConsciousnessGameObject.GetComponent<IPlayersConsciousness>();
         }
 
         private void BindEvents()
@@ -70,6 +73,7 @@ namespace IT.Gameplay
             
             if (asServer)
             {
+                _playersConsciousness.Clear();
                 _lobby.OpenLobby();
                 BindEvents();
 

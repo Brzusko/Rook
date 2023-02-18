@@ -24,10 +24,11 @@ namespace IT.Utils
             await LoadScenes();
             ServiceContainer.FetchDependency();
 
-#if UNITY_STANDALONE_LINUX
+#if UNITY_STANDALONE_LINUX || UNITY_SERVER
             ServiceContainer.Get<INetworkBridge>().StartServer();
-#endif
+#else
             await LoadMainMenu();
+#endif
             await UnloadSceneBySceneRef(_bootstrapSceneRef);
         }
 

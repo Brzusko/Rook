@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using FishNet.Connection;
 using FishNet.Object;
 using FishNet.Transporting;
@@ -59,23 +60,38 @@ namespace IT.Gameplay
             _contestArea.PointCounterGainAllPoints -= OnPointCounterGainAllPoints;
             
             ServerManager.OnRemoteConnectionState -= OnRemoteConnectionState;
-            
             _areEventsBound = false;
         }
         
         private void OnRemoteConnectionState(NetworkConnection arg1, RemoteConnectionStateArgs arg2)
         {
-            throw new NotImplementedException();
+            if(arg2.ConnectionState != RemoteConnectionState.Stopped)
+                return;
+            
+            if(ServerManager.Clients.Count > 1)
+                return;
+
+            if (ServerManager.Clients.Count == 1)
+            {
+                NetworkConnection connection = ServerManager.Clients.Values.First();
+                
+                if(!connection.Disconnecting)
+                    return;
+            }
+            
+            _stateMachine.ChangeState(MatchStatesID.WAITING, true);
         }
 
         private void OnPointCounterGainAllPoints(IPointCounter obj)
         {
-            throw new NotImplementedException();
+            //cache result and send it on Exit
+            
+            _stateMachine.ChangeState(MatchStatesID.WON, true);
         }
 
         private void OnPointCounterStartContesting(IPointCounter obj)
         {
-            throw new NotImplementedException();
+            
         }
 
         public void Enter(bool asServer)

@@ -39,4 +39,15 @@ public class PlayerConsciousness : NetworkBehaviour, IPlayerConsciousness
         
         _boundPossession.RevokePossession();
     }
+
+    public void Clear()
+    {
+        if(!IsServer)
+            return;
+        
+        ServerManager.Despawn(NetworkObject);
+        
+        if(_boundPossession != null)
+            ServerManager.Despawn(_boundPossession.NetworkObject);
+    }
 }

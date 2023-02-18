@@ -9,5 +9,7 @@ namespace IT.Interfaces
     {
         public void PossessAll();
         public void UnpossessAll();
+
+        public void Clear();
     }
 }

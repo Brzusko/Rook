@@ -10,5 +10,7 @@ namespace IT.Interfaces
         public void BindEntity(IEntityToPossess entityToPossess);
         public void Possess();
         public void Unpossess();
+
+        public void Clear();
     }
 }

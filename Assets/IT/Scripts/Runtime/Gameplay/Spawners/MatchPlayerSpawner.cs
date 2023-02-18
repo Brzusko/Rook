@@ -5,8 +5,10 @@ using FishNet;
 using FishNet.Connection;
 using FishNet.Managing.Server;
 using FishNet.Object;
+using IT.Data;
 using IT.Interfaces;
 using IT.Lobby;
+using MyNamespace;
 using UnityEngine;
 
 namespace IT.Gameplay
@@ -80,7 +82,9 @@ namespace IT.Gameplay
                 }
                 
                 playerConsciousness.BindEntity(entityToPossess);
-                
+                IIdentity<PlayerIdentity> identity = playerInstance.GetComponent<IIdentity<PlayerIdentity>>();
+                identity.BindIdentity(new PlayerIdentity {Color = waiter.WaiterColor});
+
                 InstanceFinder.ServerManager.Spawn(playerConsciousness.NetworkObject, waiter.Connection);
                 InstanceFinder.ServerManager.Spawn(playerInstance);
             }

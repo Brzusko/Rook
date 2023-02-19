@@ -1,0 +1,9 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/IT/Scripts/Runtime/UI/LobbyUI/LobbyUI.uss?fileID=7433441132597879392&amp;guid=5a96e2e199f25374e81f0fece3094c6d&amp;type=3#LobbyUI" />
+    <ui:VisualElement name="Root" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); flex-direction: row; justify-content: flex-end;">
+        <ui:VisualElement name="PlayerContainer" style="flex-grow: 0; background-color: rgba(0, 0, 0, 0); height: 100%; width: 25%; padding-top: 15px;">
+            <ui:VisualElement name="PlayerIndicators" style="flex-grow: 0; background-color: rgba(0, 0, 0, 0);" />
+            <ui:Label tabindex="-1" text="Points to win: 10" display-tooltip-when-elided="true" name="GameplayLabel" class="text" style="flex-direction: column; -unity-text-align: upper-right; font-size: 25px;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

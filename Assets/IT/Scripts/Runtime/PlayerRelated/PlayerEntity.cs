@@ -4,12 +4,14 @@ using System.Collections.Generic;
 using FishNet.Connection;
 using FishNet.Object;
 using IT.Interfaces;
+using IT.ScriptableObjects.UI;
 using UnityEngine;
 
 public class PlayerEntity : NetworkBehaviour, IEntityToPossess
 {
     public event Action<bool> ServerPossessChanged;
     public event Action<bool> ClientPossessChanged;
+
     public bool CanBePossessed => OwnerId == -1;
     
     [Server]
@@ -18,7 +20,6 @@ public class PlayerEntity : NetworkBehaviour, IEntityToPossess
         if(!CanBePossessed || playerConsciousness.HasPossession)
             return false;
         
-        Debug.Log(playerConsciousness.NetworkObject.Owner.ClientId);
         NetworkObject.GiveOwnership(playerConsciousness.NetworkObject.Owner);
         
         ServerPossessChanged?.Invoke(true);

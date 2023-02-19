@@ -8,7 +8,6 @@ using FishNet.Object;
 using IT.Data;
 using IT.Interfaces;
 using IT.Lobby;
-using MyNamespace;
 using UnityEngine;
 
 namespace IT.Gameplay

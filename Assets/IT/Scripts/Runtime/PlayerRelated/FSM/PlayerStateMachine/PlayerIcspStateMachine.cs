@@ -303,7 +303,7 @@ namespace IT.FSM
             if(_characterMovement.isGrounded)
                 _characterMovement.PauseGroundConstraint();
             
-            _characterMovement.AddForce(_knockbackForce, ForceMode.VelocityChange);
+            _characterMovement.AddForce(_knockbackForce, ForceMode.Impulse);
             _knockbackForce = new Vector3(_xComponent, _yComponent, _zComponent);
         }
         

@@ -7,6 +7,7 @@ using FishNet.Object;
 using FishNet.Transporting;
 using IT.Interfaces;
 using IT.Interfaces.FSM;
+using IT.UI;
 using UnityEngine;
 
 namespace IT.Gameplay
@@ -43,7 +44,6 @@ namespace IT.Gameplay
             if(_areEventsBound)
                 return;
             
-            _contestArea.PointCounterStartContesting += OnPointCounterStartContesting;
             _contestArea.PointCounterGainAllPoints += OnPointCounterGainAllPoints;
             
             ServerManager.OnRemoteConnectionState += OnRemoteConnectionState;
@@ -56,7 +56,6 @@ namespace IT.Gameplay
             if(!_areEventsBound)
                 return;
             
-            _contestArea.PointCounterStartContesting -= OnPointCounterStartContesting;
             _contestArea.PointCounterGainAllPoints -= OnPointCounterGainAllPoints;
             
             ServerManager.OnRemoteConnectionState -= OnRemoteConnectionState;
@@ -88,18 +87,15 @@ namespace IT.Gameplay
             
             _stateMachine.ChangeState(MatchStatesID.WON, true);
         }
-
-        private void OnPointCounterStartContesting(IPointCounter obj)
-        {
-            
-        }
-
+        
         public void Enter(bool asServer)
         {
             if (asServer)
             {
                 BindEvents();
             }
+            
+            ServiceContainer.Get<IUI>().ShowUI(ControllerIDs.GAMEPLAY);
         }
 
         public void Exit(bool asServer)
@@ -107,7 +103,11 @@ namespace IT.Gameplay
             if (asServer)
             {
                 UnbindEvents();
+                
+                _contestArea.Restart();
             }
+            
+            ServiceContainer.Get<IUI>().HideUI(ControllerIDs.GAMEPLAY);
         }
     }
 }

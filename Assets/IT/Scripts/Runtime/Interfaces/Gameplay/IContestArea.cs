@@ -8,7 +8,6 @@ namespace IT.Interfaces
     public interface IContestArea
     {
         public event Action<IPointCounter> PointCounterGainAllPoints;
-        public event Action<IPointCounter> PointCounterStartContesting; 
         public void Restart();
     }
 }

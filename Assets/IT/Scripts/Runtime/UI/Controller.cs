@@ -19,8 +19,9 @@ public class Controller : MonoBehaviour
         ServiceContainer.Get<IUI>().RegisterController(this);
     }
 
-    protected void OnDestroy()
+    protected virtual void OnDestroy()
     {
+        UnbindUI();
         ServiceContainer.Get<IUI>().UnregisterController(this);
     }
     

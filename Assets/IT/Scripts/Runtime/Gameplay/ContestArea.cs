@@ -2,7 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using FishNet.Connection;
 using FishNet.Object;
+using FishNet.Transporting;
 using IT.Data.Gameplay;
 using IT.Interfaces;
 using IT.ScriptableObjects;
@@ -14,8 +16,7 @@ namespace IT.Gameplay
     public class ContestArea : NetworkBehaviour, IContestArea
     {
         public event Action<IPointCounter> PointCounterGainAllPoints;
-        public event Action<IPointCounter> PointCounterStartContesting;
-        
+
         [SerializeField] private float _timeToContest;
         [SerializeField, ReadOnly] private float _currentContestTime;
         [SerializeField] private GameSettings _gameSettings;
@@ -27,6 +28,7 @@ namespace IT.Gameplay
             base.OnStartServer();
             TimeManager.OnTick += OnTick;
             TimeManager.OnPostTick += OnPostTick;
+            ServerManager.OnRemoteConnectionState += OnRemoteConnectionState;
             
             _contestAreaPlayersData = new List<ContestAreaPlayerData>();
         }
@@ -36,6 +38,7 @@ namespace IT.Gameplay
             base.OnStopServer();
             TimeManager.OnTick -= OnTick;
             TimeManager.OnPostTick -= OnPostTick;
+            ServerManager.OnRemoteConnectionState -= OnRemoteConnectionState;
         }
 
         private void OnTriggerStay(Collider other)
@@ -67,6 +70,20 @@ namespace IT.Gameplay
             TryToIncrement();
             TryToDecrement();
             TryGivePoints();
+        }
+        
+        private void OnRemoteConnectionState(NetworkConnection connection, RemoteConnectionStateArgs stateArgs)
+        {
+            if(stateArgs.ConnectionState != RemoteConnectionState.Stopped)
+                return;
+            
+            if(_currentContestPlayer == null)
+                return;
+            
+            if(_currentContestPlayer.NetworkObject.Owner != connection)
+                return;
+
+            _currentContestPlayer = null;
         }
 
         private void FlagData()
@@ -140,9 +157,6 @@ namespace IT.Gameplay
             if(_currentContestTime >= _timeToContest)
                 return;
             
-            if(_currentContestTime == 0)
-                PointCounterStartContesting?.Invoke(_currentContestPlayer);
-
             _currentContestTime = Mathf.MoveTowards(_currentContestTime, _timeToContest, (float)TimeManager.TickDelta);
         }
 

@@ -9,5 +9,6 @@ namespace IT.UI
         NONE,
         MAIN_MENU,
         LOBBY,
+        GAMEPLAY,
     }
 }

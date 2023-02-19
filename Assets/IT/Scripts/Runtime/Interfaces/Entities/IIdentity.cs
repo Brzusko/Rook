@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace MyNamespace
+namespace IT.Interfaces
 {
     public interface IIdentity<T>
     {

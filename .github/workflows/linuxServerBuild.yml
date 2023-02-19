@@ -9,7 +9,8 @@ on:
 jobs:
   build:
     name: Build Linux ${{ matrix.targetPlatform }}
-    runs-on: self-hosted
+    #runs-on: self-hosted
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
@@ -64,7 +65,7 @@ jobs:
 
   # Sets Version
   version:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: Set env
@@ -78,7 +79,7 @@ jobs:
   ftpdeploy:
     name: Upload to Server via ftp
     needs: [build, version]
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: true
     steps:

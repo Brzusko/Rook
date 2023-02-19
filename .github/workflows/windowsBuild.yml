@@ -13,7 +13,8 @@ env:
 jobs:
   build:
     name: Build Windows ${{ matrix.targetPlatform }}
-    runs-on: self-hosted
+    #runs-on: self-hosted
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
@@ -68,7 +69,7 @@ jobs:
 
   # Sets Version
   version:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: Set env
@@ -82,7 +83,7 @@ jobs:
   deploy:
     name: Upload to Itch
     needs: [build, version]
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: true
       matrix:
